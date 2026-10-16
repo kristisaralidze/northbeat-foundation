@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { db } from "@/lib/admin/db";
 import { humanize } from "@/lib/admin/entities";
-import { SUBMISSION_STATUSES, SUBMISSION_TYPES, type Submission } from "@/lib/admin/submissions";
+import { SUBMISSION_STATUSES, SUBMISSION_TYPES, submissionLabel, type Submission } from "@/lib/admin/submissions";
 import { selectClass } from "@/components/admin/EntityList";
 
 type Search = { type?: string; status?: string };
@@ -21,7 +21,7 @@ function Inbox() {
   const q = useQuery({
     queryKey: ["submissions", search],
     queryFn: async () => {
-      let query = db.from("submissions").select("id, type, status, name, email, organisation_name, entry_kind, message, created_at").order("created_at", { ascending: false }).limit(500);
+      let query = db.from("submissions").select("id, type, status, name, email, organisation_name, entry_kind, payload, message, created_at").order("created_at", { ascending: false }).limit(500);
       if (search.type) query = query.eq("type", search.type);
       if (search.status) query = query.eq("status", search.status);
       const { data, error } = await query;
@@ -59,7 +59,7 @@ function Inbox() {
               {q.data.map((s) => (
                 <tr key={s.id} className={`border-t border-border hover:bg-accent/40 ${s.status === "new" ? "font-medium" : ""}`}>
                   <td className="p-2 whitespace-nowrap"><Link to="/admin/submissions/$id" params={{ id: s.id }} className="hover:underline">{new Date(s.created_at).toLocaleString()}</Link></td>
-                  <td className="p-2">{humanize(s.type)}{s.entry_kind ? ` · ${humanize(s.entry_kind)}` : ""}</td>
+                  <td className="p-2">{submissionLabel(s)}</td>
                   <td className="p-2">{s.name || s.email || "—"}</td>
                   <td className="p-2 max-w-xs truncate">{s.organisation_name || s.message || "—"}</td>
                   <td className="p-2">{humanize(s.status)}</td>

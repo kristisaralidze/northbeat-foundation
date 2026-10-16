@@ -84,3 +84,21 @@ export function buildDraft(entity: EntityKey, s: Pick<Submission, "name" | "orga
   }
   return out;
 }
+
+/** Human label for what the visitor submitted, e.g. "Add company". */
+export function submissionLabel(s: Pick<Submission, "type" | "entry_kind" | "payload">): string {
+  if (s.type === "podcast_guest") return "Apply to be a guest";
+  if (s.type === "new_entry") {
+    const e = guessEntity(s);
+    const m: Record<string, string> = { organisations: "Add company", events: "Add event", opportunities: "Add opportunity", people: "Add person", episodes: "Add episode" };
+    return (e && m[e]) || "Add entry";
+  }
+  return s.type === "correction" ? "Correction" : "Contact";
+}
+
+/** Which submissions can be approved into a draft, and the default entity. */
+export function approvableEntity(s: Pick<Submission, "type" | "entry_kind" | "payload">): EntityKey | null {
+  if (s.type === "podcast_guest") return "people";
+  if (s.type === "new_entry") return guessEntity(s) ?? "organisations";
+  return null;
+}
