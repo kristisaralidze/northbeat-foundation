@@ -9,7 +9,7 @@ export type Row = Record<string, unknown> & { id: string };
 type Rec = Record<string, string>;
 const recs = (d: unknown) => (d ?? []) as Rec[];
 export type Term = { id: string; kind: string; name: string; parent_id: string | null; sort_order: number };
-export type LinkRow = { otherId: string; role: string };
+export type LinkRow = { otherId: string; role: string; note?: string | null };
 
 export type ListFilters = { q?: string | undefined; type?: string | undefined; status?: string | undefined; field?: string | undefined; country?: string | undefined };
 
@@ -63,9 +63,11 @@ export async function getEntry(cfg: EntityConfig, id: string): Promise<EntryBund
   fail(tErr);
   const links: Record<string, LinkRow[]> = {};
   for (const l of cfg.links) {
-    const { data, error: lErr } = await db.from(l.table).select(`${l.otherFk}, role`).eq(l.selfFk, id);
+    const rc = l.roleColumn ?? "role";
+    const cols = l.roleColumn ? `${l.otherFk}, ${rc}, note` : `${l.otherFk}, ${rc}`;
+    const { data, error: lErr } = await db.from(l.table).select(cols).eq(l.selfFk, id);
     fail(lErr);
-    links[l.table] = recs(data).map((r) => ({ otherId: String(r[l.otherFk]), role: r["role"] ?? "" }));
+    links[l.table] = recs(data).map((r) => ({ otherId: String(r[l.otherFk]), role: r[rc] ?? "", ...(l.roleColumn ? { note: r["note"] ?? null } : {}) }));
   }
   return { row: row as Row | null, termIds: (terms ?? []).map((t: { term_id: string }) => t.term_id), links };
 }
@@ -106,7 +108,11 @@ export async function saveEntry(
     const seen = new Set<string>();
     const rows = (links[l.table] ?? [])
       .filter((r) => r.otherId && !seen.has(`${r.otherId}|${r.role}`) && seen.add(`${r.otherId}|${r.role}`))
-      .map((r) => ({ [l.selfFk]: entryId, [l.otherFk]: r.otherId, role: r.role.trim() }));
+      .filter((r) => !l.roleOptions || l.roleOptions.includes(r.role))
+      .map((r) => ({
+        [l.selfFk]: entryId, [l.otherFk]: r.otherId, [l.roleColumn ?? "role"]: r.role.trim(),
+        ...(l.roleColumn ? { note: r.note ?? null } : {}),
+      }));
     if (rows.length) {
       const { error } = await db.from(l.table).insert(rows);
       fail(error);

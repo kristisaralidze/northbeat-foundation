@@ -269,19 +269,30 @@ function LinkPicker({ def, rows, onChange }: { def: LinkDef; rows: LinkRow[]; on
 
   return (
     <section className="space-y-2">
-      <h2 className="text-base font-semibold text-foreground">Linked {def.label.toLowerCase()}</h2>
+      <h2 className="text-base font-semibold text-foreground">{def.roleOptions ? def.label : `Linked ${def.label.toLowerCase()}`}</h2>
       {rows.length === 0 && <p className="text-sm text-muted-foreground">None linked.</p>}
       <ul className="space-y-2">
         {rows.map((r, i) => (
           <li key={`${r.otherId}-${i}`} className="flex items-center gap-2">
             <span className="min-w-0 flex-1 truncate text-sm">{byId.get(r.otherId) ?? "…"}</span>
-            <Input
-              aria-label="Role"
-              placeholder="Role (e.g. founder, speaker)"
-              className="w-56"
-              value={r.role}
-              onChange={(e) => onChange(rows.map((x, j) => (j === i ? { ...x, role: e.target.value } : x)))}
-            />
+            {def.roleOptions ? (
+              <select
+                aria-label="Relation"
+                className={`${selectClass} w-56`}
+                value={r.role}
+                onChange={(e) => onChange(rows.map((x, j) => (j === i ? { ...x, role: e.target.value } : x)))}
+              >
+                {def.roleOptions.map((o) => <option key={o} value={o}>{humanize(o)}</option>)}
+              </select>
+            ) : (
+              <Input
+                aria-label="Role"
+                placeholder="Role (e.g. founder, speaker)"
+                className="w-56"
+                value={r.role}
+                onChange={(e) => onChange(rows.map((x, j) => (j === i ? { ...x, role: e.target.value } : x)))}
+              />
+            )}
             <Button type="button" variant="ghost" size="sm" onClick={() => onChange(rows.filter((_, j) => j !== i))}>Remove</Button>
           </li>
         ))}
@@ -296,7 +307,7 @@ function LinkPicker({ def, rows, onChange }: { def: LinkDef; rows: LinkRow[]; on
                   type="button"
                   className="w-full px-3 py-2 text-left text-sm hover:bg-accent"
                   onClick={() => {
-                    onChange([...rows, { otherId: o.id, role: "" }]);
+                    onChange([...rows, { otherId: o.id, role: def.roleOptions?.[0] ?? "" }]);
                     setQ("");
                   }}
                 >

@@ -28,7 +28,12 @@ export type LinkDef = {
   otherFk: string;
   other: EntityKey;
   label: string;
+  /** Column holding the role/relation (default "role"). */
+  roleColumn?: string;
+  /** When set, the role is picked from these values instead of free text. */
+  roleOptions?: readonly string[];
 };
+export const ORG_RELATIONS = ["invested_in", "spun_out_of", "acquired", "partner_of"] as const;
 
 export type EntityConfig = {
   key: EntityKey;
@@ -87,6 +92,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
       L("organisation_events", "organisation_id", "event_id", "events", "Events"),
       L("organisation_opportunities", "organisation_id", "opportunity_id", "opportunities", "Opportunities"),
       L("organisation_episodes", "organisation_id", "episode_id", "episodes", "Episodes"),
+      { table: "organisation_relations", selfFk: "from_org_id", otherFk: "to_org_id", other: "organisations", label: "Related organisations", roleColumn: "relation", roleOptions: ORG_RELATIONS },
     ],
   },
   people: {
