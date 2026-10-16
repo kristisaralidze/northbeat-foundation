@@ -12,10 +12,14 @@ A proposal only. No code or database changes until you approve it.
 ```text
 entry_status        draft | published | archived
 organisation_type   startup | investor | incubator | accelerator | funder |
-                    research_group | lab | hospital_innovation_unit | service_provider
+                    research_group | lab | hospital_innovation_unit | service_provider |
+                    university | public_agency | patient_organisation | community
 opportunity_type    programme_intake | grant_call | competition | job
 term_kind           field | sub_area | country | stage
 event_format        in_person | online | hybrid
+event_type          conference | pitch_competition | hackathon | demo_day | meetup |
+                    workshop | volunteering
+open_to_kind        advising | mentoring | intros | investing | validation
 submission_type     new_entry | correction | contact | podcast_guest
 submission_status   new | in_review | accepted | rejected | done
 entry_kind          organisation | person | event | opportunity | episode | newsletter_issue | guide
@@ -26,11 +30,13 @@ app_role            admin
 `id uuid`, `slug text unique`, `status entry_status default 'draft'`, `source_url text`, `last_checked date`, `published_at`, `created_at`, `updated_at`, `created_by` (an admin).
 
 ## Entry tables
-- **organisations**: name, type (organisation_type), short_description, description, website, logo_url, city, founded_year, linkedin_url. Investor details (optional): ticket_min_eur, ticket_max_eur.
-- **people**: full_name, headline, bio, photo_url, linkedin_url, is_clinical_advisor, is_validation_partner, expertise_note.
-- **events**: title, summary, description, starts_at, ends_at, timezone, format, venue, city, registration_url, price_note.
+- **organisations**: name, type (organisation_type), short_description, description, website, logo_url, city, founded_year, linkedin_url, contact_email, contact_email_public (default false). Investor details (optional): ticket_min_eur, ticket_max_eur.
+- **people**: full_name, headline, bio, photo_url, linkedin_url, open_to (list of open_to_kind), expertise_note, contact_email, contact_email_public (default false).
+- **events**: title, event_type, summary, description, starts_at, ends_at, apply_deadline_at (optional), timezone, format, venue, city, registration_url, price_note.
 - **opportunities**: title, type (opportunity_type), summary, description, opens_at, deadline_at, amount_min_eur, amount_max_eur, apply_url. Job details (optional): location, employment_type, remote_ok.
-- **episodes**: title, episode_number, season, summary, show_notes, audio_url, embed_url, duration_seconds, published_on, cover_url.
+- **episodes**: title, episode_number, season, summary, show_notes, transcript (optional), audio_url, embed_url, duration_seconds, published_on, cover_url.
+
+**Contact email privacy:** visitors cannot read the contact_email column on organisations or people directly. They get it through public views (`public_organisations`, `public_people`) that only show published rows and only include the email when contact_email_public is true. Admins always see it.
 - **newsletter_issues**: title, issue_number, summary, body, sent_on, web_url.
 - **guides**: title, summary, body (rich text / markdown), cover_url, reading_minutes.
 
@@ -83,6 +89,12 @@ Each table gets explicit grants so the app can reach it.
 - Indexes on slug, status, starts_at, deadline_at, and the term_id and entry ids in every link table.
 - Name and summary columns can be searched for later full-text search.
 
-## Open points (your call when you approve)
-1. Should organisation people roles be a fixed list or free text? Proposed: free text.
-2. Is double opt-in for the newsletter (a confirmation email) wanted now or later? Proposed: later, but the field is already there.
+## Decisions
+- Roles on links are free text.
+- Newsletter double opt-in comes later; the confirmed_at field is already in place.
+
+## Build steps (after approval)
+1. Turn on Lovable Cloud.
+2. Create everything in one database change: enums, tables, link tables, admin roles, views, grants, policies, triggers and indexes.
+3. Create the public media bucket with admin-only uploads.
+4. No pages or screens.
