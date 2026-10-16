@@ -44,10 +44,10 @@ export function NewsletterSignup({ source = "footer" }: { source?: string }) {
         </button>
       </div>
       <label className="flex items-start gap-2 nb-small text-muted-foreground">
-        <input type="checkbox" className="mt-1 accent-[var(--berry)]" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+        <input type="checkbox" className="mt-1 accent-primary" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
         <span>Yes, email me the Northbeat newsletter. Unsubscribe any time.</span>
       </label>
-      <p role="status" aria-live="polite" className={`nb-small ${state === "error" ? "text-destructive" : "text-berry"}`}>
+      <p role="status" aria-live="polite" className={`nb-small ${state === "error" ? "text-danger" : "text-berry"}`}>
         {state === "done" || state === "error" ? msg : ""}
       </p>
     </form>

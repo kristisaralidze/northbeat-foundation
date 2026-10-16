@@ -14,7 +14,7 @@ export function PulseLine({ className = "" }: { className?: string }) {
 export function Wordmark({ className = "" }: { className?: string }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
-      <span className="font-[family-name:var(--font-display)] text-[1.5rem] leading-none tracking-[-0.02em] text-ink">
+      <span className="nb-wordmark text-ink">
         Northbeat
       </span>
       <svg width="26" height="12" viewBox="0 0 26 12" fill="none" aria-hidden="true" className="text-berry">

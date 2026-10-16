@@ -54,7 +54,7 @@ function Header() {
           <ul className="nb-container divide-y divide-hairline py-4">
             {NAV.map((n) => (
               <li key={n.to}>
-                <Link to={n.to} onClick={() => setOpen(false)} className="block py-4 nb-h3 text-ink data-[status=active]:text-berry">
+                <Link to={n.to} onClick={() => setOpen(false)} className="nb-menulink">
                   {n.label}
                 </Link>
               </li>
@@ -62,7 +62,7 @@ function Header() {
           </ul>
           <div className="nb-container pb-10">
             <PulseLine className="mb-6" />
-            <Link to="/submit" onClick={() => setOpen(false)} className="nb-btn nb-btn-primary w-full">Submit an entry</Link>
+            <Link to="/submit" onClick={() => setOpen(false)} className="nb-btn nb-btn-primary nb-btn-block">Submit an entry</Link>
           </div>
         </nav>
       )}
