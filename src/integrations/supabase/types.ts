@@ -789,6 +789,48 @@ export type Database = {
           },
         ]
       }
+      organisation_relations: {
+        Row: {
+          created_at: string
+          from_org_id: string
+          id: string
+          note: string | null
+          relation: Database["public"]["Enums"]["org_relation"]
+          to_org_id: string
+        }
+        Insert: {
+          created_at?: string
+          from_org_id: string
+          id?: string
+          note?: string | null
+          relation: Database["public"]["Enums"]["org_relation"]
+          to_org_id: string
+        }
+        Update: {
+          created_at?: string
+          from_org_id?: string
+          id?: string
+          note?: string | null
+          relation?: Database["public"]["Enums"]["org_relation"]
+          to_org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organisation_relations_from_org_id_fkey"
+            columns: ["from_org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organisation_relations_to_org_id_fkey"
+            columns: ["to_org_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organisation_terms: {
         Row: {
           organisation_id: string
@@ -1301,6 +1343,7 @@ export type Database = {
         | "grant_call"
         | "competition"
         | "job"
+      org_relation: "invested_in" | "spun_out_of" | "acquired" | "partner_of"
       organisation_type:
         | "startup"
         | "investor"
@@ -1479,6 +1522,7 @@ export const Constants = {
         "competition",
         "job",
       ],
+      org_relation: ["invested_in", "spun_out_of", "acquired", "partner_of"],
       organisation_type: [
         "startup",
         "investor",
