@@ -22,11 +22,11 @@ const toLocalInput = (iso: unknown) => {
 
 function normalise(fields: FieldDef[], v: Values): Values {
   const out: Values = {
-    slug: v.slug || null,
-    status: v.status || "draft",
-    source_url: v.source_url || null,
-    last_checked: v.last_checked || null,
-    published_at: v.published_at || null,
+    slug: v["slug"] || null,
+    status: v["status"] || "draft",
+    source_url: v["source_url"] || null,
+    last_checked: v["last_checked"] || null,
+    published_at: v["published_at"] || null,
   };
   for (const f of fields) {
     const raw = v[f.name];
@@ -55,7 +55,7 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
     const r = bundle.data.row ?? {};
     const v: Values = { ...r };
     for (const f of cfg.fields) if (f.kind === "datetime") v[f.name] = toLocalInput(r[f.name as keyof typeof r]);
-    if (!bundle.data.row) v.status = "draft";
+    if (!bundle.data.row) v["status"] = "draft";
     setValues(v);
     setTermIds(bundle.data.termIds);
     setLinks(bundle.data.links);
@@ -115,22 +115,22 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
       <section className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1">
           <Label htmlFor="status">Status</Label>
-          <select id="status" className={`${selectClass} w-full`} value={String(values.status ?? "draft")} onChange={(e) => set("status", e.target.value)}>
+          <select id="status" className={`${selectClass} w-full`} value={String(values["status"] ?? "draft")} onChange={(e) => set("status", e.target.value)}>
             {STATUS.map((s) => <option key={s} value={s}>{humanize(s)}</option>)}
           </select>
         </div>
         <div className="space-y-1">
           <Label htmlFor="slug">Slug</Label>
-          <Input id="slug" placeholder="Generated from name if empty" value={String(values.slug ?? "")} onChange={(e) => set("slug", e.target.value)} />
+          <Input id="slug" placeholder="Generated from name if empty" value={String(values["slug"] ?? "")} onChange={(e) => set("slug", e.target.value)} />
         </div>
         <div className="space-y-1">
           <Label htmlFor="source_url">Source URL</Label>
-          <Input id="source_url" type="url" value={String(values.source_url ?? "")} onChange={(e) => set("source_url", e.target.value)} />
+          <Input id="source_url" type="url" value={String(values["source_url"] ?? "")} onChange={(e) => set("source_url", e.target.value)} />
         </div>
         <div className="space-y-1">
           <Label htmlFor="last_checked">Last checked</Label>
           <div className="flex gap-2">
-            <Input id="last_checked" type="date" value={String(values.last_checked ?? "")} onChange={(e) => set("last_checked", e.target.value)} />
+            <Input id="last_checked" type="date" value={String(values["last_checked"] ?? "")} onChange={(e) => set("last_checked", e.target.value)} />
             <Button type="button" variant="outline" onClick={() => set("last_checked", new Date().toISOString().slice(0, 10))}>Today</Button>
           </div>
         </div>

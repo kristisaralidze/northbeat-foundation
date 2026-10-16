@@ -9,7 +9,7 @@ export type Row = Record<string, unknown> & { id: string };
 export type Term = { id: string; kind: string; name: string; parent_id: string | null };
 export type LinkRow = { otherId: string; role: string };
 
-export type ListFilters = { q?: string; type?: string; status?: string; field?: string; country?: string };
+export type ListFilters = { q?: string | undefined; type?: string | undefined; status?: string | undefined; field?: string | undefined; country?: string | undefined };
 
 function fail(error: { message: string } | null) {
   if (error) throw new Error(error.message);
@@ -48,7 +48,7 @@ export async function listOptions(key: EntityKey): Promise<{ id: string; label: 
   const cfg = ENTITIES[key];
   const { data, error } = await db.from(cfg.table).select(`id, ${cfg.titleField}`).order(cfg.titleField).limit(2000);
   fail(error);
-  return (data ?? []).map((r: Record<string, string>) => ({ id: r.id, label: r[cfg.titleField] }));
+  return (data ?? []).map((r: Record<string, string>) => ({ id: r["id"], label: r[cfg.titleField] }));
 }
 
 export type EntryBundle = { row: Row | null; termIds: string[]; links: Record<string, LinkRow[]> };
@@ -76,13 +76,13 @@ export async function saveEntry(
   links: Record<string, LinkRow[]>,
 ): Promise<string> {
   const payload: Record<string, unknown> = { ...values };
-  if (!payload.slug) payload.slug = slugify(String(payload[cfg.titleField] ?? ""));
-  if (payload.status === "published" && !payload.published_at) payload.published_at = new Date().toISOString();
+  if (!payload["slug"]) payload["slug"] = slugify(String(payload[cfg.titleField] ?? ""));
+  if (payload["status"] === "published" && !payload["published_at"]) payload["published_at"] = new Date().toISOString();
 
   let entryId = id;
   if (id === "new") {
     const { data: u } = await supabase.auth.getUser();
-    payload.created_by = u.user?.id ?? null;
+    payload["created_by"] = u.user?.id ?? null;
     const { data, error } = await db.from(cfg.table).insert(payload).select("id").single();
     fail(error);
     entryId = (data as { id: string }).id;

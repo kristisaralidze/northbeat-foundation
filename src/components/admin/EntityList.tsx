@@ -82,16 +82,16 @@ export function EntityList({ entity, filters }: { entity: EntityKey; filters: Li
               <TableRow><TableCell colSpan={5} className="text-muted-foreground">Nothing here yet.</TableCell></TableRow>
             )}
             {rows.data?.map((r) => (
-              <TableRow key={r.id}>
+              <TableRow key={r["id"]}>
                 <TableCell>
-                  <Link to={`/admin/${entity}/$id` as never} params={{ id: r.id } as never} className="font-medium text-foreground underline-offset-2 hover:underline">
+                  <Link to={`/admin/${entity}/$id` as never} params={{ id: r["id"] } as never} className="font-medium text-foreground underline-offset-2 hover:underline">
                     {String(r[cfg.titleField] ?? "(untitled)")}
                   </Link>
                 </TableCell>
                 {cfg.typeField && <TableCell>{humanize(String(r[cfg.typeField] ?? ""))}</TableCell>}
-                <TableCell>{humanize(String(r.status))}</TableCell>
-                <TableCell>{(r.last_checked as string) ?? "—"}</TableCell>
-                <TableCell>{new Date(String(r.updated_at)).toLocaleDateString()}</TableCell>
+                <TableCell>{humanize(String(r["status"]))}</TableCell>
+                <TableCell>{(r["last_checked"] as string) ?? "—"}</TableCell>
+                <TableCell>{new Date(String(r["updated_at"])).toLocaleDateString()}</TableCell>
               </TableRow>
             ))}
           </TableBody>
