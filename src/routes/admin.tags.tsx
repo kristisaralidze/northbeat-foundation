@@ -68,7 +68,7 @@ function TermSection({
     e.preventDefault();
     const n = name.trim();
     if (!n) return;
-    if (isSub && !parent) return toast.error("Choose a parent field first.");
+    if (isSub && !parent) { toast.error("Choose a parent field first."); return; }
     run(async () => {
       const sort = items.reduce((m, t) => Math.max(m, t.sort_order), 0) + 1;
       const { error } = await db.from("terms").insert({ kind, name: n, slug: slugify(n), parent_id: isSub ? parent : null, sort_order: sort });
