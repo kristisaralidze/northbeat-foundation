@@ -50,7 +50,7 @@ export async function listOptions(key: EntityKey): Promise<{ id: string; label: 
   const cfg = ENTITIES[key];
   const { data, error } = await db.from(cfg.table).select(`id, ${cfg.titleField}`).order(cfg.titleField).limit(2000);
   fail(error);
-  return (data ?? []).map((r: Record<string, string>) => ({ id: r["id"], label: r[cfg.titleField] }));
+  return recs(data).map((r) => ({ id: String(r["id"]), label: String(r[cfg.titleField] ?? "") }));
 }
 
 export type EntryBundle = { row: Row | null; termIds: string[]; links: Record<string, LinkRow[]> };
