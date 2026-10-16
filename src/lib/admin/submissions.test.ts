@@ -26,3 +26,17 @@ describe("guessEntity", () => {
     expect(guessEntity({ entry_kind: "guide", payload: {} })).toBeNull();
   });
 });
+
+import { approvableEntity, submissionLabel } from "./submissions";
+describe("submission approval", () => {
+  it("guest applications approve into a person draft", () => {
+    expect(approvableEntity({ type: "podcast_guest", entry_kind: null, payload: {} })).toBe("people");
+    expect(submissionLabel({ type: "podcast_guest", entry_kind: null, payload: {} })).toBe("Apply to be a guest");
+  });
+  it("new organisation entry is labelled Add company", () => {
+    expect(submissionLabel({ type: "new_entry", entry_kind: "organisation", payload: {} })).toBe("Add company");
+  });
+  it("contact submissions cannot be approved", () => {
+    expect(approvableEntity({ type: "contact", entry_kind: null, payload: {} })).toBeNull();
+  });
+});
