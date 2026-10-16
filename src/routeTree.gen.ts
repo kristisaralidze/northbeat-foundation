@@ -14,7 +14,6 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminNewsletterRouteImport } from './routes/admin.newsletter'
-import { Route as AdminSubmissionsRouteImport } from './routes/admin.submissions'
 import { Route as AdminTagsRouteImport } from './routes/admin.tags'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as AdminEpisodesIndexRouteImport } from './routes/admin.episodes.index'
@@ -51,11 +50,6 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminNewsletterRoute = AdminNewsletterRouteImport.update({
   id: '/newsletter',
   path: '/newsletter',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminSubmissionsRoute = AdminSubmissionsRouteImport.update({
-  id: '/submissions',
-  path: '/submissions',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminTagsRoute = AdminTagsRouteImport.update({
@@ -124,7 +118,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
-  '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/': typeof AdminIndexRoute
@@ -143,7 +136,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
-  '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin': typeof AdminIndexRoute
@@ -164,7 +156,6 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
-  '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin_/login': typeof AdminLoginRoute
   '/admin/': typeof AdminIndexRoute
@@ -186,7 +177,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/reset-password'
     | '/admin/newsletter'
-    | '/admin/submissions'
     | '/admin/tags'
     | '/admin/login'
     | '/admin/'
@@ -205,7 +195,6 @@ export interface FileRouteTypes {
     | '/'
     | '/reset-password'
     | '/admin/newsletter'
-    | '/admin/submissions'
     | '/admin/tags'
     | '/admin/login'
     | '/admin'
@@ -225,7 +214,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/reset-password'
     | '/admin/newsletter'
-    | '/admin/submissions'
     | '/admin/tags'
     | '/admin_/login'
     | '/admin/'
@@ -283,13 +271,6 @@ declare module '@tanstack/react-router' {
       path: '/newsletter'
       fullPath: '/admin/newsletter'
       preLoaderRoute: typeof AdminNewsletterRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/submissions': {
-      id: '/admin/submissions'
-      path: '/submissions'
-      fullPath: '/admin/submissions'
-      preLoaderRoute: typeof AdminSubmissionsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/tags': {
@@ -381,7 +362,6 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminNewsletterRoute: typeof AdminNewsletterRoute
-  AdminSubmissionsRoute: typeof AdminSubmissionsRoute
   AdminTagsRoute: typeof AdminTagsRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminEpisodesIdRoute: typeof AdminEpisodesIdRoute
@@ -398,7 +378,6 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminNewsletterRoute: AdminNewsletterRoute,
-  AdminSubmissionsRoute: AdminSubmissionsRoute,
   AdminTagsRoute: AdminTagsRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminEpisodesIdRoute: AdminEpisodesIdRoute,
