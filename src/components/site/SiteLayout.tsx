@@ -72,7 +72,7 @@ function Header() {
 
 function Footer() {
   return (
-    <footer className="mt-auto border-t border-hairline bg-frost/60">
+    <footer className="mt-auto border-t border-hairline bg-frost-wash">
       <div className="nb-container grid gap-10 py-14 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-16">
         <div className="max-w-md space-y-4">
           <p className="nb-eyebrow">The newsletter</p>

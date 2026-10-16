@@ -154,6 +154,7 @@
   --color-berry: var(--berry);
   --color-berry-soft: var(--berry-soft);
   --color-frost: var(--frost);
+  --color-frost-wash: var(--frost-wash);
   --color-cream: var(--cream);
   --color-hairline: var(--hairline);
   --color-danger: var(--danger);
@@ -169,6 +170,8 @@
   --berry: oklch(0.43 0.135 358);
   --berry-soft: oklch(0.94 0.03 358);
   --frost: oklch(0.955 0.018 300);
+  /* Footer surface: frost at 60% over cream, as a named token. */
+  --frost-wash: color-mix(in oklab, var(--frost) 60%, var(--cream));
   --hairline: oklch(0.87 0.012 290);
   --danger: oklch(0.5 0.12 30);
 
