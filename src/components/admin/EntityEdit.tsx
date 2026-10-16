@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ENTITIES, STATUS, humanize, type EntityKey, type FieldDef, type LinkDef } from "@/lib/admin/entities";
 import { deleteEntry, getEntry, listOptions, listTerms, saveEntry, type LinkRow, type Term } from "@/lib/admin/db";
 import { selectClass } from "./EntityList";
+import { ImageField } from "./ImageField";
 
 type Values = Record<string, unknown>;
 
@@ -181,6 +182,13 @@ function FieldInput({ field: f, value, onChange }: { field: FieldDef; value: unk
       </fieldset>
     );
   }
+  if (f.kind === "image")
+    return (
+      <div className="space-y-1 sm:col-span-2">
+        <Label htmlFor={f.name}>{f.label}</Label>
+        <ImageField id={f.name} folder={f.name.replace(/_url$/, "")} value={value == null ? "" : String(value)} onChange={onChange} />
+      </div>
+    );
   if (f.kind === "select")
     return (
       <div className={wrap}>

@@ -8,7 +8,8 @@ export type FieldKind =
   | "datetime"
   | "select"
   | "boolean"
-  | "multi";
+  | "multi"
+  | "image";
 
 export type FieldDef = {
   name: string;
@@ -73,7 +74,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
       { name: "description", label: "Description", kind: "textarea" },
       { name: "website", label: "Website", kind: "url" },
       { name: "linkedin_url", label: "LinkedIn", kind: "url" },
-      { name: "logo_url", label: "Logo URL", kind: "url" },
+      { name: "logo_url", label: "Logo", kind: "image" },
       { name: "city", label: "City", kind: "text" },
       { name: "founded_year", label: "Founded year", kind: "number" },
       { name: "contact_email", label: "Contact email", kind: "email" },
@@ -96,7 +97,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
       { name: "full_name", label: "Full name", kind: "text", required: true },
       { name: "headline", label: "Headline", kind: "text" },
       { name: "bio", label: "Bio", kind: "textarea" },
-      { name: "photo_url", label: "Photo URL", kind: "url" },
+      { name: "photo_url", label: "Photo", kind: "image" },
       { name: "linkedin_url", label: "LinkedIn", kind: "url" },
       { name: "open_to", label: "Open to", kind: "multi", options: OPEN_TO },
       { name: "expertise_note", label: "Expertise note", kind: "textarea" },
@@ -174,7 +175,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
       { name: "embed_url", label: "Embed URL", kind: "url" },
       { name: "duration_seconds", label: "Duration (seconds)", kind: "number" },
       { name: "published_on", label: "Published on", kind: "date" },
-      { name: "cover_url", label: "Cover URL", kind: "url" },
+      { name: "cover_url", label: "Cover image", kind: "image" },
     ],
     links: [
       L("organisation_episodes", "episode_id", "organisation_id", "organisations", "Organisations"),

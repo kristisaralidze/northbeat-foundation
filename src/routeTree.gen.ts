@@ -14,7 +14,6 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminNewsletterRouteImport } from './routes/admin.newsletter'
-import { Route as AdminSubmissionsRouteImport } from './routes/admin.submissions'
 import { Route as AdminTagsRouteImport } from './routes/admin.tags'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as AdminEpisodesIndexRouteImport } from './routes/admin.episodes.index'
@@ -27,6 +26,8 @@ import { Route as AdminOrganisationsIndexRouteImport } from './routes/admin.orga
 import { Route as AdminOrganisationsIdRouteImport } from './routes/admin.organisations.$id'
 import { Route as AdminPeopleIndexRouteImport } from './routes/admin.people.index'
 import { Route as AdminPeopleIdRouteImport } from './routes/admin.people.$id'
+import { Route as AdminSubmissionsIndexRouteImport } from './routes/admin.submissions.index'
+import { Route as AdminSubmissionsIdRouteImport } from './routes/admin.submissions.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,11 +52,6 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminNewsletterRoute = AdminNewsletterRouteImport.update({
   id: '/newsletter',
   path: '/newsletter',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminSubmissionsRoute = AdminSubmissionsRouteImport.update({
-  id: '/submissions',
-  path: '/submissions',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminTagsRoute = AdminTagsRouteImport.update({
@@ -118,13 +114,22 @@ const AdminPeopleIdRoute = AdminPeopleIdRouteImport.update({
   path: '/people/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSubmissionsIndexRoute = AdminSubmissionsIndexRouteImport.update({
+  id: '/submissions/',
+  path: '/submissions/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSubmissionsIdRoute = AdminSubmissionsIdRouteImport.update({
+  id: '/submissions/$id',
+  path: '/submissions/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
-  '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/': typeof AdminIndexRoute
@@ -133,17 +138,18 @@ export interface FileRoutesByFullPath {
   '/admin/opportunities/$id': typeof AdminOpportunitiesIdRoute
   '/admin/organisations/$id': typeof AdminOrganisationsIdRoute
   '/admin/people/$id': typeof AdminPeopleIdRoute
+  '/admin/submissions/$id': typeof AdminSubmissionsIdRoute
   '/admin/episodes/': typeof AdminEpisodesIndexRoute
   '/admin/events/': typeof AdminEventsIndexRoute
   '/admin/opportunities/': typeof AdminOpportunitiesIndexRoute
   '/admin/organisations/': typeof AdminOrganisationsIndexRoute
   '/admin/people/': typeof AdminPeopleIndexRoute
+  '/admin/submissions/': typeof AdminSubmissionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/reset-password': typeof ResetPasswordRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
-  '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin': typeof AdminIndexRoute
@@ -152,11 +158,13 @@ export interface FileRoutesByTo {
   '/admin/opportunities/$id': typeof AdminOpportunitiesIdRoute
   '/admin/organisations/$id': typeof AdminOrganisationsIdRoute
   '/admin/people/$id': typeof AdminPeopleIdRoute
+  '/admin/submissions/$id': typeof AdminSubmissionsIdRoute
   '/admin/episodes': typeof AdminEpisodesIndexRoute
   '/admin/events': typeof AdminEventsIndexRoute
   '/admin/opportunities': typeof AdminOpportunitiesIndexRoute
   '/admin/organisations': typeof AdminOrganisationsIndexRoute
   '/admin/people': typeof AdminPeopleIndexRoute
+  '/admin/submissions': typeof AdminSubmissionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -164,7 +172,6 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
-  '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin_/login': typeof AdminLoginRoute
   '/admin/': typeof AdminIndexRoute
@@ -173,11 +180,13 @@ export interface FileRoutesById {
   '/admin/opportunities/$id': typeof AdminOpportunitiesIdRoute
   '/admin/organisations/$id': typeof AdminOrganisationsIdRoute
   '/admin/people/$id': typeof AdminPeopleIdRoute
+  '/admin/submissions/$id': typeof AdminSubmissionsIdRoute
   '/admin/episodes/': typeof AdminEpisodesIndexRoute
   '/admin/events/': typeof AdminEventsIndexRoute
   '/admin/opportunities/': typeof AdminOpportunitiesIndexRoute
   '/admin/organisations/': typeof AdminOrganisationsIndexRoute
   '/admin/people/': typeof AdminPeopleIndexRoute
+  '/admin/submissions/': typeof AdminSubmissionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -186,7 +195,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/reset-password'
     | '/admin/newsletter'
-    | '/admin/submissions'
     | '/admin/tags'
     | '/admin/login'
     | '/admin/'
@@ -195,17 +203,18 @@ export interface FileRouteTypes {
     | '/admin/opportunities/$id'
     | '/admin/organisations/$id'
     | '/admin/people/$id'
+    | '/admin/submissions/$id'
     | '/admin/episodes/'
     | '/admin/events/'
     | '/admin/opportunities/'
     | '/admin/organisations/'
     | '/admin/people/'
+    | '/admin/submissions/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/reset-password'
     | '/admin/newsletter'
-    | '/admin/submissions'
     | '/admin/tags'
     | '/admin/login'
     | '/admin'
@@ -214,18 +223,19 @@ export interface FileRouteTypes {
     | '/admin/opportunities/$id'
     | '/admin/organisations/$id'
     | '/admin/people/$id'
+    | '/admin/submissions/$id'
     | '/admin/episodes'
     | '/admin/events'
     | '/admin/opportunities'
     | '/admin/organisations'
     | '/admin/people'
+    | '/admin/submissions'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/reset-password'
     | '/admin/newsletter'
-    | '/admin/submissions'
     | '/admin/tags'
     | '/admin_/login'
     | '/admin/'
@@ -234,11 +244,13 @@ export interface FileRouteTypes {
     | '/admin/opportunities/$id'
     | '/admin/organisations/$id'
     | '/admin/people/$id'
+    | '/admin/submissions/$id'
     | '/admin/episodes/'
     | '/admin/events/'
     | '/admin/opportunities/'
     | '/admin/organisations/'
     | '/admin/people/'
+    | '/admin/submissions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -283,13 +295,6 @@ declare module '@tanstack/react-router' {
       path: '/newsletter'
       fullPath: '/admin/newsletter'
       preLoaderRoute: typeof AdminNewsletterRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/submissions': {
-      id: '/admin/submissions'
-      path: '/submissions'
-      fullPath: '/admin/submissions'
-      preLoaderRoute: typeof AdminSubmissionsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/tags': {
@@ -376,12 +381,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPeopleIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/submissions/': {
+      id: '/admin/submissions/'
+      path: '/submissions'
+      fullPath: '/admin/submissions/'
+      preLoaderRoute: typeof AdminSubmissionsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/submissions/$id': {
+      id: '/admin/submissions/$id'
+      path: '/submissions/$id'
+      fullPath: '/admin/submissions/$id'
+      preLoaderRoute: typeof AdminSubmissionsIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
   AdminNewsletterRoute: typeof AdminNewsletterRoute
-  AdminSubmissionsRoute: typeof AdminSubmissionsRoute
   AdminTagsRoute: typeof AdminTagsRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminEpisodesIdRoute: typeof AdminEpisodesIdRoute
@@ -389,16 +407,17 @@ interface AdminRouteChildren {
   AdminOpportunitiesIdRoute: typeof AdminOpportunitiesIdRoute
   AdminOrganisationsIdRoute: typeof AdminOrganisationsIdRoute
   AdminPeopleIdRoute: typeof AdminPeopleIdRoute
+  AdminSubmissionsIdRoute: typeof AdminSubmissionsIdRoute
   AdminEpisodesIndexRoute: typeof AdminEpisodesIndexRoute
   AdminEventsIndexRoute: typeof AdminEventsIndexRoute
   AdminOpportunitiesIndexRoute: typeof AdminOpportunitiesIndexRoute
   AdminOrganisationsIndexRoute: typeof AdminOrganisationsIndexRoute
   AdminPeopleIndexRoute: typeof AdminPeopleIndexRoute
+  AdminSubmissionsIndexRoute: typeof AdminSubmissionsIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminNewsletterRoute: AdminNewsletterRoute,
-  AdminSubmissionsRoute: AdminSubmissionsRoute,
   AdminTagsRoute: AdminTagsRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminEpisodesIdRoute: AdminEpisodesIdRoute,
@@ -406,11 +425,13 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminOpportunitiesIdRoute: AdminOpportunitiesIdRoute,
   AdminOrganisationsIdRoute: AdminOrganisationsIdRoute,
   AdminPeopleIdRoute: AdminPeopleIdRoute,
+  AdminSubmissionsIdRoute: AdminSubmissionsIdRoute,
   AdminEpisodesIndexRoute: AdminEpisodesIndexRoute,
   AdminEventsIndexRoute: AdminEventsIndexRoute,
   AdminOpportunitiesIndexRoute: AdminOpportunitiesIndexRoute,
   AdminOrganisationsIndexRoute: AdminOrganisationsIndexRoute,
   AdminPeopleIndexRoute: AdminPeopleIndexRoute,
+  AdminSubmissionsIndexRoute: AdminSubmissionsIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
