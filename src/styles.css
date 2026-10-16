@@ -142,3 +142,290 @@
     color: var(--color-foreground);
   }
 }
+
+/* ================================================================
+ * Northbeat public site theme.
+ * Scoped to .theme-site so /admin keeps the plain default look.
+ * ================================================================ */
+@theme inline {
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-body: "Inter Tight", ui-sans-serif, system-ui, sans-serif;
+  --color-ink: var(--ink);
+  --color-berry: var(--berry);
+  --color-berry-soft: var(--berry-soft);
+  --color-frost: var(--frost);
+  --color-cream: var(--cream);
+  --color-hairline: var(--hairline);
+}
+
+.theme-site {
+  /* Palette */
+  --cream: oklch(0.982 0.009 85);
+  --snow: oklch(0.995 0.003 85);
+  --ink: oklch(0.21 0.028 270);
+  --ink-soft: oklch(0.45 0.022 270);
+  --berry: oklch(0.43 0.135 358);
+  --berry-soft: oklch(0.94 0.03 358);
+  --frost: oklch(0.955 0.018 300);
+  --hairline: oklch(0.87 0.012 290);
+
+  /* Semantic tokens consumed by utilities/shadcn */
+  --radius: 0.5rem;
+  --background: var(--cream);
+  --foreground: var(--ink);
+  --card: var(--snow);
+  --card-foreground: var(--ink);
+  --popover: var(--snow);
+  --popover-foreground: var(--ink);
+  --primary: var(--berry);
+  --primary-foreground: var(--snow);
+  --secondary: var(--frost);
+  --secondary-foreground: var(--ink);
+  --muted: var(--frost);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--frost);
+  --accent-foreground: var(--ink);
+  --border: var(--hairline);
+  --input: var(--hairline);
+  --ring: var(--berry);
+
+  /* Spacing scale (4px base) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --gutter: clamp(1.25rem, 4vw, 2.5rem);
+  --section: clamp(3.5rem, 8vw, 6rem);
+  --measure: 68ch;
+
+  /* Very soft hover shadow (the only shadow allowed) */
+  --shadow-hover: 0 6px 24px -12px color-mix(in oklab, var(--ink) 18%, transparent);
+
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01", "cv11";
+}
+
+.theme-site ::selection {
+  background: var(--berry-soft);
+  color: var(--ink);
+}
+
+.theme-site :focus-visible {
+  outline: 2px solid var(--berry);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------- Type scale (fluid, editorial) ---------- */
+@utility nb-display {
+  font-family: var(--font-display);
+  font-weight: 380;
+  font-size: clamp(2.75rem, 6vw + 1rem, 5.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+}
+@utility nb-h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.25rem, 3.5vw + 1rem, 3.75rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 120;
+}
+@utility nb-h2 {
+  font-family: var(--font-display);
+  font-weight: 420;
+  font-size: clamp(1.75rem, 2vw + 1rem, 2.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+@utility nb-h3 {
+  font-family: var(--font-display);
+  font-weight: 450;
+  font-size: clamp(1.25rem, 0.8vw + 1rem, 1.5rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+@utility nb-lead {
+  font-size: clamp(1.125rem, 0.4vw + 1rem, 1.3125rem);
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+@utility nb-body {
+  font-size: 1rem;
+  line-height: 1.65;
+}
+@utility nb-small {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+@utility nb-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* ---------- Layout ---------- */
+@utility nb-container {
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+@utility nb-section {
+  padding-block: var(--section);
+}
+@utility nb-hairline {
+  border: 0;
+  border-top: 1px solid var(--hairline);
+}
+
+/* ---------- Buttons ---------- */
+@utility nb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1.25rem;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 550;
+  letter-spacing: 0.005em;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 200ms ease;
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+}
+@utility nb-btn-primary {
+  background: var(--berry);
+  color: var(--snow);
+  &:hover { background: color-mix(in oklab, var(--berry) 88%, var(--ink)); box-shadow: var(--shadow-hover); }
+}
+@utility nb-btn-secondary {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--ink);
+  &:hover { background: var(--ink); color: var(--snow); }
+}
+@utility nb-btn-quiet {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--hairline);
+  &:hover { border-color: var(--ink); }
+}
+@utility nb-btn-sm {
+  min-height: 2.25rem;
+  padding: 0 0.875rem;
+  font-size: 0.875rem;
+}
+
+/* ---------- Links ---------- */
+@utility nb-link {
+  color: var(--ink);
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in oklab, var(--berry) 45%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  transition: color 160ms ease, text-decoration-color 160ms ease;
+  &:hover { color: var(--berry); text-decoration-color: var(--berry); }
+}
+@utility nb-navlink {
+  position: relative;
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: color 160ms ease;
+  &:hover { color: var(--ink); }
+  &[data-status="active"] { color: var(--ink); }
+  &[data-status="active"]::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: -0.4rem;
+    height: 1px;
+    background: var(--berry);
+  }
+}
+
+/* ---------- Tag chip ---------- */
+@utility nb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 1.75rem;
+  padding: 0 0.625rem;
+  border-radius: 999px;
+  border: 1px solid var(--hairline);
+  background: var(--snow);
+  color: var(--ink);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1;
+  transition: border-color 160ms ease, background-color 160ms ease;
+  &:hover { border-color: var(--ink); }
+  &[aria-pressed="true"], &[data-active="true"] {
+    background: var(--berry-soft);
+    border-color: var(--berry);
+    color: var(--berry);
+  }
+}
+@utility nb-chip-frost {
+  background: var(--frost);
+  border-color: transparent;
+}
+
+/* ---------- Card ---------- */
+@utility nb-card {
+  display: block;
+  background: var(--snow);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+  transition: border-color 200ms ease, box-shadow 240ms ease, transform 240ms ease;
+  &:hover { border-color: color-mix(in oklab, var(--ink) 35%, var(--hairline)); box-shadow: var(--shadow-hover); }
+}
+@utility nb-card-frost {
+  background: var(--frost);
+  border-color: transparent;
+}
+
+/* ---------- Form field (public) ---------- */
+@utility nb-input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 0.875rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--hairline);
+  background: var(--snow);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  transition: border-color 160ms ease;
+  &::placeholder { color: var(--ink-soft); opacity: 0.8; }
+  &:focus { border-color: var(--ink); outline: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-site *, .theme-site *::before, .theme-site *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
