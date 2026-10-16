@@ -17,6 +17,16 @@ import { Route as AdminNewsletterRouteImport } from './routes/admin.newsletter'
 import { Route as AdminSubmissionsRouteImport } from './routes/admin.submissions'
 import { Route as AdminTagsRouteImport } from './routes/admin.tags'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
+import { Route as AdminEpisodesIndexRouteImport } from './routes/admin.episodes.index'
+import { Route as AdminEpisodesIdRouteImport } from './routes/admin.episodes.$id'
+import { Route as AdminEventsIndexRouteImport } from './routes/admin.events.index'
+import { Route as AdminEventsIdRouteImport } from './routes/admin.events.$id'
+import { Route as AdminOpportunitiesIndexRouteImport } from './routes/admin.opportunities.index'
+import { Route as AdminOpportunitiesIdRouteImport } from './routes/admin.opportunities.$id'
+import { Route as AdminOrganisationsIndexRouteImport } from './routes/admin.organisations.index'
+import { Route as AdminOrganisationsIdRouteImport } from './routes/admin.organisations.$id'
+import { Route as AdminPeopleIndexRouteImport } from './routes/admin.people.index'
+import { Route as AdminPeopleIdRouteImport } from './routes/admin.people.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -58,6 +68,56 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminEpisodesIndexRoute = AdminEpisodesIndexRouteImport.update({
+  id: '/episodes/',
+  path: '/episodes/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEpisodesIdRoute = AdminEpisodesIdRouteImport.update({
+  id: '/episodes/$id',
+  path: '/episodes/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEventsIndexRoute = AdminEventsIndexRouteImport.update({
+  id: '/events/',
+  path: '/events/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEventsIdRoute = AdminEventsIdRouteImport.update({
+  id: '/events/$id',
+  path: '/events/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOpportunitiesIndexRoute = AdminOpportunitiesIndexRouteImport.update({
+  id: '/opportunities/',
+  path: '/opportunities/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOpportunitiesIdRoute = AdminOpportunitiesIdRouteImport.update({
+  id: '/opportunities/$id',
+  path: '/opportunities/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrganisationsIndexRoute = AdminOrganisationsIndexRouteImport.update({
+  id: '/organisations/',
+  path: '/organisations/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrganisationsIdRoute = AdminOrganisationsIdRouteImport.update({
+  id: '/organisations/$id',
+  path: '/organisations/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPeopleIndexRoute = AdminPeopleIndexRouteImport.update({
+  id: '/people/',
+  path: '/people/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPeopleIdRoute = AdminPeopleIdRouteImport.update({
+  id: '/people/$id',
+  path: '/people/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -68,6 +128,16 @@ export interface FileRoutesByFullPath {
   '/admin/tags': typeof AdminTagsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/episodes/$id': typeof AdminEpisodesIdRoute
+  '/admin/events/$id': typeof AdminEventsIdRoute
+  '/admin/opportunities/$id': typeof AdminOpportunitiesIdRoute
+  '/admin/organisations/$id': typeof AdminOrganisationsIdRoute
+  '/admin/people/$id': typeof AdminPeopleIdRoute
+  '/admin/episodes/': typeof AdminEpisodesIndexRoute
+  '/admin/events/': typeof AdminEventsIndexRoute
+  '/admin/opportunities/': typeof AdminOpportunitiesIndexRoute
+  '/admin/organisations/': typeof AdminOrganisationsIndexRoute
+  '/admin/people/': typeof AdminPeopleIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -77,6 +147,16 @@ export interface FileRoutesByTo {
   '/admin/tags': typeof AdminTagsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin': typeof AdminIndexRoute
+  '/admin/episodes/$id': typeof AdminEpisodesIdRoute
+  '/admin/events/$id': typeof AdminEventsIdRoute
+  '/admin/opportunities/$id': typeof AdminOpportunitiesIdRoute
+  '/admin/organisations/$id': typeof AdminOrganisationsIdRoute
+  '/admin/people/$id': typeof AdminPeopleIdRoute
+  '/admin/episodes': typeof AdminEpisodesIndexRoute
+  '/admin/events': typeof AdminEventsIndexRoute
+  '/admin/opportunities': typeof AdminOpportunitiesIndexRoute
+  '/admin/organisations': typeof AdminOrganisationsIndexRoute
+  '/admin/people': typeof AdminPeopleIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,6 +168,16 @@ export interface FileRoutesById {
   '/admin/tags': typeof AdminTagsRoute
   '/admin_/login': typeof AdminLoginRoute
   '/admin/': typeof AdminIndexRoute
+  '/admin/episodes/$id': typeof AdminEpisodesIdRoute
+  '/admin/events/$id': typeof AdminEventsIdRoute
+  '/admin/opportunities/$id': typeof AdminOpportunitiesIdRoute
+  '/admin/organisations/$id': typeof AdminOrganisationsIdRoute
+  '/admin/people/$id': typeof AdminPeopleIdRoute
+  '/admin/episodes/': typeof AdminEpisodesIndexRoute
+  '/admin/events/': typeof AdminEventsIndexRoute
+  '/admin/opportunities/': typeof AdminOpportunitiesIndexRoute
+  '/admin/organisations/': typeof AdminOrganisationsIndexRoute
+  '/admin/people/': typeof AdminPeopleIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,6 +190,16 @@ export interface FileRouteTypes {
     | '/admin/tags'
     | '/admin/login'
     | '/admin/'
+    | '/admin/episodes/$id'
+    | '/admin/events/$id'
+    | '/admin/opportunities/$id'
+    | '/admin/organisations/$id'
+    | '/admin/people/$id'
+    | '/admin/episodes/'
+    | '/admin/events/'
+    | '/admin/opportunities/'
+    | '/admin/organisations/'
+    | '/admin/people/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -109,6 +209,16 @@ export interface FileRouteTypes {
     | '/admin/tags'
     | '/admin/login'
     | '/admin'
+    | '/admin/episodes/$id'
+    | '/admin/events/$id'
+    | '/admin/opportunities/$id'
+    | '/admin/organisations/$id'
+    | '/admin/people/$id'
+    | '/admin/episodes'
+    | '/admin/events'
+    | '/admin/opportunities'
+    | '/admin/organisations'
+    | '/admin/people'
   id:
     | '__root__'
     | '/'
@@ -119,6 +229,16 @@ export interface FileRouteTypes {
     | '/admin/tags'
     | '/admin_/login'
     | '/admin/'
+    | '/admin/episodes/$id'
+    | '/admin/events/$id'
+    | '/admin/opportunities/$id'
+    | '/admin/organisations/$id'
+    | '/admin/people/$id'
+    | '/admin/episodes/'
+    | '/admin/events/'
+    | '/admin/opportunities/'
+    | '/admin/organisations/'
+    | '/admin/people/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -186,6 +306,76 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/episodes/': {
+      id: '/admin/episodes/'
+      path: '/episodes'
+      fullPath: '/admin/episodes/'
+      preLoaderRoute: typeof AdminEpisodesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/episodes/$id': {
+      id: '/admin/episodes/$id'
+      path: '/episodes/$id'
+      fullPath: '/admin/episodes/$id'
+      preLoaderRoute: typeof AdminEpisodesIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/events/': {
+      id: '/admin/events/'
+      path: '/events'
+      fullPath: '/admin/events/'
+      preLoaderRoute: typeof AdminEventsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/events/$id': {
+      id: '/admin/events/$id'
+      path: '/events/$id'
+      fullPath: '/admin/events/$id'
+      preLoaderRoute: typeof AdminEventsIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/opportunities/': {
+      id: '/admin/opportunities/'
+      path: '/opportunities'
+      fullPath: '/admin/opportunities/'
+      preLoaderRoute: typeof AdminOpportunitiesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/opportunities/$id': {
+      id: '/admin/opportunities/$id'
+      path: '/opportunities/$id'
+      fullPath: '/admin/opportunities/$id'
+      preLoaderRoute: typeof AdminOpportunitiesIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/organisations/': {
+      id: '/admin/organisations/'
+      path: '/organisations'
+      fullPath: '/admin/organisations/'
+      preLoaderRoute: typeof AdminOrganisationsIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/organisations/$id': {
+      id: '/admin/organisations/$id'
+      path: '/organisations/$id'
+      fullPath: '/admin/organisations/$id'
+      preLoaderRoute: typeof AdminOrganisationsIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/people/': {
+      id: '/admin/people/'
+      path: '/people'
+      fullPath: '/admin/people/'
+      preLoaderRoute: typeof AdminPeopleIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/people/$id': {
+      id: '/admin/people/$id'
+      path: '/people/$id'
+      fullPath: '/admin/people/$id'
+      preLoaderRoute: typeof AdminPeopleIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
@@ -194,6 +384,16 @@ interface AdminRouteChildren {
   AdminSubmissionsRoute: typeof AdminSubmissionsRoute
   AdminTagsRoute: typeof AdminTagsRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminEpisodesIdRoute: typeof AdminEpisodesIdRoute
+  AdminEventsIdRoute: typeof AdminEventsIdRoute
+  AdminOpportunitiesIdRoute: typeof AdminOpportunitiesIdRoute
+  AdminOrganisationsIdRoute: typeof AdminOrganisationsIdRoute
+  AdminPeopleIdRoute: typeof AdminPeopleIdRoute
+  AdminEpisodesIndexRoute: typeof AdminEpisodesIndexRoute
+  AdminEventsIndexRoute: typeof AdminEventsIndexRoute
+  AdminOpportunitiesIndexRoute: typeof AdminOpportunitiesIndexRoute
+  AdminOrganisationsIndexRoute: typeof AdminOrganisationsIndexRoute
+  AdminPeopleIndexRoute: typeof AdminPeopleIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
@@ -201,6 +401,16 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminSubmissionsRoute: AdminSubmissionsRoute,
   AdminTagsRoute: AdminTagsRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminEpisodesIdRoute: AdminEpisodesIdRoute,
+  AdminEventsIdRoute: AdminEventsIdRoute,
+  AdminOpportunitiesIdRoute: AdminOpportunitiesIdRoute,
+  AdminOrganisationsIdRoute: AdminOrganisationsIdRoute,
+  AdminPeopleIdRoute: AdminPeopleIdRoute,
+  AdminEpisodesIndexRoute: AdminEpisodesIndexRoute,
+  AdminEventsIndexRoute: AdminEventsIndexRoute,
+  AdminOpportunitiesIndexRoute: AdminOpportunitiesIndexRoute,
+  AdminOrganisationsIndexRoute: AdminOrganisationsIndexRoute,
+  AdminPeopleIndexRoute: AdminPeopleIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
