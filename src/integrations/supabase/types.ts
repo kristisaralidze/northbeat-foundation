@@ -655,13 +655,6 @@ export type Database = {
             referencedRelation: "organisations"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "organisation_episodes_organisation_id_fkey"
-            columns: ["organisation_id"]
-            isOneToOne: false
-            referencedRelation: "public_organisations"
-            referencedColumns: ["id"]
-          },
         ]
       }
       organisation_events: {
@@ -698,13 +691,6 @@ export type Database = {
             referencedRelation: "organisations"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "organisation_events_organisation_id_fkey"
-            columns: ["organisation_id"]
-            isOneToOne: false
-            referencedRelation: "public_organisations"
-            referencedColumns: ["id"]
-          },
         ]
       }
       organisation_opportunities: {
@@ -739,13 +725,6 @@ export type Database = {
             columns: ["organisation_id"]
             isOneToOne: false
             referencedRelation: "organisations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "organisation_opportunities_organisation_id_fkey"
-            columns: ["organisation_id"]
-            isOneToOne: false
-            referencedRelation: "public_organisations"
             referencedColumns: ["id"]
           },
         ]
@@ -787,24 +766,10 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "organisation_people_organisation_id_fkey"
-            columns: ["organisation_id"]
-            isOneToOne: false
-            referencedRelation: "public_organisations"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "organisation_people_person_id_fkey"
             columns: ["person_id"]
             isOneToOne: false
             referencedRelation: "people"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "organisation_people_person_id_fkey"
-            columns: ["person_id"]
-            isOneToOne: false
-            referencedRelation: "public_people"
             referencedColumns: ["id"]
           },
         ]
@@ -828,13 +793,6 @@ export type Database = {
             columns: ["organisation_id"]
             isOneToOne: false
             referencedRelation: "organisations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "organisation_terms_organisation_id_fkey"
-            columns: ["organisation_id"]
-            isOneToOne: false
-            referencedRelation: "public_organisations"
             referencedColumns: ["id"]
           },
           {
@@ -1018,13 +976,6 @@ export type Database = {
             referencedRelation: "people"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "person_episodes_person_id_fkey"
-            columns: ["person_id"]
-            isOneToOne: false
-            referencedRelation: "public_people"
-            referencedColumns: ["id"]
-          },
         ]
       }
       person_events: {
@@ -1059,13 +1010,6 @@ export type Database = {
             columns: ["person_id"]
             isOneToOne: false
             referencedRelation: "people"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "person_events_person_id_fkey"
-            columns: ["person_id"]
-            isOneToOne: false
-            referencedRelation: "public_people"
             referencedColumns: ["id"]
           },
         ]
@@ -1104,13 +1048,6 @@ export type Database = {
             referencedRelation: "people"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "person_opportunities_person_id_fkey"
-            columns: ["person_id"]
-            isOneToOne: false
-            referencedRelation: "public_people"
-            referencedColumns: ["id"]
-          },
         ]
       }
       person_terms: {
@@ -1132,13 +1069,6 @@ export type Database = {
             columns: ["person_id"]
             isOneToOne: false
             referencedRelation: "people"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "person_terms_person_id_fkey"
-            columns: ["person_id"]
-            isOneToOne: false
-            referencedRelation: "public_people"
             referencedColumns: ["id"]
           },
           {
@@ -1268,120 +1198,7 @@ export type Database = {
       }
     }
     Views: {
-      public_organisations: {
-        Row: {
-          city: string | null
-          contact_email: string | null
-          description: string | null
-          founded_year: number | null
-          id: string | null
-          last_checked: string | null
-          linkedin_url: string | null
-          logo_url: string | null
-          name: string | null
-          published_at: string | null
-          short_description: string | null
-          slug: string | null
-          source_url: string | null
-          ticket_max_eur: number | null
-          ticket_min_eur: number | null
-          type: Database["public"]["Enums"]["organisation_type"] | null
-          updated_at: string | null
-          website: string | null
-        }
-        Insert: {
-          city?: string | null
-          contact_email?: never
-          description?: string | null
-          founded_year?: number | null
-          id?: string | null
-          last_checked?: string | null
-          linkedin_url?: string | null
-          logo_url?: string | null
-          name?: string | null
-          published_at?: string | null
-          short_description?: string | null
-          slug?: string | null
-          source_url?: string | null
-          ticket_max_eur?: number | null
-          ticket_min_eur?: number | null
-          type?: Database["public"]["Enums"]["organisation_type"] | null
-          updated_at?: string | null
-          website?: string | null
-        }
-        Update: {
-          city?: string | null
-          contact_email?: never
-          description?: string | null
-          founded_year?: number | null
-          id?: string | null
-          last_checked?: string | null
-          linkedin_url?: string | null
-          logo_url?: string | null
-          name?: string | null
-          published_at?: string | null
-          short_description?: string | null
-          slug?: string | null
-          source_url?: string | null
-          ticket_max_eur?: number | null
-          ticket_min_eur?: number | null
-          type?: Database["public"]["Enums"]["organisation_type"] | null
-          updated_at?: string | null
-          website?: string | null
-        }
-        Relationships: []
-      }
-      public_people: {
-        Row: {
-          bio: string | null
-          contact_email: string | null
-          expertise_note: string | null
-          full_name: string | null
-          headline: string | null
-          id: string | null
-          last_checked: string | null
-          linkedin_url: string | null
-          open_to: Database["public"]["Enums"]["open_to_kind"][] | null
-          photo_url: string | null
-          published_at: string | null
-          slug: string | null
-          source_url: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          bio?: string | null
-          contact_email?: never
-          expertise_note?: string | null
-          full_name?: string | null
-          headline?: string | null
-          id?: string | null
-          last_checked?: string | null
-          linkedin_url?: string | null
-          open_to?: Database["public"]["Enums"]["open_to_kind"][] | null
-          photo_url?: string | null
-          published_at?: string | null
-          slug?: string | null
-          source_url?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          bio?: string | null
-          contact_email?: never
-          expertise_note?: string | null
-          full_name?: string | null
-          headline?: string | null
-          id?: string | null
-          last_checked?: string | null
-          linkedin_url?: string | null
-          open_to?: Database["public"]["Enums"]["open_to_kind"][] | null
-          photo_url?: string | null
-          published_at?: string | null
-          slug?: string | null
-          source_url?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       entry_is_published: {
@@ -1394,6 +1211,48 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      public_organisations: {
+        Args: never
+        Returns: {
+          city: string
+          contact_email: string
+          description: string
+          founded_year: number
+          id: string
+          last_checked: string
+          linkedin_url: string
+          logo_url: string
+          name: string
+          published_at: string
+          short_description: string
+          slug: string
+          source_url: string
+          ticket_max_eur: number
+          ticket_min_eur: number
+          type: Database["public"]["Enums"]["organisation_type"]
+          updated_at: string
+          website: string
+        }[]
+      }
+      public_people: {
+        Args: never
+        Returns: {
+          bio: string
+          contact_email: string
+          expertise_note: string
+          full_name: string
+          headline: string
+          id: string
+          last_checked: string
+          linkedin_url: string
+          open_to: Database["public"]["Enums"]["open_to_kind"][]
+          photo_url: string
+          published_at: string
+          slug: string
+          source_url: string
+          updated_at: string
+        }[]
       }
     }
     Enums: {
