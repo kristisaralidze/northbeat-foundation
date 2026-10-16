@@ -6,6 +6,8 @@ import { ENTITIES, slugify, type EntityConfig, type EntityKey } from "./entities
 export const db = supabase as unknown as SupabaseClient;
 
 export type Row = Record<string, unknown> & { id: string };
+type Rec = Record<string, string>;
+const recs = (d: unknown) => (d ?? []) as Rec[];
 export type Term = { id: string; kind: string; name: string; parent_id: string | null };
 export type LinkRow = { otherId: string; role: string };
 
@@ -24,7 +26,7 @@ export async function listTerms(): Promise<Term[]> {
 async function idsWithTerm(cfg: EntityConfig, termId: string): Promise<string[]> {
   const { data, error } = await db.from(cfg.termTable).select(cfg.termFk).eq("term_id", termId);
   fail(error);
-  return (data ?? []).map((r: Record<string, string>) => r[cfg.termFk]);
+  return recs(data).map((r) => String(r[cfg.termFk]));
 }
 
 export async function listEntries(cfg: EntityConfig, f: ListFilters): Promise<Row[]> {
@@ -63,7 +65,7 @@ export async function getEntry(cfg: EntityConfig, id: string): Promise<EntryBund
   for (const l of cfg.links) {
     const { data, error: lErr } = await db.from(l.table).select(`${l.otherFk}, role`).eq(l.selfFk, id);
     fail(lErr);
-    links[l.table] = (data ?? []).map((r: Record<string, string>) => ({ otherId: r[l.otherFk], role: r.role ?? "" }));
+    links[l.table] = recs(data).map((r) => ({ otherId: String(r[l.otherFk]), role: r["role"] ?? "" }));
   }
   return { row: row as Row | null, termIds: (terms ?? []).map((t: { term_id: string }) => t.term_id), links };
 }
