@@ -89,6 +89,12 @@ Each table gets explicit grants so the app can reach it.
 - Indexes on slug, status, starts_at, deadline_at, and the term_id and entry ids in every link table.
 - Name and summary columns can be searched for later full-text search.
 
-## Open points (your call when you approve)
-1. Should organisation people roles be a fixed list or free text? Proposed: free text.
-2. Is double opt-in for the newsletter (a confirmation email) wanted now or later? Proposed: later, but the field is already there.
+## Decisions
+- Roles on links are free text.
+- Newsletter double opt-in comes later; the confirmed_at field is already in place.
+
+## Build steps (after approval)
+1. Turn on Lovable Cloud.
+2. Create everything in one database change: enums, tables, link tables, admin roles, views, grants, policies, triggers and indexes.
+3. Create the public media bucket with admin-only uploads.
+4. No pages or screens.
