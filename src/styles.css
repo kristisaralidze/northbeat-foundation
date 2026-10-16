@@ -156,6 +156,8 @@
   --color-frost: var(--frost);
   --color-cream: var(--cream);
   --color-hairline: var(--hairline);
+  --color-danger: var(--danger);
+  --radius-pill: 999px;
 }
 
 .theme-site {
@@ -168,6 +170,7 @@
   --berry-soft: oklch(0.94 0.03 358);
   --frost: oklch(0.955 0.018 300);
   --hairline: oklch(0.87 0.012 290);
+  --danger: oklch(0.5 0.12 30);
 
   /* Semantic tokens consumed by utilities/shadcn */
   --radius: 0.5rem;
@@ -279,6 +282,13 @@
   color: var(--ink-soft);
 }
 
+@utility nb-wordmark {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
 /* ---------- Layout ---------- */
 @utility nb-container {
   width: 100%;
@@ -337,6 +347,11 @@
   font-size: 0.875rem;
 }
 
+@utility nb-btn-block {
+  display: flex;
+  width: 100%;
+}
+
 /* ---------- Links ---------- */
 @utility nb-link {
   color: var(--ink);
@@ -364,6 +379,20 @@
   }
 }
 
+@utility nb-menulink {
+  display: block;
+  padding-block: 1rem;
+  font-family: var(--font-display);
+  font-weight: 450;
+  font-size: clamp(1.25rem, 0.8vw + 1rem, 1.5rem);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  transition: color 160ms ease;
+  &:hover { color: var(--berry); }
+  &[data-status="active"] { color: var(--berry); }
+}
+
 /* ---------- Tag chip ---------- */
 @utility nb-chip {
   display: inline-flex;
@@ -371,7 +400,7 @@
   gap: 0.375rem;
   height: 1.75rem;
   padding: 0 0.625rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--hairline);
   background: var(--snow);
   color: var(--ink);
