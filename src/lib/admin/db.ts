@@ -8,7 +8,7 @@ export const db = supabase as unknown as SupabaseClient;
 export type Row = Record<string, unknown> & { id: string };
 type Rec = Record<string, string>;
 const recs = (d: unknown) => (d ?? []) as Rec[];
-export type Term = { id: string; kind: string; name: string; parent_id: string | null };
+export type Term = { id: string; kind: string; name: string; parent_id: string | null; sort_order: number };
 export type LinkRow = { otherId: string; role: string };
 
 export type ListFilters = { q?: string | undefined; type?: string | undefined; status?: string | undefined; field?: string | undefined; country?: string | undefined };
@@ -18,7 +18,7 @@ function fail(error: { message: string } | null) {
 }
 
 export async function listTerms(): Promise<Term[]> {
-  const { data, error } = await db.from("terms").select("id, kind, name, parent_id").order("sort_order").order("name");
+  const { data, error } = await db.from("terms").select("id, kind, name, parent_id, sort_order").order("sort_order").order("name");
   fail(error);
   return (data ?? []) as Term[];
 }
