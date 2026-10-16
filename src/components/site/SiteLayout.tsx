@@ -23,7 +23,7 @@ function Header() {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-hairline bg-background/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b border-hairline bg-background">
       <div className="nb-container flex h-16 items-center justify-between gap-6">
         <Link to="/" aria-label="Northbeat home" className="shrink-0" onClick={() => setOpen(false)}>
           <Wordmark />
