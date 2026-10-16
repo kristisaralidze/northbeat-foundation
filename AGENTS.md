@@ -16,3 +16,4 @@
 - Newsletter sign-up/unsubscribe must go through server functions using the admin client; visitors have no direct table access. Why: protect subscriber emails.
 - Media bucket `media` is private (workspace blocks public buckets) but readable by anyone through storage policies; use signed or authenticated download URLs. Why: workspace policy.
 - Admin auth: sign-up is restricted by `admin_allowlist` via triggers on auth.users, which also grant the admin role. `/admin` layout gates itself client-side (ssr:false) and redirects to `/admin/login` (`admin_.login.tsx`). Why: only founders get accounts; no public sign-up.
+- Admin CRUD is config-driven: `src/lib/admin/entities.ts` defines fields, tag table and link tables per entity; `EntityList`/`EntityEdit` render any entity. Saves replace all tag/link rows for the entry. Why: one pattern for every entry type.

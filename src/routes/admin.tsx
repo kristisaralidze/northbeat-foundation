@@ -84,7 +84,7 @@ function AdminLayout() {
                 <SidebarMenu>
                   {items.map((item) => (
                     <SidebarMenuItem key={item.to}>
-                      <SidebarMenuButton asChild isActive={path === item.to} tooltip={item.title}>
+                      <SidebarMenuButton asChild isActive={path.startsWith(item.to)} tooltip={item.title}>
                         <Link to={item.to}>
                           <span className="w-4 text-center text-xs">{item.title[0]}</span>
                           <span>{item.title}</span>
