@@ -13,14 +13,18 @@ function World({ palette }: Pick<Props, 'palette'>) {
     const ctx = canvas.getContext('2d');
     if (ctx) { const gradient = ctx.createRadialGradient(32,32,0,32,32,32); gradient.addColorStop(0,palette.berry); gradient.addColorStop(.15,palette.berry); gradient.addColorStop(1,'transparent'); ctx.fillStyle = gradient; ctx.fillRect(0,0,64,64); }
     const texture = new CanvasTexture(canvas); texture.colorSpace = SRGBColorSpace;
-    return { land: geometry(points.filter(p => p[2] === 0)), nordic: geometry(points.filter(p => p[2] === 1)), texture };
+    const diskCanvas = document.createElement('canvas'); diskCanvas.width = diskCanvas.height = 32;
+    const disk = diskCanvas.getContext('2d');
+    if (disk) { disk.fillStyle = palette.background; disk.beginPath(); disk.arc(16,16,14,0,Math.PI*2); disk.fill(); }
+    const diskTexture = new CanvasTexture(diskCanvas);
+    return { land: geometry(points.filter(p => p[2] === 0)), nordic: geometry(points.filter(p => p[2] === 1)), texture, diskTexture };
   }, [palette]);
-  useEffect(() => () => { resources.land.dispose(); resources.nordic.dispose(); resources.texture.dispose(); }, [resources]);
+  useEffect(() => () => { resources.land.dispose(); resources.nordic.dispose(); resources.texture.dispose(); resources.diskTexture.dispose(); }, [resources]);
   return <>
     <mesh><sphereGeometry args={[1,48,32]} /><meshBasicMaterial color={palette.background} /></mesh>
-    <points geometry={resources.land}><pointsMaterial color={palette.land} size={.007} sizeAttenuation /></points>
-    <points geometry={resources.nordic}><pointsMaterial color={palette.berry} size={.008} sizeAttenuation /></points>
-    {NORDIC_CITIES.map(city => <sprite key={city.name} position={globePosition(city.lat,city.lng,1.01)} scale={[.055,.055,1]}><spriteMaterial map={resources.texture} transparent depthWrite={false} /></sprite>)}
+    <points geometry={resources.land}><pointsMaterial color={palette.land} alphaMap={resources.diskTexture} alphaTest={.5} size={.009} sizeAttenuation /></points>
+    <points geometry={resources.nordic}><pointsMaterial color={palette.berry} alphaMap={resources.diskTexture} alphaTest={.5} size={.015} sizeAttenuation /></points>
+    {NORDIC_CITIES.map(city => <sprite key={city.name} position={globePosition(city.lat,city.lng,1.01)} scale={[.035,.035,1]}><spriteMaterial map={resources.texture} transparent depthWrite={false} /></sprite>)}
   </>;
 }
 function Interaction({ visible, reduced, touched, wheel, zoom, reset, onFailure }: Props) {
