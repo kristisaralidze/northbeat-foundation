@@ -5,7 +5,7 @@ import { glossaryQuery } from '@/lib/learn.query';
 import { groupGlossary } from '@/lib/learn';
 
 const TITLE = 'Glossary: Northbeat Learn';
-const DESC = 'Health innovation and startup terms explained in plain language, A to Z.';
+const DESC = 'Health innovation and venture terms explained in plain language, A to Z.';
 
 export const Route = createFileRoute('/learn/glossary')({
   validateSearch: (search: Record<string, unknown>): { q?: string } => (typeof search['q'] === 'string' && search['q'] ? { q: search['q'] } : {}),

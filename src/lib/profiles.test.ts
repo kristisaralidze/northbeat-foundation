@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { loadPublicProfile } from './profiles.server';
-import { orgRelationLabel, safeWebUrl } from './profiles';
+import { orgRelationLabel, safeWebUrl, publicProfileTerms, showRelationshipMap, text, type PublicProfile } from './profiles';
 function fixture() {
   const tables: Record<string, Record<string, unknown>[]> = {
     organisations: [{ id: 'org-1', slug: 'public-org', name: 'Public org', status: 'published', contact_email: 'private@example.org', contact_email_public: false }],
@@ -29,6 +29,27 @@ function fixture() {
   return { client, calls };
 }
 describe('public profiles', () => {
+  it('preserves organisation types and URLs during public copy reviews', () => {
+    expect(text({ type: 'startup' }, 'type')).toBe('startup');
+    expect(text({ website: 'https://healthstartups.fi' }, 'website')).toBe('https://healthstartups.fi');
+    expect(text({ slug: 'health-startup' }, 'slug')).toBe('health-startup');
+  });
+  it('does not display journey steps as public profile tags', () => {
+    const tags = [{ id: 'step', slug: 'idea', name: 'Idea', kind: 'journey_step' }, { id: 'field', slug: 'medtech', name: 'Medtech', kind: 'field' }];
+    expect(publicProfileTerms(tags).map(term => term.id)).toEqual(['field']);
+  });
+  it('requires at least three unique connections for a relationship map', () => {
+    const profile: PublicProfile = { kind: 'organisations', row: { id: 'centre', slug: 'centre' }, title: 'Centre', summary: null, image: null, terms: [], related: [] };
+    const entries = Array.from({ length: 3 }, (_, i) => ({ id: String(i), slug: String(i), title: String(i), summary: null, image: null, roles: [] }));
+    profile.related = [{ kind: 'organisations', label: 'Partners', entries: entries.slice(0, 2) }];
+    expect(showRelationshipMap(profile)).toBe(false);
+    const third = entries[2];
+    if (!third) throw new Error('Missing third test connection');
+    profile.related[0]?.entries.push(third);
+    expect(showRelationshipMap(profile)).toBe(true);
+    profile.related = [{ kind: 'organisations', label: 'Partners', entries: [entries[0], entries[0], entries[1]].filter((e): e is NonNullable<typeof e> => Boolean(e)) }];
+    expect(showRelationshipMap(profile)).toBe(false);
+  });
   it('reads organisation contact through the masking RPC, never the base table', async () => {
     const { client, calls } = fixture(); const profile = await loadPublicProfile(client, 'organisations', 'public-org');
     expect(profile?.row['contact_email']).toBeNull(); expect(calls).toContain('public_organisations'); expect(calls).not.toContain('organisations');

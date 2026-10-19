@@ -4,6 +4,7 @@ import { HubList, LearnError, LearnNotFound } from '@/components/site/LearnParts
 import { guideQuery } from '@/lib/learn.query';
 import { levelLabel, paragraphs, readingLabel } from '@/lib/learn';
 import { dateLabel } from '@/lib/events';
+import { publicCopy } from '@/lib/profiles';
 
 export const Route = createFileRoute('/learn/$slug')({
   loader: ({ context, params }) => context.queryClient.ensureQueryData(guideQuery(params.slug)),
@@ -37,16 +38,16 @@ function Guide() {
   return <article className="nb-container nb-section">
     <div className="mx-auto max-w-2xl">
       <nav aria-label="Breadcrumb" className="nb-small mb-6"><Link to="/learn" className="nb-link">Learn</Link></nav>
-      <h1 className="nb-h1">{guide.title}</h1>
-      <p className="nb-small mt-4 text-muted-foreground">{meta.join(' · ')}</p>
+      <h1 data-page-title className="nb-h1">{guide.title}</h1>
+      <div className="nb-small mt-4 flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">{meta.map(item => <span key={item}>{item}</span>)}</div>
       {guide.one_sentence && <div data-one-sentence className="mt-8 border-l-2 border-primary pl-5">
         <p className="nb-eyebrow mb-2">In one sentence</p>
-        <p className="nb-lead text-ink">{guide.one_sentence}</p>
+        <p className="nb-lead text-ink">{publicCopy(guide.one_sentence)}</p>
       </div>}
       {body.length > 0 && <div data-guide-body className="nb-body mt-10 space-y-5 text-ink">{body.map((p, i) => <p key={i} className="whitespace-pre-line">{p}</p>)}</div>}
       {guide.next_step && <aside className="nb-card-frost mt-12">
         <p className="nb-eyebrow mb-2">Your next step</p>
-        <p className="nb-body text-ink whitespace-pre-line">{guide.next_step}</p>
+        <p className="nb-body text-ink whitespace-pre-line">{publicCopy(guide.next_step)}</p>
       </aside>}
       {(organisations.length > 0 || opportunities.length > 0 || events.length > 0) && <section className="mt-14" aria-labelledby="in-hub">
         <h2 id="in-hub" className="nb-h3 mb-6">In the hub</h2>

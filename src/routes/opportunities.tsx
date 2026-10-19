@@ -7,7 +7,7 @@ import { OPP_TYPES, humanize } from '@/lib/admin/entities';
 import { opportunitiesQuery } from '@/lib/opportunities.query';
 import { compactSearch } from '@/lib/search-params';
 import { amountLabel, deadlineLabel, filterOpportunities } from '@/lib/opportunities';
-import { publicTitle } from '@/lib/profiles';
+import { publicTitle, publicCopy } from '@/lib/profiles';
 import { DateTimeline } from '@/components/site/DateTimeline';
 import { closingDays } from '@/lib/timeline';
 
@@ -79,7 +79,7 @@ function Opportunities() {
       {hasFilters && <Button variant="ghost" className="nb-btn nb-btn-quiet" onClick={() => update({ type: '', field: '', stage: '' })}>Clear filters</Button>}
     </div>
     <p className="nb-small my-6 text-muted-foreground" role="status">{opportunities.length} {search.archive ? 'closed' : 'open'} {opportunities.length === 1 ? 'opportunity' : 'opportunities'}{!search.archive && opportunities.length > 0 ? ' · nearest deadline first' : ''}</p>
-    {opportunities.length > 0 && <DateTimeline items={opportunities} date={opportunity => opportunity.deadline_at} now={data.now} earlier={search.archive}>
+    {opportunities.length > 0 && <DateTimeline items={opportunities} date={opportunity => opportunity.deadline_at} now={data.now} earlier={search.archive} undatedHeading="Rolling and open now">
       {(opportunity) => {
         const amount = amountLabel(opportunity);
         const job = opportunity.type === 'job';
@@ -89,7 +89,7 @@ function Opportunities() {
             <p className={`nb-small ${closingDays(opportunity.deadline_at, data.now) !== null ? 'text-primary' : 'text-muted-foreground'}`}>{closingDays(opportunity.deadline_at, data.now) !== null ? `Closes in ${closingDays(opportunity.deadline_at, data.now)} days` : deadlineLabel(opportunity, data.now)}</p>
           </div>
           <h2 className="nb-h3 mt-2"><Link to="/opportunity/$slug" params={{ slug: opportunity.slug }} className="nb-org-link break-words">{publicTitle(opportunity.title)}</Link></h2>
-          {opportunity.summary && <p className="nb-body mt-2 text-muted-foreground">{opportunity.summary}</p>}
+          {opportunity.summary && <p className="nb-body mt-2 text-muted-foreground">{publicCopy(opportunity.summary)}</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             {amount && <span className="nb-chip">{amount}</span>}
             {job && opportunity.location && <span className="nb-chip">{opportunity.location}{opportunity.remote_ok ? ' · remote OK' : ''}</span>}

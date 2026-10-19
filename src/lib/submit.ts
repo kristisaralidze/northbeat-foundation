@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const SUBMIT_TABS = [
-  { id: "company", label: "Add a company", heading: "Add a company", intro: "Suggest a Nordic health startup, investor or programme for the directory." },
+  { id: "company", label: "Add a company", heading: "Add a company", intro: "Suggest a Nordic health venture, investor or programme for the directory." },
   { id: "event", label: "Add an event", heading: "Add an event", intro: "Send us the details of an event for Nordic health innovation." },
   { id: "opportunity", label: "Add an opportunity", heading: "Add an opportunity", intro: "Share a grant call, programme intake, competition or job opening in Nordic health." },
   { id: "guest", label: "Be a podcast guest", heading: "Apply to be a podcast guest", intro: "Tell us about your work in Nordic health innovation and what you would discuss on the podcast." },

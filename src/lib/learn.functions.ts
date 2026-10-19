@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import type { Database } from '@/integrations/supabase/types';
 import { publicTitle } from './profiles';
-import { areaNeighbours, orderGuides, parseSources, sharesHub, type GlossaryEntry, type GuideCard, type GuidePage, type HubItem, type LearnHub, type LearnTerm } from './learn';
+import { areaNeighbours, orderGuides, parseSources, rankHub, type GlossaryEntry, type GuideCard, type GuidePage, type HubItem, type LearnHub, type LearnTerm } from './learn';
 
 type Client = SupabaseClient<Database>;
 function publicClient(): Client {
@@ -79,17 +79,21 @@ export const getGuide = createServerFn({ method: 'GET' }).inputValidator(z.objec
   const { data: row, error } = await c.from('guides').select(`${GUIDE_CARD},summary,body,next_step,reviewed_by,last_checked,sources`).eq('status', 'published').eq('slug', data.slug).maybeSingle();
   if (error) throw new Error('This guide could not be loaded. Please try again.');
   if (!row) return null;
-  const [list, guideRows] = await Promise.all([terms(c, ['area', 'journey_step']), guides(c)]);
+  const [list, guideRows, guideTags] = await Promise.all([terms(c, ['area', 'journey_step', 'field']), guides(c), c.from('guide_terms').select('term_id').eq('guide_id', row.id)]);
+  if (guideTags.error) throw new Error('This guide could not be loaded. Please try again.');
+  const fields = (guideTags.data ?? []).map(tag => tag.term_id).filter(id => list.some(term => term.id === id && term.kind === 'field'));
+  const matchTerms = [...fields, ...(row.journey_step_id ? [row.journey_step_id] : [])];
   const steps = list.filter((t) => t.kind === 'journey_step');
   const stepOrder = new Map(steps.map((t, i) => [t.id, i]));
-  const [orgs, opps, events] = row.journey_step_id ? await Promise.all([tagged(c, 'organisations', [row.journey_step_id]), tagged(c, 'opportunities', [row.journey_step_id]), tagged(c, 'events', [row.journey_step_id], true)]) : [[], [], []];
+  const [orgs, opps, events] = await Promise.all([tagged(c, 'organisations', matchTerms), tagged(c, 'opportunities', matchTerms), tagged(c, 'events', matchTerms, true)]);
+  const ranked = rankHub([...orgs.map(o => ({ ...o, kind: 'organisations' })), ...opps.map(o => ({ ...o, kind: 'opportunities' })), ...events.map(o => ({ ...o, kind: 'events' }))], row.journey_step_id, fields);
   const term = (id: string | null) => { const t = list.find((x) => x.id === id); return t ? { id: t.id, name: t.name, slug: t.slug, sort_order: t.sort_order } : null; };
   const { sources, ...guide } = row;
   return {
     guide: cleanGuide(guide), area: term(row.area_id), step: term(row.journey_step_id), sources: parseSources(sources),
-    organisations: orgs.filter((o) => sharesHub(o.termIds, row.journey_step_id)).map(strip),
-    opportunities: opps.filter((o) => sharesHub(o.termIds, row.journey_step_id)).map(strip),
-    events: events.filter((o) => sharesHub(o.termIds, row.journey_step_id)).map(strip),
+    organisations: ranked.filter(o => o.kind === 'organisations').map(strip),
+    opportunities: ranked.filter(o => o.kind === 'opportunities').map(strip),
+    events: ranked.filter(o => o.kind === 'events').map(strip),
     ...areaNeighbours(guideRows, row.id, stepOrder),
   };
 });

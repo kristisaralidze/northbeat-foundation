@@ -365,6 +365,8 @@ html.lenis, html.lenis body { height: auto; }
 .nb-public-shell { background: var(--snow); }
 .nb-site-logo { display: flex; align-items: center; width: 9rem; height: 2.5rem; }
 .nb-site-logo .nb-laboratory-wordmark { width: 100%; height: auto; margin: 0; }
+.nb-site-header { z-index: 100; }
+.theme-site #mobile-nav { z-index: 101; background: var(--snow); }
 .nb-page { width: 100%; max-width: 76rem; margin-inline: auto; padding: var(--section) var(--gutter); }
 .nb-page-header { margin-bottom: var(--space-8); max-width: var(--measure); }
 .nb-page-header .nb-lead { margin-top: var(--space-4); }
@@ -400,13 +402,17 @@ html.lenis, html.lenis body { height: auto; }
 .nb-explore-bar h1 { line-height: 1.15; }
 .nb-group-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--node-color); margin-right: 8px; vertical-align: middle; flex-shrink: 0; }
 .theme-site { --network-startup: oklch(.52 .14 356); --network-investor: oklch(.48 .08 165); --network-incubator: oklch(.57 .11 65); --network-funder: oklch(.56 .12 30); --network-research: oklch(.48 .09 255); --network-lab: oklch(.53 .09 210); --network-care: oklch(.50 .10 120); --network-agency: oklch(.50 .04 285); --network-patient: oklch(.54 .12 325); --network-community: oklch(.58 .11 85); --network-service: oklch(.47 .04 45); }
-.nb-relationship-map { position: relative; margin-block: 24px; min-height: 260px; }
+.nb-relationship-map { position: relative; margin-block: 24px; min-height: 260px; max-width: 48rem; }
 .nb-relationship-lines { position: absolute; width: 100%; height: 100%; inset: 0; pointer-events: none; }
-.nb-relationship-lines path { stroke: var(--hairline); fill: none; stroke-width: 1; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.nb-relationship-lines path { stroke: var(--ink-soft); fill: none; stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-dasharray: 1; stroke-dashoffset: 1; }
 .nb-relationship-map[data-drawn='true'] path { stroke-dashoffset: 0; transition: stroke-dashoffset 650ms ease; }
 .nb-relationship-centre { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 28%; text-align: center; background: var(--snow); padding: 12px 4px; font-size: 16px; font-weight: 500; overflow-wrap: anywhere; }
 .nb-relationship-nodes { display: grid; grid-template-columns: 1fr 1fr; column-gap: 40%; }
 .nb-relationship-nodes li { min-height: 96px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; overflow-wrap: anywhere; }
+.nb-relationship-nodes li { flex-direction: column; gap: var(--space-2); padding-block: var(--space-2); }
+.nb-relationship-nodes li > span { position: relative; background: var(--snow); }
+.nb-relationship-centre > .nb-org-logo { margin-inline: auto; margin-bottom: var(--space-2); }
+.nb-org-logo img { width: 100%; height: 100%; object-fit: contain; }
 .nb-date-timeline { padding-bottom: 32px; }
 .nb-timeline-track { position: relative; padding-left: 28px; }
 .nb-timeline-track::before, .nb-timeline-fill { position: absolute; top: 0; bottom: 0; left: 5px; width: 1px; background: var(--hairline); }
@@ -792,7 +798,7 @@ html.lenis, html.lenis body { height: auto; }
   width: 4rem;
   height: 4rem;
   padding: var(--space-2);
-  background: var(--frost-wash);
+  background: var(--snow);
   border-radius: var(--radius);
 }
 @utility nb-org-link {

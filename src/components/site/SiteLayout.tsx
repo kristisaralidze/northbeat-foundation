@@ -26,7 +26,7 @@ function Header({ isHome }: { isHome: boolean }) {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-hairline bg-background">
+    <header className="nb-site-header sticky top-0 border-b border-hairline bg-background">
       <div className="nb-container flex h-16 items-center justify-between gap-6">
         <Link to="/" aria-label="Northbeat home" className={`shrink-0 nb-site-logo${isHome ? ' nb-home-header-logo' : ''}`} onClick={() => setOpen(false)}>
           <LaboratoryWordmark compact />
@@ -45,7 +45,7 @@ function Header({ isHome }: { isHome: boolean }) {
           </div>
           <Button
             type="button"
-            variant="ghost" size="icon" className="lg:hidden"
+            variant="ghost" size="icon" className="min-h-11 min-w-11 lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"}
@@ -56,7 +56,7 @@ function Header({ isHome }: { isHome: boolean }) {
         </div>
       </div>
       {open && (
-        <nav id="mobile-nav" aria-label="Main" className="fixed inset-x-0 bottom-0 top-16 z-40 flex flex-col overflow-y-auto bg-background lg:hidden">
+        <nav id="mobile-nav" aria-label="Main" className="fixed inset-x-0 bottom-0 top-16 flex flex-col overflow-y-auto bg-background lg:hidden">
           <ul className="nb-container divide-y divide-hairline py-4">
             {NAV.map((n) => (
               <li key={n.to}>

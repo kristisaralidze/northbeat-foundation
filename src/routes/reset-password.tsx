@@ -13,6 +13,8 @@ export const Route = createFileRoute("/reset-password")({
       { name: "description", content: "Set a new Northbeat admin password." },
       { property: "og:title", content: "Reset password · Northbeat" },
       { property: "og:description", content: "Set a new Northbeat admin password." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),

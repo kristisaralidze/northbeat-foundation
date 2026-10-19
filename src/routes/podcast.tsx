@@ -11,9 +11,9 @@ export const Route = createFileRoute('/podcast')({
   head: () => ({
     meta: [
       { title: 'Podcast: Northbeat' },
-      { name: 'description', content: 'Conversations with the people building Nordic health startups.' },
+      { name: 'description', content: 'Conversations with the people building health innovation in the Nordics.' },
       { property: 'og:title', content: 'Podcast: Northbeat' },
-      { property: 'og:description', content: 'Conversations with the people building Nordic health startups.' },
+      { property: 'og:description', content: 'Conversations with the people building health innovation in the Nordics.' },
       { property: 'og:type', content: 'website' },
       { property: 'og:url', content: '/podcast' },
       { name: 'twitter:card', content: 'summary' },
@@ -30,8 +30,8 @@ function Podcast() {
   const episodes = sortEpisodes(data.episodes);
   return <div className="nb-container nb-section">
     <header className="mb-8"><h1 className="nb-h1">Podcast</h1>
-      <p className="nb-lead mt-4 max-w-2xl">Conversations with the people building Nordic health startups.</p></header>
-    <p className="nb-small mb-6 text-muted-foreground" role="status">{episodes.length} {episodes.length === 1 ? 'episode' : 'episodes'}</p>
+      <p className="nb-lead mt-4 max-w-2xl">Conversations with the people building health innovation in the Nordics.</p></header>
+    {episodes.length > 0 && <p className="nb-small mb-6 text-muted-foreground" role="status">{episodes.length} {episodes.length === 1 ? 'episode' : 'episodes'}</p>}
     {episodes.length > 0 && <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {episodes.map((episode) => {
         const duration = durationLabel(episode.duration_seconds);
@@ -45,6 +45,6 @@ function Podcast() {
         </li>;
       })}
     </ul>}
-    {episodes.length === 0 && <div className="py-12"><h2 className="nb-h3">No episodes yet</h2><p className="nb-body mt-3 text-muted-foreground">Our first episode is on its way.</p></div>}
+    {episodes.length === 0 && <div className="py-8"><p className="nb-body text-muted-foreground">First episodes are being recorded.</p><Link to="/submit" search={{ tab: 'guest' }} className="nb-link mt-4 inline-block">Suggest a guest</Link></div>}
   </div>;
 }

@@ -20,7 +20,7 @@ export const Route = createFileRoute("/")({
     links: [{ rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&display=swap" }],
     meta: [
       { title: "Northbeat: The heartbeat of Nordic health innovation." },
-      { name: "description", content: "The reference hub for Nordic health, medtech and biotech startups: companies, investors, programmes, funding, events and jobs." },
+      { name: "description", content: "The reference hub for Nordic health ventures: companies, investors, programmes, funding, events and jobs." },
       { property: "og:title", content: "Northbeat: The heartbeat of Nordic health innovation." },
       { property: "og:description", content: "We track Nordic health innovation so you don't miss it." },
       { property: "og:type", content: "website" },

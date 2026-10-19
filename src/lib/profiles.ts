@@ -4,9 +4,27 @@ export type ProfileTerm = { id: string; name: string; kind: string; slug: string
 export type RelatedEntry = { id: string; slug: string; title: string; summary: string | null; image: string | null; roles: string[]; type?: string | undefined };
 export type RelatedGroup = { kind: EntityKey; label: string; entries: RelatedEntry[] };
 export type PublicProfile = { kind: EntityKey; row: ProfileRow; title: string; summary: string | null; image: string | null; terms: ProfileTerm[]; related: RelatedGroup[] };
+export function relationshipNodes(profile: PublicProfile) {
+  const seen = new Set<string>();
+  return profile.related.flatMap(group => group.entries.flatMap(entry => {
+    const key = `${group.kind}:${entry.id}`;
+    if (seen.has(key) || !['organisations', 'people', 'events', 'opportunities'].includes(group.kind)) return [];
+    seen.add(key);
+    return [{ kind: group.kind, entry }];
+  }));
+}
+export const showRelationshipMap = (profile: PublicProfile) => relationshipNodes(profile).length >= 3;
+export const publicProfileTerms = (terms: ProfileTerm[]) => terms.filter(term => term.kind !== 'journey_step');
 /** Presentation only: leave stored entry titles unchanged. */
 export const publicTitle = (value: string): string => value.replace(/\s*[—–]\s*/g, ': ');
-export const text = (row: Record<string, unknown>, key: string): string | null => typeof row[key] === 'string' && row[key] ? String(row[key]) : null;
+/** Broader health wording is presentation-only, preserving editorial records and type names. */
+export const publicCopy = (value: string): string => value
+  .replace(/health, medtech (?:or|and) biotech startups?/gi, match => match.endsWith('s') ? 'health ventures' : 'health venture')
+  .replace(/health startups?/gi, match => match.endsWith('s') ? 'health ventures' : 'health venture');
+export const text = (row: Record<string, unknown>, key: string): string | null => {
+  const value = typeof row[key] === 'string' && row[key] ? String(row[key]) : null;
+  return value && ['description', 'short_description', 'summary', 'bio', 'headline', 'show_notes', 'expertise_note', 'transcript'].includes(key) ? publicCopy(value) : value;
+};
 export function safeWebUrl(value: string | null): string | null {
   if (!value) return null;
   try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) ? url.href : null; } catch { return null; }

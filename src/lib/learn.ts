@@ -1,4 +1,4 @@
-import { safeWebUrl } from './profiles';
+import { safeWebUrl, publicCopy } from './profiles';
 
 export type LearnTerm = { id: string; name: string; slug: string; sort_order: number };
 export type GuideCard = { id: string; slug: string; title: string; one_sentence: string | null; level: string; reading_minutes: number | null; area_id: string | null; journey_step_id: string | null };
@@ -21,6 +21,13 @@ export const readingLabel = (minutes: number | null) => (minutes && minutes > 0 
 /** Guide recommendations match the journey step alone, regardless of field tags. */
 export function sharesHub(itemTermIds: string[], stepId: string | null): boolean {
   return Boolean(stepId && itemTermIds.includes(stepId));
+}
+/** Keep one cross-type shortlist, prioritising the journey and then shared fields. */
+export function rankHub<T extends { title: string; termIds: string[] }>(items: T[], stepId: string | null, fieldIds: string[]): T[] {
+  const fieldMatch = (item: T) => fieldIds.some(id => item.termIds.includes(id));
+  return items.filter(item => sharesHub(item.termIds, stepId) || fieldMatch(item))
+    .sort((a, b) => Number(sharesHub(b.termIds, stepId)) - Number(sharesHub(a.termIds, stepId)) || Number(fieldMatch(b)) - Number(fieldMatch(a)) || a.title.localeCompare(b.title))
+    .slice(0, 5);
 }
 
 /** Guides in one area, ordered along the journey, then by title. */
@@ -48,7 +55,7 @@ export function parseSources(value: unknown): GuideSource[] {
   });
 }
 
-export const paragraphs = (body: string | null) => (body ?? '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+export const paragraphs = (body: string | null) => publicCopy(body ?? '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 
 export const glossaryLetter = (term: string) => {
   const letter = term.trim().charAt(0).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();

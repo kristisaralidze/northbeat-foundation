@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import histology from "@/assets/directions-histology.jpg";
 import { EMPTY_SEARCH } from "@/lib/explore";
+import { OrganisationLogo } from './OrganisationLogo';
 
 const INTRO = "Every founder, investor, programme and deadline in Nordic health, in one place. We track it so you don't miss it.";
 const DEADLINES = [
@@ -30,6 +31,7 @@ function DeadlineRows() {
 function OrganisationRows() {
   return <div className="direction-organisations">{ORGANISATIONS.map((org) => (
     <article className="direction-organisation" key={org.slug}>
+      <OrganisationLogo name={org.name} slug={org.slug} />
       <h3><Link to="/org/$slug" params={{ slug: org.slug }}>{org.name}</Link></h3>
       <p>{org.description}</p>
     </article>

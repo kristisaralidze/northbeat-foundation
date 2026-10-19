@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { areaNeighbours, groupGlossary, parseSources, sharesHub, type GuideCard } from './learn';
+import { areaNeighbours, groupGlossary, parseSources, sharesHub, rankHub, type GuideCard } from './learn';
 
 const g = (id: string, area: string | null, step: string | null, title = id): GuideCard => ({ id, slug: id, title, one_sentence: null, level: 'beginner', reading_minutes: null, area_id: area, journey_step_id: step });
 
 describe('learn', () => {
+  it('limits the cross-type recommendation shortlist to five entries', () => {
+    const items = Array.from({ length: 8 }, (_, i) => ({ title: String(i), termIds: ['step1'] }));
+    expect(rankHub(items, 'step1', [])).toHaveLength(5);
+  });
+  it('ranks the same journey step first, then shared fields', () => {
+    const items = [{ title: 'Field only', termIds: ['field1'] }, { title: 'Step only', termIds: ['step1'] }, { title: 'Both', termIds: ['step1', 'field1'] }, { title: 'Unrelated', termIds: ['other'] }];
+    expect(rankHub(items, 'step1', ['field1']).map(item => item.title)).toEqual(['Both', 'Step only', 'Field only']);
+  });
   it('in the hub needs the same journey step', () => {
     expect(sharesHub(['field1'], 'step1')).toBe(false);
     expect(sharesHub(['step1'], 'step1')).toBe(true);
