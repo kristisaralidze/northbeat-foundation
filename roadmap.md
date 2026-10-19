@@ -1,4 +1,5 @@
 # Home transition safeguards
+- [ ] Replace globe buttons and wheel zoom with reversible scroll zoom, touch pinch and eased rotation recovery; verify interactions.
 - [x] Keep globe rendering dimensions stable and remeasure/recentre on entry and resize.
 - [x] Synchronise scrolling and snap globe, ecosystem and wordmark endpoints after fast scrolls.
 - [x] Verify repeated fast scrolling, scrollbar jumps, resize and reduced motion.
