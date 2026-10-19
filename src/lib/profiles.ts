@@ -17,7 +17,11 @@ export const showRelationshipMap = (profile: PublicProfile) => relationshipNodes
 export const publicProfileTerms = (terms: ProfileTerm[]) => terms.filter(term => term.kind !== 'journey_step');
 /** Presentation only: leave stored entry titles unchanged. */
 export const publicTitle = (value: string): string => value.replace(/\s*[—–]\s*/g, ': ');
-export const text = (row: Record<string, unknown>, key: string): string | null => typeof row[key] === 'string' && row[key] ? String(row[key]) : null;
+/** Broader health wording is presentation-only, preserving editorial records and type names. */
+export const publicCopy = (value: string): string => value
+  .replace(/health, medtech (?:or|and) biotech startups?/gi, match => match.endsWith('s') ? 'health ventures' : 'health venture')
+  .replace(/health startups?/gi, match => match.endsWith('s') ? 'health ventures' : 'health venture');
+export const text = (row: Record<string, unknown>, key: string): string | null => typeof row[key] === 'string' && row[key] ? publicCopy(String(row[key])) : null;
 export function safeWebUrl(value: string | null): string | null {
   if (!value) return null;
   try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) ? url.href : null; } catch { return null; }

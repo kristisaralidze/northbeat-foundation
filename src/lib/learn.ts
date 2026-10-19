@@ -1,4 +1,4 @@
-import { safeWebUrl } from './profiles';
+import { safeWebUrl, publicCopy } from './profiles';
 
 export type LearnTerm = { id: string; name: string; slug: string; sort_order: number };
 export type GuideCard = { id: string; slug: string; title: string; one_sentence: string | null; level: string; reading_minutes: number | null; area_id: string | null; journey_step_id: string | null };
@@ -55,7 +55,7 @@ export function parseSources(value: unknown): GuideSource[] {
   });
 }
 
-export const paragraphs = (body: string | null) => (body ?? '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+export const paragraphs = (body: string | null) => publicCopy(body ?? '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 
 export const glossaryLetter = (term: string) => {
   const letter = term.trim().charAt(0).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
