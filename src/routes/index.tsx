@@ -4,6 +4,7 @@ import { EMPTY_SEARCH } from "@/lib/explore";
 import { EcosystemNetwork } from "@/components/site/EcosystemNetwork";
 import { ecosystemQuery } from "@/lib/ecosystem.query";
 import { NordicGlobe } from "@/components/site/NordicGlobe";
+import { HomeScrollStory } from "@/components/site/HomeScrollStory";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(ecosystemQuery),
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
-    <>
+    <HomeScrollStory>
     <div className="nb-home-wordmark-section">
       <LaboratoryWordmark />
       <div className="nb-home-intro">
@@ -38,6 +39,6 @@ function Index() {
     </div>
     <EcosystemNetwork />
     <NordicGlobe />
-    </>
+    </HomeScrollStory>
   );
 }

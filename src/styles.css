@@ -221,6 +221,36 @@
   font-feature-settings: "ss01", "cv11";
 }
 
+.nb-home-shell {
+  --home-opening: var(--snow);
+  --home-ecosystem: var(--frost);
+  --home-nordics: var(--snow);
+  --home-ending: var(--frost-wash);
+  --home-surface: var(--home-opening);
+  background-color: var(--home-surface);
+}
+.nb-home-shell > header,
+.nb-home-shell > footer {
+  border: 0;
+  background-color: var(--home-surface);
+}
+.nb-home-shell > footer [role='presentation'],
+.nb-home-shell #mobile-nav [role='presentation'] { display: none; }
+.nb-home-shell #mobile-nav ul > li { border: 0; }
+.nb-home-story .nb-network-section,
+.nb-home-story .nb-globe-section { border: 0; background: transparent; }
+.nb-home-story .nb-network-section { --network-label-halo: var(--home-surface); }
+.nb-home-story .nb-globe-stage { background: transparent; }
+.nb-home-story .nb-globe-still { mix-blend-mode: multiply; }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: clip; }
+@media (prefers-reduced-motion: reduce) {
+  .nb-home-shell { --home-surface: var(--home-opening); scroll-behavior: auto; }
+  .nb-home-story .nb-home-intro,
+  .nb-home-story .nb-network-heading { transform: none !important; }
+}
+
 .nb-home-wordmark-section {
   width: 100%;
   padding: var(--space-16) var(--gutter) var(--space-24);
