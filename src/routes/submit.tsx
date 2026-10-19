@@ -29,7 +29,7 @@ function SubmitPage() {
   return (
     <div className="nb-page">
       <header className="nb-page-header">
-        <p className="nb-eyebrow">Submit</p>
+        
         <h1 className="nb-h1">Help us track it</h1>
         <p className="nb-lead">Northbeat is curated. Send us what we're missing and we'll take a look.</p>
       </header>

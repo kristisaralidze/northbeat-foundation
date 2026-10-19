@@ -18,7 +18,7 @@ function AboutPage() {
   return (
     <div className="nb-page">
       <header className="nb-page-header">
-        <p className="nb-eyebrow">About</p>
+        
         <h1 className="nb-h1">We track it so you don't miss it.</h1>
         <p className="nb-lead">Northbeat is the reference hub for anyone starting, joining, funding or researching a health, medtech or biotech startup in the Nordics.</p>
       </header>

@@ -42,11 +42,13 @@ export function facetCounts(data: DirectoryData, search: ExploreSearch, facet: F
   return counts;
 }
 const TAG_PRIORITY: Record<string, number> = { sub_area: 0, field: 1, stage: 2 };
-/** Card chips: most specific first (sub-area, field, stage), max 3, remainder counted. */
-export function cardTags(org: DirectoryOrganisation, terms: DirectoryTerm[], max = 3) {
+/** One specific field/sub-area and one stage; other tags stay off cards. */
+export function cardTags(org: DirectoryOrganisation, terms: DirectoryTerm[]) {
   const tags = terms.filter((t) => org.termIds.includes(t.id))
     .sort((a, b) => (TAG_PRIORITY[a.kind] ?? 3) - (TAG_PRIORITY[b.kind] ?? 3) || a.sort_order - b.sort_order);
-  return { shown: tags.slice(0, max), extra: Math.max(0, tags.length - max) };
+  const field = tags.find(t => t.kind === 'sub_area' || t.kind === 'field');
+  const stage = tags.find(t => t.kind === 'stage');
+  return { shown: [field, stage].filter((t): t is DirectoryTerm => Boolean(t)), extra: 0 };
 }
 
 /** Drop empty params so shared URLs stay clean. */

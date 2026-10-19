@@ -1,3 +1,15 @@
+# Public scroll foundation and browsing
+- [x] Site-wide object wordmark, no pulse logos or decorative eyebrows, sentence-case field labels, shared container padding and no section dividers.
+- [x] Newsletter single signup and published-only issue section; phone Events filter sheet; Explore field/stage-only tags; modest organisation monogram.
+- [x] Extend smooth scrolling and reversible compact intro bars to public pages without changing content or data.
+- [x] Remove public section dividers and use spacing and soft surfaces; respect reduced motion.
+- [x] Explore: sticky title/search/count, reachable filters, desktop sticky panel, group dots and sub-300ms rearrangement.
+- [x] Organisation profiles: compact identity bar and real linked relationship map, hidden when empty.
+- [x] Learn journey: eight scroll-lit steps and sticky current-step indicator; guides: reading progress and sticky one-sentence summary; glossary: sticky active-letter index.
+- [x] Keep Podcast, Newsletter, Submit and About limited to the shared intro pattern.
+- [x] Events and opportunities: scroll-fill timelines, sticky month, Today marker, 14-day closing labels and quieter Earlier items.
+- [x] Test date rules and verify populated public browsing, navigation and reduced motion across screen sizes.
+
 # Home and site-shell refinements
 - [x] Redesign header actions and mobile menu placement; remove footer pulse and newsletter eyebrow.
 - [x] Reveal the large intro immediately at docking and reduce home gaps.

@@ -12,7 +12,7 @@ const OBJECTS = [
 type Metrics = { cap: number; width: number; positions: number[]; widths: number[] };
 
 /** Serif letters remain visible until each object has successfully loaded. */
-export function LaboratoryWordmark() {
+export function LaboratoryWordmark({ compact = false }: { compact?: boolean }) {
   const host = useRef<HTMLHeadingElement>(null);
   const [loaded, setLoaded] = useState<number[]>([]);
   const [metrics, setMetrics] = useState<Metrics>({ cap: 144, width: 1293, positions: LETTERS.map((_, i) => i * 144), widths: LETTERS.map(() => 141) });
@@ -53,7 +53,8 @@ export function LaboratoryWordmark() {
     return () => { cancelled = true; };
   }, [loaded]);
 
-  return <h1 ref={host} className="nb-laboratory-wordmark" aria-label="Northbeat">
+  const Tag = compact ? 'span' : 'h1';
+  return <Tag ref={host} className="nb-laboratory-wordmark" aria-label="Northbeat">
     <svg viewBox={`0 0 ${metrics.width} ${metrics.cap}`} className="nb-laboratory-lettering" aria-hidden="true">
       {LETTERS.map((letter, index) => {
         const object = OBJECTS.find((item) => item.index === index && loaded.includes(index));
@@ -64,5 +65,5 @@ export function LaboratoryWordmark() {
         return <image key={index} href={object.src} x={x + (width - imageWidth) / 2} y={0} width={imageWidth} height={metrics.cap} preserveAspectRatio="xMidYMid meet" onError={() => setLoaded((current) => current.filter((item) => item !== index))}><title>{object.name}</title></image>;
       })}
     </svg>
-  </h1>;
+  </Tag>;
 }

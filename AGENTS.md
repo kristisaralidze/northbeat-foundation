@@ -10,10 +10,12 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
-- Home scrolling is owned by a route-mounted Lenis/GSAP wrapper that measures a single fixed wordmark against the header dock, reveals the intro inside the same opening pin, pins reversible world/happening scenes, sends progress events to the network and globe, and reverts everything on reduced motion or navigation; happening entries reuse the published Events and Opportunities queries and tested nearest-first helpers. Why: a shared opening avoids empty scroll while the coordinated sequence preserves safe real data, globe input and other pages.
+- Home owns one Lenis/GSAP story with wordmark docking, intro, world and happening pins; ordinary public routes use a keyed PublicScrollFrame for smooth scrolling and reversible compact titles. Both clean up on navigation and reduced motion. Why: one controller per route avoids duplicate tickers and empty scroll.
+- Relationship maps reuse published profile links and network tokens; timelines use tested date helpers with existing URL filters and archive views. Why: visual additions preserve real connections and editorial data.
 - The home ecosystem groups the paginated published reader into fixed group anchors and one cloud dot per entry; group links use Explore's canonical type search and separate conceptual edges. Why: group browsing stays distinct from individual database relationships.
 - The home globe lazy-loads an R3F scene with locally sampled Design Lab country geometry and a matching still; OrbitControls handles rotation while zoom is bounded and wheel-gated. Why: SSR stays safe and scrolling works without external runtime assets.
-- The home object wordmark uses local asset pointers and measured serif lettering; object images replace letters only after loading and failed images revert to letters. Why: the imported composition stays readable even when media is unavailable.
+- LaboratoryWordmark uses local assets, measured serif fallbacks and compact mode for every public header/footer. Why: one readable logo, even if images fail.
+- Mobile filters reuse FilterSheet with existing URL state. Why: accessible controls without divergent browsing logic.
 - Public entry titles use the shared publicTitle formatter for dash punctuation; stored titles are never rewritten during copy reviews. Why: public copy can follow the voice rules without changing editorial data.
 - Events use a paginated public read and URL-backed browsing state; past is a date-based view of published entries, not an entry status mutation. Why: past events remain publicly readable and linked while upcoming lists stay current.
 - Database: every entry table shares slug/status/source_url/last_checked; public reads only `status = 'published'`, writes need `has_role(auth.uid(),'admin')`. Why: one consistent publish workflow and RLS model.

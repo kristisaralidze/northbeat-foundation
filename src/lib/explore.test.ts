@@ -34,10 +34,12 @@ describe("Explore directory", () => {
   });
 });import { cardTags, cleanExploreSearch } from "./explore";
 describe("Explore cards and URLs", () => {
-  it("shows at most 3 chips, sub-area then field then stage, plus a remainder", () => {
-    const r = cardTags(data.organisations[0]!, data.terms);
-    expect(r.shown.map((t) => t.id)).toEqual(["wearables", "medtech", "seed"]);
-    expect(r.extra).toBe(1);
+  it("shows one sub-area or field and one stage, never journey steps", () => {
+    const org = data.organisations[0]; if (!org) throw new Error('Missing fixture');
+    const journey = { id: 'idea', kind: 'journey_step', slug: 'idea', name: 'Idea', parent_id: null, sort_order: 0 };
+    const r = cardTags({ ...org, termIds: [...org.termIds, 'idea'] }, [...data.terms, journey]);
+    expect(r.shown.map((t) => t.id)).toEqual(["wearables", "seed"]);
+    expect(r.extra).toBe(0);
   });
   it("drops empty URL params", () => expect(cleanExploreSearch({ ...EMPTY_SEARCH, country: ["finland"] })).toEqual({ country: ["finland"] }));
 });

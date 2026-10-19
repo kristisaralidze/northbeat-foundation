@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { PulseLine } from '@/components/site/PulseLine';
 import { HubList, LearnError, LearnNotFound } from '@/components/site/LearnParts';
 import { learnHubQuery } from '@/lib/learn.query';
 import { levelLabel, readingLabel, type JourneyStep } from '@/lib/learn';
+import { useEffect, useRef, useState } from 'react';
 
 const TITLE = 'Learn: Northbeat';
 const DESC = 'Plain guides for building a health venture in the Nordics, step by step, from first idea to growth.';
@@ -28,6 +28,14 @@ export const Route = createFileRoute('/learn/')({
 const hasContent = (s: JourneyStep) => s.guides.length + s.organisations.length + s.opportunities.length + s.events.length > 0;
 
 function Learn() {
+  const journeyRef = useRef<HTMLElement>(null);
+  const [scrollStep, setScrollStep] = useState(0);
+  useEffect(() => {
+    const el = journeyRef.current; if (!el) return;
+    const update = (event: Event) => setScrollStep((event as CustomEvent<number>).detail);
+    el.addEventListener('northbeat:journey-step', update);
+    return () => el.removeEventListener('northbeat:journey-step', update);
+  }, []);
   const { data } = useSuspenseQuery(learnHubQuery);
   const { step: stepSlug } = Route.useSearch();
   const active = data.steps.find((s) => s.slug === stepSlug && hasContent(s));
@@ -35,7 +43,7 @@ function Learn() {
 
   return <div className="nb-container nb-section">
     <header className="max-w-2xl">
-      <p className="nb-eyebrow mb-3">Start here</p>
+      
       <h1 className="nb-h1">Learn</h1>
       <div className="nb-lead mt-6 space-y-3">
         <p>Health innovation is any new way to prevent, find, treat or care for illness, or to keep people well.</p>
@@ -44,7 +52,8 @@ function Learn() {
       </div>
     </header>
 
-    {data.steps.length > 0 && <section className="mt-16" aria-labelledby="journey">
+    {data.steps.length > 0 && <section ref={journeyRef} data-journey className="mt-16" aria-labelledby="journey">
+      <p data-journey-current className="nb-journey-current">{scrollStep + 1} / {data.steps.length}: {data.steps[scrollStep]?.name}</p>
       <h2 id="journey" className="nb-h2">The founder journey</h2>
       <p className="nb-body mt-3 max-w-2xl text-muted-foreground">Eight steps from curious to growing. Pick one to see its guides and who can help.</p>
       <ol className="mt-8 flex flex-col md:flex-row">
@@ -52,7 +61,7 @@ function Learn() {
           const open = active?.id === s.id;
           const usable = hasContent(s);
           const dot = <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border nb-small font-medium ${open ? 'border-primary bg-primary text-primary-foreground' : usable ? 'border-primary text-berry' : 'border-hairline text-muted-foreground'}`}>{i + 1}</span>;
-          return <li key={s.id} className="relative flex flex-1 md:flex-col">
+          return <li key={s.id} data-journey-step data-lit={i <= scrollStep} data-step-name={s.name} className="relative flex flex-1 md:flex-col">
             <span aria-hidden className={`absolute bg-hairline ${i === data.steps.length - 1 ? 'hidden' : ''} left-[18px] top-9 h-[calc(100%-2.25rem)] w-px md:left-9 md:top-[18px] md:h-px md:w-[calc(100%-2.25rem)]`} />
             {usable
               ? <Link to="/learn" search={open ? {} : { step: s.slug }} resetScroll={false} aria-expanded={open} aria-controls="journey-panel"
@@ -82,7 +91,6 @@ function Learn() {
     </section>}
 
     {areas.length > 0 && <section className="mt-16" aria-labelledby="areas">
-      <PulseLine className="mb-10" />
       <h2 id="areas" className="nb-h2">Browse by area</h2>
       <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {areas.map((a) => <li key={a.id} className="nb-card flex flex-col gap-3">
