@@ -1,9 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LaboratoryWordmark } from "@/components/site/LaboratoryWordmark";
 import { EMPTY_SEARCH } from "@/lib/explore";
+import { EcosystemNetwork } from "@/components/site/EcosystemNetwork";
+import { ecosystemQuery } from "@/lib/ecosystem.query";
 
 export const Route = createFileRoute("/")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(ecosystemQuery),
   head: () => ({
+    links: [{ rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&display=swap" }],
     meta: [
       { title: "Northbeat: The heartbeat of Nordic health innovation." },
       { name: "description", content: "The reference hub for Nordic health, medtech and biotech startups: companies, investors, programmes, funding, events and jobs." },
@@ -18,6 +22,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   return (
+    <>
     <div className="nb-home-wordmark-section">
       <LaboratoryWordmark />
       <div className="nb-home-intro">
@@ -30,5 +35,7 @@ function Index() {
         </div>
       </div>
     </div>
+    <EcosystemNetwork />
+    </>
   );
 }
