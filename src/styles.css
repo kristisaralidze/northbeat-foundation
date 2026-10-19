@@ -453,6 +453,41 @@
   &:focus { border-color: var(--ink); outline: none; }
 }
 
+/* ---------- Directory patterns ---------- */
+@utility nb-directory-layout {
+  display: grid;
+  gap: var(--space-8);
+  @media (min-width: 64rem) {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: var(--space-12);
+  }
+}
+@utility nb-filter-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 2.75rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  &:hover { color: var(--berry); }
+}
+@utility nb-org-logo {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 4rem;
+  height: 4rem;
+  padding: var(--space-2);
+  background: var(--frost-wash);
+  border-radius: var(--radius);
+}
+@utility nb-org-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  &:hover { color: var(--berry); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .theme-site *, .theme-site *::before, .theme-site *::after {
     transition-duration: 0.01ms !important;
