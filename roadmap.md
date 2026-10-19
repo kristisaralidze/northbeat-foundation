@@ -12,3 +12,7 @@
 - [x] Build published event data, date classification and 14-day deadline strip.
 - [x] Add URL-backed type/city/month filters, list/calendar views and a past-event archive.
 - [x] Test date boundaries in multiple timezones and verify populated browsing on desktop and mobile; remove test entries.
+
+# Opportunities
+- [x] Build /opportunities: type/field/stage filters, nearest-deadline sort, open/closed toggle, amount and job chips.
+- [x] Test sorting, filters, archive and deadline labels; verify in preview with temporary entries and remove them.
