@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { OrganisationCard } from "@/components/site/OrganisationCard";
 import { DirectoryFilters } from "@/components/site/DirectoryFilters";
 import { getDirectory } from "@/lib/explore.functions";
-import { EMPTY_SEARCH, FACETS, filterOrganisations, parseExploreSearch, type Facet } from "@/lib/explore";
+import { EMPTY_SEARCH, FACETS, cleanExploreSearch, filterOrganisations, parseExploreSearch, type ExploreSearch, type Facet } from "@/lib/explore";
 import { humanize } from "@/lib/admin/entities";
 
 const directoryQuery = queryOptions({ queryKey: ["public-organisations"], queryFn: () => getDirectory(), staleTime: 60_000 });
 
 export const Route = createFileRoute("/explore")({
   validateSearch: parseExploreSearch,
+  search: { middlewares: [({ search, next }) => cleanExploreSearch(next(search)) as ExploreSearch] },
   loader: async ({ context }) => { await context.queryClient.ensureQueryData(directoryQuery); },
   head: () => ({
     meta: [
@@ -50,20 +51,20 @@ function Explore() {
       <h1 className="nb-h1">Explore</h1>
     </div>
     <div className="nb-directory-layout">
-      <aside aria-label="Organisation filters">
-        <div className="mb-6 flex items-center justify-between gap-3">
+      <div className="relative min-w-0 lg:col-start-2 lg:row-start-1">
+        <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
+        <input type="search" aria-label="Search organisations" placeholder="Search organisations…" value={search.q} onChange={(event) => { void navigate({ search: (prev) => ({ ...prev, q: event.target.value }), replace: true, resetScroll: false }); }} className="nb-input pl-12" />
+      </div>
+      <aside aria-label="Organisation filters" className="lg:col-start-1 lg:row-start-1 lg:row-span-2">
+        <div className="mb-6 hidden items-center justify-between gap-3 lg:flex">
           <h2 className="nb-h3">Filters</h2>
           {(selected.length > 0 || search.q) && <Button variant="ghost" size="sm" onClick={clear} className="text-primary">Clear all</Button>}
         </div>
-        <Button variant="ghost" className="nb-btn nb-btn-quiet nb-btn-block mb-6 lg:hidden" aria-expanded={filtersOpen} aria-controls="directory-filters" onClick={() => setFiltersOpen((open) => !open)}><SlidersHorizontal aria-hidden />{filtersOpen ? "Hide filters" : `Show filters${selected.length ? ` (${selected.length})` : ""}`}</Button>
-        <div id="directory-filters" className={filtersOpen ? "block" : "hidden lg:block"}><DirectoryFilters data={data} search={search} onToggle={toggle} /></div>
+        <Button variant="ghost" className="nb-btn nb-btn-quiet nb-btn-block lg:hidden" aria-expanded={filtersOpen} aria-controls="directory-filters" onClick={() => setFiltersOpen((open) => !open)}><SlidersHorizontal aria-hidden />{filtersOpen ? "Hide filters" : `Show filters${selected.length ? ` (${selected.length})` : ""}`}</Button>
+        <div id="directory-filters" className={filtersOpen ? "mt-6 block lg:mt-0" : "hidden lg:block"}><DirectoryFilters data={data} search={search} onToggle={toggle} /></div>
       </aside>
-      <section aria-label="Organisations" className="min-w-0">
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
-          <input type="search" aria-label="Search organisations" placeholder="Search organisations…" value={search.q} onChange={(event) => { void navigate({ search: (prev) => ({ ...prev, q: event.target.value }), replace: true, resetScroll: false }); }} className="nb-input pl-12" />
-        </div>
-        {selected.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{selected.map(({ facet, value, label }) => <Button key={`${facet}-${value}`} variant="ghost" size="sm" className="nb-chip" data-active="true" onClick={() => toggle(facet, value)} aria-label={`Remove ${label} filter`}>{label}<X className="h-3 w-3" aria-hidden /></Button>)}</div>}
+      <section aria-label="Organisations" className="min-w-0 lg:col-start-2">
+        {selected.length > 0 && <div className="flex flex-wrap gap-2">{selected.map(({ facet, value, label }) => <Button key={`${facet}-${value}`} variant="ghost" size="sm" className="nb-chip" data-active="true" onClick={() => toggle(facet, value)} aria-label={`Remove ${label} filter`}>{label}<X className="h-3 w-3" aria-hidden /></Button>)}</div>}
         <p className="nb-small my-6 text-muted-foreground" aria-live="polite">{results.length} {results.length === 1 ? "organisation" : "organisations"}</p>
         {results.length ? <div className="grid grid-cols-1 gap-6 md:grid-cols-2">{results.map((org) => <OrganisationCard key={org.id} organisation={org} terms={data.terms} />)}</div> : <div className="border-y border-hairline py-16">
           <h2 className="nb-h2">{data.organisations.length ? "No matching organisations" : "No published organisations yet"}</h2>
