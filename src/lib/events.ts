@@ -46,3 +46,13 @@ export function dateLabel(value: string, timezone?: string | null) {
   const key = dayKey(value, timezone ?? undefined);
   return key ? new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${key}T12:00:00Z`)) : 'Date to be announced';
 }
+/** Every YYYY-MM spanned by the given dated events, ascending. */
+export function eventMonths(events: EventRow[]) {
+  const months = new Set<string>();
+  for (const event of events) {
+    const { start, end } = eventDays(event);
+    if (!start) continue;
+    for (let m = start.slice(0, 7); m <= end.slice(0, 7); m = shiftMonth(m, 1)) months.add(m);
+  }
+  return [...months].sort();
+}

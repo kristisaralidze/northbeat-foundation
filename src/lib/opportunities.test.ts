@@ -50,6 +50,7 @@ describe('deadlineLabel', () => {
     expect(deadlineLabel(row({ deadline_at: '2026-10-19T12:00:00Z' }), NOW)).toBe('Closes today');
     expect(deadlineLabel(row({ deadline_at: '2026-10-25T00:00:00Z' }), NOW)).toBe('25 Oct 2026 · 6 days left');
     expect(deadlineLabel(row({ deadline_at: '2026-10-01T00:00:00Z' }), NOW)).toBe('Closed 1 Oct 2026');
-    expect(deadlineLabel(row({}), NOW)).toBe('No deadline');
+    expect(deadlineLabel(row({ type: 'grant_call' }), NOW)).toBe('Dates TBA');
+    expect(deadlineLabel(row({ type: 'job' }), NOW)).toBe('Rolling');
   });
 });

@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { OPP_TYPES, humanize } from '@/lib/admin/entities';
 import { opportunitiesQuery } from '@/lib/opportunities.query';
+import { compactSearch } from '@/lib/search-params';
 import { amountLabel, deadlineLabel, filterOpportunities } from '@/lib/opportunities';
 
 const searchSchema = z.object({
@@ -16,6 +17,7 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute('/opportunities')({
   validateSearch: zodValidator(searchSchema),
+  search: { middlewares: [({ search, next }) => compactSearch(next(search))] },
   loader: ({ context }) => context.queryClient.ensureQueryData(opportunitiesQuery),
   head: () => ({ meta: [
     { title: 'Opportunities — Northbeat' },
@@ -37,8 +39,10 @@ function Opportunities() {
   const navigate = useNavigate({ from: '/opportunities' });
   const filters = { type: search.type, field: search.field, stage: search.stage, archive: search.archive };
   const opportunities = filterOpportunities(data, filters);
-  const fields = data.terms.filter((term) => term.kind === 'field');
-  const stages = data.terms.filter((term) => term.kind === 'stage');
+  const has = (patch: Partial<typeof filters>) => filterOpportunities(data, { ...filters, ...patch }).length > 0;
+  const types = OPP_TYPES.filter((type) => has({ type }));
+  const fields = data.terms.filter((term) => term.kind === 'field' && has({ field: term.slug }));
+  const stages = data.terms.filter((term) => term.kind === 'stage' && has({ stage: term.slug }));
   const update = (patch: Partial<typeof search>) => navigate({ search: (prev) => ({ ...prev, ...patch }) });
   const hasFilters = search.type || search.field || search.stage;
 
@@ -54,7 +58,7 @@ function Opportunities() {
       <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">Type</span>
         <select aria-label="Opportunity type" className="nb-input" value={search.type} onChange={(e) => update({ type: e.target.value })}>
           <option value="">All types</option>
-          {OPP_TYPES.map((type) => <option key={type} value={type}>{humanize(type)}</option>)}
+          {types.map((type) => <option key={type} value={type}>{humanize(type)}</option>)}
           {search.type && !OPP_TYPES.some((type) => type === search.type) && <option value={search.type}>{humanize(search.type)}</option>}
         </select></label>
       <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">Field</span>

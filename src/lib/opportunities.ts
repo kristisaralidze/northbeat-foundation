@@ -37,7 +37,7 @@ export function amountLabel(opportunity: OpportunityRow): string {
 }
 
 export function deadlineLabel(opportunity: OpportunityRow, now: string): string {
-  if (!opportunity.deadline_at) return 'No deadline';
+  if (!opportunity.deadline_at) return opportunity.type === 'job' || opportunity.type === 'programme_intake' ? 'Rolling' : 'Dates TBA';
   const date = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
     .format(new Date(opportunity.deadline_at));
   const dayOf = (value: string) => Math.floor(Date.parse(value) / 86_400_000);
