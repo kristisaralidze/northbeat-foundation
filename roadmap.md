@@ -9,6 +9,6 @@
 - [x] Test visibility and contact privacy, and verify populated profiles end-to-end on desktop and mobile using temporary entries; remove verification data afterward.
 
 # Events
-- [ ] Build published event data, date classification and 14-day deadline strip.
-- [ ] Add URL-backed type/city/month filters, list/calendar views and a past-event archive.
-- [ ] Test date boundaries and verify populated browsing on desktop and mobile; remove test entries.
+- [x] Build published event data, date classification and 14-day deadline strip.
+- [x] Add URL-backed type/city/month filters, list/calendar views and a past-event archive.
+- [x] Test date boundaries in multiple timezones and verify populated browsing on desktop and mobile; remove test entries.
