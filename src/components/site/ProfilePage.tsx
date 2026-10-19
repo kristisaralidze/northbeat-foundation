@@ -4,6 +4,7 @@ import { useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowUpRight, Building2, UserRound, Radio } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { humanize, type EntityKey } from '@/lib/admin/entities';
+import { EMPTY_SEARCH } from '@/lib/explore';
 import { safeWebUrl, text, type PublicProfile, type RelatedEntry } from '@/lib/profiles';
 
 export function EntryLink({ kind, entry, children, className }: { kind: EntityKey; entry: { slug: string }; children: ReactNode; className?: string }) {
@@ -53,7 +54,7 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
   ] : kind === 'opportunities' ? [['Opens', date(text(row, 'opens_at'))], ['Deadline', date(text(row, 'deadline_at'))], ['Location', text(row, 'location')], ['Employment', text(row, 'employment_type')]] : kind === 'episodes' ? [['Episode', row['episode_number'] ? String(row['episode_number']) : null], ['Published', date(text(row, 'published_on'))]] : [];
   const label = isPerson ? 'Person' : kind === 'episodes' ? 'Podcast' : humanize(text(row, kind === 'events' ? 'event_type' : 'type') ?? kind);
   return <article className="nb-container nb-section">
-    <div className="mb-8"><Link to="/explore" className="nb-link inline-flex items-center gap-2"><ArrowLeft className="h-4 w-4" aria-hidden />Explore</Link></div>
+    <div className="mb-8"><Link to="/explore" search={EMPTY_SEARCH} className="nb-link inline-flex items-center gap-2"><ArrowLeft className="h-4 w-4" aria-hidden />Explore</Link></div>
     <header className="border-b border-hairline pb-10">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
         {(isOrg || isPerson || profile.image) && <ProfileImage image={profile.image} name={profile.title} kind={kind} />}
@@ -82,7 +83,7 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
     {profile.related.map((group) => <section key={`${group.kind}-${group.label}`} className="border-t border-hairline py-10"><h2 className="nb-h2 mb-6">{group.label}</h2><div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">{group.entries.map((entry) => <RelatedCard kind={group.kind} entry={entry} key={entry.id} />)}</div></section>)}
   </article>;
 }
-export function ProfileNotFound() { return <div className="nb-container nb-section"><h1 className="nb-h2">Profile not found</h1><p className="nb-body mt-4">This entry is unavailable or has not been published.</p><Link to="/explore" className="nb-link mt-6 inline-block">Back to Explore</Link></div>; }
+export function ProfileNotFound() { return <div className="nb-container nb-section"><h1 className="nb-h2">Profile not found</h1><p className="nb-body mt-4">This entry is unavailable or has not been published.</p><Link to="/explore" search={EMPTY_SEARCH} className="nb-link mt-6 inline-block">Back to Explore</Link></div>; }
 export function ProfileError() {
   const router = useRouter(); const queryClient = useQueryClient();
   return <div className="nb-container nb-section"><h1 className="nb-h2">This profile didn’t load</h1><p className="nb-body mt-4 text-danger" role="alert">Please try again in a moment.</p><Button variant="ghost" className="nb-btn nb-btn-primary mt-6" onClick={async () => { await queryClient.resetQueries({ queryKey: ['public-profile'] }); await router.invalidate(); }}>Try again</Button></div>;

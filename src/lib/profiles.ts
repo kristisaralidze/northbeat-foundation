@@ -1,5 +1,5 @@
 import type { EntityKey } from './admin/entities';
-export type ProfileRow = Record<string, unknown> & { id: string; slug: string };
+export type ProfileRow = Record<string, string | number | boolean | string[] | null> & { id: string; slug: string };
 export type ProfileTerm = { id: string; name: string; kind: string; slug: string };
 export type RelatedEntry = { id: string; slug: string; title: string; summary: string | null; image: string | null; roles: string[] };
 export type RelatedGroup = { kind: EntityKey; label: string; entries: RelatedEntry[] };
