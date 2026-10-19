@@ -1,7 +1,7 @@
 # Home transition safeguards
-- [ ] Keep globe rendering dimensions stable and remeasure/recentre on entry and resize.
-- [ ] Synchronise scrolling and snap globe, ecosystem and wordmark endpoints after fast scrolls.
-- [ ] Verify repeated fast scrolling, scrollbar jumps, resize and reduced motion.
+- [x] Keep globe rendering dimensions stable and remeasure/recentre on entry and resize.
+- [x] Synchronise scrolling and snap globe, ecosystem and wordmark endpoints after fast scrolls.
+- [x] Verify repeated fast scrolling, scrollbar jumps, resize and reduced motion.
 
 # Public scroll foundation and browsing
 - [x] Site-wide object wordmark, no pulse logos or decorative eyebrows, sentence-case field labels, shared container padding and no section dividers.
