@@ -1,4 +1,6 @@
 # Home scroll story
+- [ ] Add a full-screen opening, reversible wordmark docking and sequential introduction/action reveal.
+- [ ] Verify the opening, dock, reversal, reduced motion and navigation on desktop and phones.
 - [x] Add home-only smooth scrolling and one coordinated scroll-linked sequence with soft background shifts and no section dividers.
 - [x] Verify reduced motion, globe scrolling and cleanup when leaving home.
 
