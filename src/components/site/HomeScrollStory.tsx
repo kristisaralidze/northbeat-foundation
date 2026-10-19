@@ -90,6 +90,8 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
                 { left: () => startBounds().left, top: () => startBounds().top, width: () => startBounds().width },
                 { left: () => dockBounds().left, top: () => dockBounds().top, width: () => dockBounds().width, duration: 1, ease: 'none' }, 0)
                 .to('.nb-home-tagline', { autoAlpha: 0, duration: 0.5, ease: 'none' }, 0.25)
+                .to('.nb-arrival-atmosphere', { autoAlpha: 0, duration: 1, ease: 'none' }, 0)
+                .to('.nb-arrival-atmosphere img', { yPercent: 4, duration: 1, ease: 'none' }, 0)
                 .set(intro, { autoAlpha: 1 }, 1)
                 .fromTo('.nb-home-intro-word', { opacity: 0 }, { opacity: 1, duration: 0.06, stagger: 0.008, ease: 'none' }, 1)
                 .fromTo('.nb-home-actions', { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.08, ease: 'none' }, 1.22);

@@ -5,6 +5,7 @@ import { LaboratoryWordmark } from "./LaboratoryWordmark";
 import { NewsletterSignup } from "./NewsletterSignup";
 import { Button } from "@/components/ui/button";
 import { PublicScrollFrame } from './PublicScrollFrame';
+import { AtmosphericImage } from './AtmosphericImage';
 
 const NAV = [
   { to: "/explore", label: "Explore" },
@@ -75,11 +76,12 @@ function Header({ isHome }: { isHome: boolean }) {
   );
 }
 
-function Footer({ hideSignup }: { hideSignup: boolean }) {
+function Footer({ hideSignup, isHome }: { hideSignup: boolean; isHome: boolean }) {
   return (
     <footer className="mt-auto border-t border-hairline bg-frost-wash">
       <div className="nb-container grid gap-10 py-14 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-16">
-        {!hideSignup && <div className="max-w-md space-y-4">
+        {!hideSignup && <div className={`max-w-md space-y-4${isHome ? ' nb-home-newsletter-atmosphere' : ''}`}>
+          {isHome && <AtmosphericImage />}
           <h2 className="nb-h3 text-ink">We track it so you don't miss it.</h2>
           <p className="nb-small text-muted-foreground">Funding calls, programme intakes and events in Nordic health innovation, in one email.</p>
           <NewsletterSignup source="footer" />
@@ -109,7 +111,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       </a>
       <Header isHome={isHome} />
       <main id="main" className="flex-1">{isHome ? children : <PublicScrollFrame key={pathname} pathname={pathname}>{children}</PublicScrollFrame>}</main>
-      <Footer hideSignup={pathname === '/newsletter' || pathname === '/newsletter/'} />
+      <Footer isHome={isHome} hideSignup={pathname === '/newsletter' || pathname === '/newsletter/'} />
     </div>
   );
 }

@@ -10,7 +10,8 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
-- Home owns one Lenis/GSAP story with wordmark docking, intro, world and happening pins; ordinary public routes use a keyed PublicScrollFrame for smooth scrolling and reversible compact titles. Both clean up on navigation and reduced motion. Why: one controller per route avoids duplicate tickers and empty scroll.
+- Home owns one Lenis/GSAP story; other public pages use keyed PublicScrollFrame. Both clean up on navigation and reduced motion. Why: avoid duplicate tickers.
+- AtmosphericImage uses responsive project-owned asset pointers; arrival drift joins the docking timeline. Why: reuse imagery without another scroll controller.
 - Relationship maps reuse published profile links and network tokens; timelines use tested date helpers with existing URL filters and archive views. Why: visual additions preserve real connections and editorial data.
 - The home ecosystem groups the paginated published reader into fixed group anchors and one cloud dot per entry; group links use Explore's canonical type search and separate conceptual edges. Why: group browsing stays distinct from individual database relationships.
 - The home globe uses local R3F geometry, a still, fixed canvas measurement and wrapper transforms; scroll events drive framing/zoom with endpoint snaps, touch pointers pinch, and OrbitControls recovers rotation after dragging. Why: scroll stays uncaptured and fast jumps settle correctly.

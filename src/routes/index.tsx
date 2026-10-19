@@ -8,6 +8,7 @@ import { HomeScrollStory } from "@/components/site/HomeScrollStory";
 import { HomeHappening } from "@/components/site/HomeHappening";
 import { eventsQuery } from "@/lib/events.query";
 import { opportunitiesQuery } from "@/lib/opportunities.query";
+import { AtmosphericImage } from '@/components/site/AtmosphericImage';
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => Promise.all([
@@ -33,6 +34,7 @@ function Index() {
   return (
     <HomeScrollStory>
     <section className="nb-home-wordmark-section">
+      <div className="nb-arrival-atmosphere"><AtmosphericImage eager /></div>
       <div className="nb-home-opening-content">
         <div className="nb-home-wordmark-slot"><LaboratoryWordmark /></div>
         <p className="nb-home-tagline">The heartbeat of Nordic health innovation.</p>
