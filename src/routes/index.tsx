@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { LaboratoryWordmark } from "@/components/site/LaboratoryWordmark";
+import { EMPTY_SEARCH } from "@/lib/explore";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,6 +20,15 @@ function Index() {
   return (
     <div className="nb-home-wordmark-section">
       <LaboratoryWordmark />
+      <div className="nb-home-intro">
+        <p className="nb-home-intro-line">
+          Map of the Nordic health ecosystem: the companies, the capital, the science and the people behind them.
+        </p>
+        <div className="nb-home-actions">
+          <Link to="/explore" search={EMPTY_SEARCH} className="nb-btn nb-btn-primary">Explore the hub</Link>
+          <Link to="/newsletter" className="nb-link">Get the newsletter</Link>
+        </div>
+      </div>
     </div>
   );
 }
