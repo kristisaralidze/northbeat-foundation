@@ -14,6 +14,8 @@ export function NordicGlobe() {
   const [failed,setFailed] = useState(false), [visible,setVisible] = useState(false), [reduced,setReduced] = useState(true), [touched,setTouched] = useState(false), [wheel,setWheel] = useState(false), [zoom,setZoom] = useState(0), [reset,setReset] = useState(0);
   const [palette,setPalette] = useState<{ background: string; land: string; berry: string } | null>(null);
   const [storyProgress, setStoryProgress] = useState(1);
+  const [measurement, setMeasurement] = useState(0);
+  const ready = useCallback(() => host.current?.dispatchEvent(new CustomEvent('northbeat:globe-ready', { bubbles: true })), []);
   const fail = useCallback(() => setFailed(true),[]);
   useEffect(() => {
     const el = host.current; if (!el) return;
@@ -22,15 +24,21 @@ export function NordicGlobe() {
     const colour=(token: string) => { if (!ctx) return ''; ctx.clearRect(0,0,1,1); ctx.fillStyle=css.getPropertyValue(token).trim(); ctx.fillRect(0,0,1,1); const p=ctx.getImageData(0,0,1,1).data; return `rgb(${p[0]},${p[1]},${p[2]})`; };
     setPalette({background:colour('--globe-background'),land:colour('--globe-land'),berry:colour('--globe-berry')});
     const probe=document.createElement('canvas'); const context=probe.getContext('webgl2'); if (!context) setFailed(true); else context.getExtension('WEBGL_lose_context')?.loseContext();
-    let inView=false; const sync=()=>setVisible(inView && !document.hidden); const observer=new IntersectionObserver(([entry])=>{inView=entry?.isIntersecting ?? false; sync(); if (!inView) setWheel(false);},{threshold:.05}); observer.observe(el); document.addEventListener('visibilitychange',sync);
+    const remeasure = () => { setMeasurement(v => v + 1); setReset(v => v + 1); };
+    const settle = () => { setStoryProgress(1); setTouched(false); setWheel(false); remeasure(); };
+    let inView=false; const sync=()=>setVisible(inView && !document.hidden); const observer=new IntersectionObserver(([entry])=>{const entering=!inView && entry?.isIntersecting; inView=entry?.isIntersecting ?? false; sync(); if (entering) remeasure(); if (!inView) setWheel(false);},{threshold:.05}); observer.observe(el); document.addEventListener('visibilitychange',sync);
+    let resizeFrame = 0;
+    const resize = new ResizeObserver(() => { cancelAnimationFrame(resizeFrame); resizeFrame = requestAnimationFrame(remeasure); }); resize.observe(el);
+    window.addEventListener('resize', remeasure);
+    el.addEventListener('northbeat:globe-settle', settle);
     const progress = (event: Event) => { const value = (event as CustomEvent<number>).detail; setStoryProgress(value); if (value < 1) { setTouched(false); setWheel(false); } };
     el.addEventListener('northbeat:globe-progress', progress);
-    return () => { el.removeEventListener('northbeat:globe-progress', progress); observer.disconnect(); query.removeEventListener('change',motion); document.removeEventListener('visibilitychange',sync); };
+    return () => { el.removeEventListener('northbeat:globe-progress', progress); el.removeEventListener('northbeat:globe-settle', settle); resize.disconnect(); cancelAnimationFrame(resizeFrame); window.removeEventListener('resize', remeasure); observer.disconnect(); query.removeEventListener('change',motion); document.removeEventListener('visibilitychange',sync); };
   },[]);
   const image=<img className="nb-globe-still" src={still} width={1200} height={1000} alt="Dotted world globe facing the Nordics. Finland, Sweden, Norway, Denmark and Iceland highlighted in berry, with ten Nordic cities marked." />;
   return <section className="nb-globe-section" aria-labelledby="nordic-globe-heading"><div className="nb-container"><h2 id="nordic-globe-heading" className="nb-network-heading">The Nordics</h2></div>
     <div ref={host} className="nb-globe-stage" aria-label="Nordic globe" data-story-progress={storyProgress} data-wheel-active={wheel} data-paused={!visible || touched || reduced || storyProgress < 1} onPointerDown={() => { if (storyProgress >= 1) setTouched(true); }} onClick={() => { if (storyProgress >= 1) setWheel(true); }} onBlur={e => { if (!e.currentTarget.contains(e.relatedTarget)) setWheel(false); }} onKeyDown={e => { if (e.key==='Escape') setWheel(false); }} tabIndex={0}>
-      <ClientOnly fallback={image}>{!failed && palette ? <GlobeBoundary fallback={image}><Suspense fallback={image}><Scene visible={visible} reduced={reduced} touched={touched} wheel={wheel} zoom={zoom} reset={reset} storyProgress={storyProgress} palette={palette} onFailure={fail} /></Suspense></GlobeBoundary> : image}</ClientOnly>
+      <ClientOnly fallback={image}>{!failed && palette ? <GlobeBoundary fallback={image}><Suspense fallback={image}><Scene visible={visible} reduced={reduced} touched={touched} wheel={wheel} zoom={zoom} reset={reset} measurement={measurement} storyProgress={storyProgress} palette={palette} onFailure={fail} onReady={ready} /></Suspense></GlobeBoundary> : image}</ClientOnly>
     </div>
     {!failed && <div className="nb-globe-controls">
       <Button variant="ghost" size="icon" title="Zoom in" aria-label="Zoom in" onClick={()=>{setTouched(true);setZoom(v=>v+1);}}><Plus /></Button>

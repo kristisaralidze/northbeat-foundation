@@ -269,8 +269,9 @@ html.lenis, html.lenis body { height: auto; }
 .nb-home-intro-word { display: inline-block; white-space: pre; }
 .nb-home-world-scene .nb-network-section { display: flex; flex-direction: column; }
 .nb-home-world-scene .nb-network-figure { flex: 1; min-height: 0; }
-.nb-home-world-scene .nb-globe-section { display: flex; flex-direction: column; padding-bottom: var(--space-4); }
-.nb-home-world-scene .nb-globe-stage { flex: 1; min-height: 0; max-height: 660px; margin-block: var(--space-4); }
+.nb-home-globe-wrapper { transform-origin: center center; width: 100%; }
+.nb-home-world-scene .nb-globe-section { display: flex; flex-direction: column; height: 100%; padding-bottom: var(--space-4); }
+.nb-home-world-scene .nb-globe-stage { flex: 0 0 auto; height: min(660px, max(180px, calc(min(100svh - 4rem, 900px) - 200px))); margin-block: var(--space-4); }
 .nb-home-globe-line { flex-shrink: 0; margin: var(--space-3) var(--gutter); text-align: center; font-size: 1.125rem; color: var(--ink); }
 .nb-home-world-scene .nb-globe-controls { flex-shrink: 0; }
 .nb-home-happening { min-height: min(55svh, 36rem); display: flex; flex-direction: column; justify-content: center; gap: var(--space-8); padding-block: var(--space-8); }
@@ -304,7 +305,7 @@ html.lenis, html.lenis body { height: auto; }
 @media (max-width: 40rem) {
   .nb-home-header-logo { width: 7rem; }
   .nb-home-tagline { max-width: 18rem; margin-inline: auto; }
-  .nb-home-world-scene .nb-globe-stage { max-height: 420px; }
+  .nb-home-world-scene .nb-globe-stage { height: min(420px, max(180px, calc(100svh - 4rem - 200px))); }
 }
 .nb-home-intro {
   width: 100%;

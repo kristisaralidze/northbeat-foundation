@@ -5,7 +5,7 @@ import { BufferGeometry, Float32BufferAttribute, CanvasTexture, SRGBColorSpace }
 import points from '@/assets/globe-points.json';
 import { clampGlobeDistance, globePosition, GLOBE_ROTATION_SPEED, NORDIC_CITIES } from '@/lib/globe';
 
-type Props = { visible: boolean; reduced: boolean; touched: boolean; wheel: boolean; zoom: number; reset: number; storyProgress: number; palette: { background: string; land: string; berry: string }; onFailure: () => void };
+type Props = { visible: boolean; reduced: boolean; touched: boolean; wheel: boolean; zoom: number; reset: number; measurement: number; storyProgress: number; palette: { background: string; land: string; berry: string }; onFailure: () => void; onReady: () => void };
 function World({ palette }: Pick<Props, 'palette'>) {
   const resources = useMemo(() => {
     const geometry = (rows: number[][]) => { const g = new BufferGeometry(); g.setAttribute('position', new Float32BufferAttribute(rows.flatMap(p => globePosition(p[0] ?? 0, p[1] ?? 0, 1.002)), 3)); return g; };
@@ -27,9 +27,17 @@ function World({ palette }: Pick<Props, 'palette'>) {
     {NORDIC_CITIES.map(city => <sprite key={city.name} position={globePosition(city.lat,city.lng,1.01)} scale={[.022,.022,1]}><spriteMaterial map={resources.texture} transparent opacity={.8} depthWrite={false} /></sprite>)}
   </>;
 }
-function Interaction({ visible, reduced, touched, wheel, zoom, reset, storyProgress, onFailure }: Props) {
-  const { camera, gl, invalidate } = useThree();
+function Interaction({ visible, reduced, touched, wheel, zoom, reset, measurement, storyProgress, onFailure, onReady }: Props) {
+  const { camera, gl, invalidate, setSize, size } = useThree();
   const previousZoom = useRef(zoom);
+  useEffect(() => {
+    const host = gl.domElement.closest<HTMLElement>('.nb-globe-stage');
+    if (!host || host.clientWidth <= 0 || host.clientHeight <= 0) return;
+    if (size.width !== host.clientWidth || size.height !== host.clientHeight) setSize(host.clientWidth, host.clientHeight);
+    camera.updateProjectionMatrix();
+    invalidate();
+  }, [measurement, camera, gl, setSize, invalidate, size.width, size.height]);
+  useEffect(() => { onReady(); }, [onReady]);
   useEffect(() => {
     const change = (factor: number) => { camera.position.setLength(clampGlobeDistance(camera.position.length() * factor)); camera.updateProjectionMatrix(); invalidate(); };
     const el = gl.domElement, pointers = new Map<number, { x: number; y: number }>();
@@ -48,5 +56,5 @@ function Interaction({ visible, reduced, touched, wheel, zoom, reset, storyProgr
   return <OrbitControls enabled={storyProgress >= 1} enablePan={false} enableZoom={false} enableDamping={false} autoRotate={visible && !reduced && !touched && storyProgress >= 1} autoRotateSpeed={GLOBE_ROTATION_SPEED} rotateSpeed={.5} />;
 }
 export default function NordicGlobeScene(props: Props) {
-  return <Canvas flat dpr={[1,1.5]} frameloop={props.visible && !props.reduced && !props.touched ? 'always' : 'demand'} camera={{ position: globePosition(60,14,3.3), fov: 42, near: .05, far: 20 }} gl={{ antialias: true, alpha: true }}><World palette={props.palette} /><Interaction {...props} /></Canvas>;
+  return <Canvas flat resize={{ offsetSize: true }} dpr={[1,1.5]} frameloop={props.visible && !props.reduced && !props.touched ? 'always' : 'demand'} camera={{ position: globePosition(60,14,3.3), fov: 42, near: .05, far: 20 }} gl={{ antialias: true, alpha: true }}><World palette={props.palette} /><Interaction {...props} /></Canvas>;
 }

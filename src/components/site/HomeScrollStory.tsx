@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import type { ScrollTrigger as ScrollTriggerInstance } from 'gsap/ScrollTrigger';
 
 /** Owns scroll effects only while the home route is mounted. */
 export function HomeScrollStory({ children }: { children: ReactNode }) {
@@ -46,6 +47,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
           lenis.on('scroll', ScrollTrigger.update);
           const tick = (seconds: number) => lenis.raf(seconds * 1000);
           gsap.ticker.add(tick);
+          gsap.ticker.lagSmoothing(0);
 
           let restoreWordmark = () => {};
           const notify = (target: Element | null, name: string, progress: number) => target?.dispatchEvent(new CustomEvent(name, { detail: progress }));
@@ -75,8 +77,13 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
               gsap.set(intro, { autoAlpha: 0 });
               const docking = gsap.timeline({
                 scrollTrigger: {
+                  id: 'home-opening',
                   trigger: opening, start: 'top 64px', end: () => `+=${window.innerHeight * 0.85}`,
-                  pin: true, scrub: true, invalidateOnRefresh: true,
+                  pin: true, scrub: 0.5, invalidateOnRefresh: true, fastScrollEnd: true,
+                  onLeave: self => { self.getTween()?.progress(1); self.animation?.progress(1); gsap.set(wordmark, dockBounds()); },
+                  onEnterBack: self => { self.getTween()?.progress(1); self.animation?.progress(1); gsap.set(wordmark, dockBounds()); },
+                  onLeaveBack: self => { self.getTween()?.progress(1); self.animation?.progress(0); gsap.set(wordmark, startBounds()); },
+                  onRefresh: self => { if (self.progress === 1) { self.animation?.progress(1); gsap.set(wordmark, dockBounds()); } else if (self.progress === 0) { self.animation?.progress(0); gsap.set(wordmark, startBounds()); } },
                 },
               });
               docking.fromTo(wordmark,
@@ -91,23 +98,42 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
             const network = story.querySelector<HTMLElement>('.nb-network-section');
             const svg = network?.querySelector('svg') ?? null;
             const globe = story.querySelector<HTMLElement>('.nb-globe-section');
+            const globeWrapper = story.querySelector<HTMLElement>('.nb-home-globe-wrapper');
             const stage = globe?.querySelector('.nb-globe-stage') ?? null;
-            if (world && network && svg && globe && stage) {
+            if (world && network && svg && globe && globeWrapper && stage) {
               gsap.set(world, { height: 'min(calc(100svh - 4rem), 900px)', position: 'relative' });
-              gsap.set([network, globe], { position: 'absolute', inset: 0, height: '100%' });
-              gsap.set(globe, { autoAlpha: 0, yPercent: 65, scale: .18 });
+              gsap.set([network, globeWrapper], { position: 'absolute', inset: 0, height: '100%' });
+              gsap.set(globeWrapper, { autoAlpha: 0, yPercent: 65, scale: .18 });
               gsap.set(stage, { pointerEvents: 'none' });
               gsap.set('.nb-globe-controls', { autoAlpha: 0 });
               gsap.set('.nb-home-globe-line', { autoAlpha: 0 });
               notify(svg, 'northbeat:network-progress', 0);
               notify(stage, 'northbeat:globe-progress', 0);
               const progress = { network: 0, globe: 0 };
+              const settleWorld = (self: ScrollTriggerInstance, final: boolean) => {
+                self.getTween()?.progress(1);
+                self.animation?.progress(final ? 1 : 0);
+                notify(svg, 'northbeat:network-progress', final ? 1 : 0);
+                notify(stage, 'northbeat:globe-progress', final ? 1 : 0);
+                if (final) {
+                  gsap.set(globeWrapper, { autoAlpha: 1, x: 0, y: 0, xPercent: 0, yPercent: 0, scale: 1 });
+                  gsap.set(stage, { pointerEvents: 'auto' });
+                  stage.dispatchEvent(new CustomEvent('northbeat:globe-settle'));
+                }
+              };
               const worldTimeline = gsap.timeline({
-                scrollTrigger: { id: 'home-world', trigger: world, start: 'top 64px', end: () => `+=${window.innerHeight * 3.4}`, pin: true, scrub: true, invalidateOnRefresh: true },
+                scrollTrigger: {
+                  id: 'home-world', trigger: world, start: 'top 64px', end: () => `+=${window.innerHeight * 3.4}`,
+                  pin: true, scrub: 0.5, invalidateOnRefresh: true, fastScrollEnd: true,
+                  onLeave: self => settleWorld(self, true),
+                  onEnterBack: self => settleWorld(self, true),
+                  onLeaveBack: self => settleWorld(self, false),
+                  onRefresh: self => { if (self.progress === 1) settleWorld(self, true); else if (self.progress === 0) settleWorld(self, false); },
+                },
               });
               worldTimeline.to(progress, { network: 1, duration: 2, ease: 'none', onUpdate: () => notify(svg, 'northbeat:network-progress', progress.network) }, 0)
                 .to(network, { scale: .015, autoAlpha: 0, duration: .9, ease: 'none' }, 2)
-                .to(globe, { autoAlpha: 1, yPercent: 0, scale: 1, duration: .9, ease: 'none' }, 2)
+                .to(globeWrapper, { autoAlpha: 1, yPercent: 0, scale: 1, duration: .9, ease: 'none' }, 2)
                 .to(progress, { globe: 1, duration: .9, ease: 'none', onUpdate: () => notify(stage, 'northbeat:globe-progress', progress.globe) }, 2)
                 .to('.nb-home-globe-line', { autoAlpha: 1, duration: .15, ease: 'none' }, 2.75)
                 .to('.nb-globe-controls', { autoAlpha: 1, duration: .2, ease: 'none' }, 2.9)
@@ -120,7 +146,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
             if (happening && track && viewport) {
               gsap.to(track, {
                 x: () => -Math.max(0, track.scrollWidth - viewport.clientWidth), ease: 'none',
-                scrollTrigger: { id: 'home-happening', trigger: happening, start: 'top 64px', end: () => `+=${Math.max(window.innerHeight, track.scrollWidth - viewport.clientWidth)}`, pin: true, scrub: true, invalidateOnRefresh: true },
+                scrollTrigger: { id: 'home-happening', trigger: happening, start: 'top 64px', end: () => `+=${Math.max(window.innerHeight, track.scrollWidth - viewport.clientWidth)}`, pin: true, scrub: 0.5, invalidateOnRefresh: true, fastScrollEnd: true },
               });
             }
             gsap.set(shell, { '--home-surface': surfaces[0] });
@@ -133,13 +159,20 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
               .to(shell, { '--home-surface': surfaces[3], duration: 1 });
           }, story);
 
-          const refresh = () => { if (!disposed) ScrollTrigger.refresh(); };
+          let refreshFrame = 0;
+          const refresh = () => {
+            cancelAnimationFrame(refreshFrame);
+            refreshFrame = requestAnimationFrame(() => { if (!disposed) ScrollTrigger.refresh(); });
+          };
+          story.addEventListener('northbeat:globe-ready', refresh);
           const resize = new ResizeObserver(refresh);
           resize.observe(story);
           void document.fonts.ready.then(refresh);
           ScrollTrigger.refresh();
           return () => {
             resize.disconnect();
+            cancelAnimationFrame(refreshFrame);
+            story.removeEventListener('northbeat:globe-ready', refresh);
             gsap.ticker.remove(tick);
             lenis.off('scroll', ScrollTrigger.update);
             lenis.destroy();
