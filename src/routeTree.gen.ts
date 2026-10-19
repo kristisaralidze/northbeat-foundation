@@ -35,6 +35,10 @@ import { Route as AdminEpisodesIndexRouteImport } from './routes/admin.episodes.
 import { Route as AdminEpisodesIdRouteImport } from './routes/admin.episodes.$id'
 import { Route as AdminEventsIndexRouteImport } from './routes/admin.events.index'
 import { Route as AdminEventsIdRouteImport } from './routes/admin.events.$id'
+import { Route as AdminGlossaryIndexRouteImport } from './routes/admin.glossary.index'
+import { Route as AdminGlossaryIdRouteImport } from './routes/admin.glossary.$id'
+import { Route as AdminGuidesIndexRouteImport } from './routes/admin.guides.index'
+import { Route as AdminGuidesIdRouteImport } from './routes/admin.guides.$id'
 import { Route as AdminOpportunitiesIndexRouteImport } from './routes/admin.opportunities.index'
 import { Route as AdminOpportunitiesIdRouteImport } from './routes/admin.opportunities.$id'
 import { Route as AdminOrganisationsIndexRouteImport } from './routes/admin.organisations.index'
@@ -174,6 +178,26 @@ const AdminEventsIdRoute = AdminEventsIdRouteImport.update({
   path: '/events/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminGlossaryIndexRoute = AdminGlossaryIndexRouteImport.update({
+  id: '/glossary/',
+  path: '/glossary/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGlossaryIdRoute = AdminGlossaryIdRouteImport.update({
+  id: '/glossary/$id',
+  path: '/glossary/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGuidesIndexRoute = AdminGuidesIndexRouteImport.update({
+  id: '/guides/',
+  path: '/guides/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGuidesIdRoute = AdminGuidesIdRouteImport.update({
+  id: '/guides/$id',
+  path: '/guides/$id',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminOpportunitiesIndexRoute = AdminOpportunitiesIndexRouteImport.update({
   id: '/opportunities/',
   path: '/opportunities/',
@@ -240,12 +264,16 @@ export interface FileRoutesByFullPath {
   '/newsletter/': typeof NewsletterIndexRoute
   '/admin/episodes/$id': typeof AdminEpisodesIdRoute
   '/admin/events/$id': typeof AdminEventsIdRoute
+  '/admin/glossary/$id': typeof AdminGlossaryIdRoute
+  '/admin/guides/$id': typeof AdminGuidesIdRoute
   '/admin/opportunities/$id': typeof AdminOpportunitiesIdRoute
   '/admin/organisations/$id': typeof AdminOrganisationsIdRoute
   '/admin/people/$id': typeof AdminPeopleIdRoute
   '/admin/submissions/$id': typeof AdminSubmissionsIdRoute
   '/admin/episodes/': typeof AdminEpisodesIndexRoute
   '/admin/events/': typeof AdminEventsIndexRoute
+  '/admin/glossary/': typeof AdminGlossaryIndexRoute
+  '/admin/guides/': typeof AdminGuidesIndexRoute
   '/admin/opportunities/': typeof AdminOpportunitiesIndexRoute
   '/admin/organisations/': typeof AdminOrganisationsIndexRoute
   '/admin/people/': typeof AdminPeopleIndexRoute
@@ -274,12 +302,16 @@ export interface FileRoutesByTo {
   '/newsletter': typeof NewsletterIndexRoute
   '/admin/episodes/$id': typeof AdminEpisodesIdRoute
   '/admin/events/$id': typeof AdminEventsIdRoute
+  '/admin/glossary/$id': typeof AdminGlossaryIdRoute
+  '/admin/guides/$id': typeof AdminGuidesIdRoute
   '/admin/opportunities/$id': typeof AdminOpportunitiesIdRoute
   '/admin/organisations/$id': typeof AdminOrganisationsIdRoute
   '/admin/people/$id': typeof AdminPeopleIdRoute
   '/admin/submissions/$id': typeof AdminSubmissionsIdRoute
   '/admin/episodes': typeof AdminEpisodesIndexRoute
   '/admin/events': typeof AdminEventsIndexRoute
+  '/admin/glossary': typeof AdminGlossaryIndexRoute
+  '/admin/guides': typeof AdminGuidesIndexRoute
   '/admin/opportunities': typeof AdminOpportunitiesIndexRoute
   '/admin/organisations': typeof AdminOrganisationsIndexRoute
   '/admin/people': typeof AdminPeopleIndexRoute
@@ -311,12 +343,16 @@ export interface FileRoutesById {
   '/newsletter/': typeof NewsletterIndexRoute
   '/admin/episodes/$id': typeof AdminEpisodesIdRoute
   '/admin/events/$id': typeof AdminEventsIdRoute
+  '/admin/glossary/$id': typeof AdminGlossaryIdRoute
+  '/admin/guides/$id': typeof AdminGuidesIdRoute
   '/admin/opportunities/$id': typeof AdminOpportunitiesIdRoute
   '/admin/organisations/$id': typeof AdminOrganisationsIdRoute
   '/admin/people/$id': typeof AdminPeopleIdRoute
   '/admin/submissions/$id': typeof AdminSubmissionsIdRoute
   '/admin/episodes/': typeof AdminEpisodesIndexRoute
   '/admin/events/': typeof AdminEventsIndexRoute
+  '/admin/glossary/': typeof AdminGlossaryIndexRoute
+  '/admin/guides/': typeof AdminGuidesIndexRoute
   '/admin/opportunities/': typeof AdminOpportunitiesIndexRoute
   '/admin/organisations/': typeof AdminOrganisationsIndexRoute
   '/admin/people/': typeof AdminPeopleIndexRoute
@@ -349,12 +385,16 @@ export interface FileRouteTypes {
     | '/newsletter/'
     | '/admin/episodes/$id'
     | '/admin/events/$id'
+    | '/admin/glossary/$id'
+    | '/admin/guides/$id'
     | '/admin/opportunities/$id'
     | '/admin/organisations/$id'
     | '/admin/people/$id'
     | '/admin/submissions/$id'
     | '/admin/episodes/'
     | '/admin/events/'
+    | '/admin/glossary/'
+    | '/admin/guides/'
     | '/admin/opportunities/'
     | '/admin/organisations/'
     | '/admin/people/'
@@ -383,12 +423,16 @@ export interface FileRouteTypes {
     | '/newsletter'
     | '/admin/episodes/$id'
     | '/admin/events/$id'
+    | '/admin/glossary/$id'
+    | '/admin/guides/$id'
     | '/admin/opportunities/$id'
     | '/admin/organisations/$id'
     | '/admin/people/$id'
     | '/admin/submissions/$id'
     | '/admin/episodes'
     | '/admin/events'
+    | '/admin/glossary'
+    | '/admin/guides'
     | '/admin/opportunities'
     | '/admin/organisations'
     | '/admin/people'
@@ -419,12 +463,16 @@ export interface FileRouteTypes {
     | '/newsletter/'
     | '/admin/episodes/$id'
     | '/admin/events/$id'
+    | '/admin/glossary/$id'
+    | '/admin/guides/$id'
     | '/admin/opportunities/$id'
     | '/admin/organisations/$id'
     | '/admin/people/$id'
     | '/admin/submissions/$id'
     | '/admin/episodes/'
     | '/admin/events/'
+    | '/admin/glossary/'
+    | '/admin/guides/'
     | '/admin/opportunities/'
     | '/admin/organisations/'
     | '/admin/people/'
@@ -635,6 +683,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEventsIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/glossary/': {
+      id: '/admin/glossary/'
+      path: '/glossary'
+      fullPath: '/admin/glossary/'
+      preLoaderRoute: typeof AdminGlossaryIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/glossary/$id': {
+      id: '/admin/glossary/$id'
+      path: '/glossary/$id'
+      fullPath: '/admin/glossary/$id'
+      preLoaderRoute: typeof AdminGlossaryIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/guides/': {
+      id: '/admin/guides/'
+      path: '/guides'
+      fullPath: '/admin/guides/'
+      preLoaderRoute: typeof AdminGuidesIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/guides/$id': {
+      id: '/admin/guides/$id'
+      path: '/guides/$id'
+      fullPath: '/admin/guides/$id'
+      preLoaderRoute: typeof AdminGuidesIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/opportunities/': {
       id: '/admin/opportunities/'
       path: '/opportunities'
@@ -700,12 +776,16 @@ interface AdminRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
   AdminEpisodesIdRoute: typeof AdminEpisodesIdRoute
   AdminEventsIdRoute: typeof AdminEventsIdRoute
+  AdminGlossaryIdRoute: typeof AdminGlossaryIdRoute
+  AdminGuidesIdRoute: typeof AdminGuidesIdRoute
   AdminOpportunitiesIdRoute: typeof AdminOpportunitiesIdRoute
   AdminOrganisationsIdRoute: typeof AdminOrganisationsIdRoute
   AdminPeopleIdRoute: typeof AdminPeopleIdRoute
   AdminSubmissionsIdRoute: typeof AdminSubmissionsIdRoute
   AdminEpisodesIndexRoute: typeof AdminEpisodesIndexRoute
   AdminEventsIndexRoute: typeof AdminEventsIndexRoute
+  AdminGlossaryIndexRoute: typeof AdminGlossaryIndexRoute
+  AdminGuidesIndexRoute: typeof AdminGuidesIndexRoute
   AdminOpportunitiesIndexRoute: typeof AdminOpportunitiesIndexRoute
   AdminOrganisationsIndexRoute: typeof AdminOrganisationsIndexRoute
   AdminPeopleIndexRoute: typeof AdminPeopleIndexRoute
@@ -718,12 +798,16 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
   AdminEpisodesIdRoute: AdminEpisodesIdRoute,
   AdminEventsIdRoute: AdminEventsIdRoute,
+  AdminGlossaryIdRoute: AdminGlossaryIdRoute,
+  AdminGuidesIdRoute: AdminGuidesIdRoute,
   AdminOpportunitiesIdRoute: AdminOpportunitiesIdRoute,
   AdminOrganisationsIdRoute: AdminOrganisationsIdRoute,
   AdminPeopleIdRoute: AdminPeopleIdRoute,
   AdminSubmissionsIdRoute: AdminSubmissionsIdRoute,
   AdminEpisodesIndexRoute: AdminEpisodesIndexRoute,
   AdminEventsIndexRoute: AdminEventsIndexRoute,
+  AdminGlossaryIndexRoute: AdminGlossaryIndexRoute,
+  AdminGuidesIndexRoute: AdminGuidesIndexRoute,
   AdminOpportunitiesIndexRoute: AdminOpportunitiesIndexRoute,
   AdminOrganisationsIndexRoute: AdminOrganisationsIndexRoute,
   AdminPeopleIndexRoute: AdminPeopleIndexRoute,
