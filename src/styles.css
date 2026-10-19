@@ -268,7 +268,7 @@ html.lenis, html.lenis body { height: auto; }
 .nb-arrival-atmosphere .nb-atmospheric-image { position: absolute; inset: -5% 0; opacity: .55; }
 .nb-home-opening-content { position: relative; }
 .nb-home-wordmark-section .nb-home-tagline { color: var(--ink); }
-.nb-home-newsletter-atmosphere { position: relative; isolation: isolate; }
+.nb-home-newsletter-atmosphere { position: relative; isolation: isolate; --muted-foreground: var(--ink); }
 .nb-home-newsletter-atmosphere > .nb-atmospheric-image { position: absolute; inset: -1.5rem; z-index: -1; opacity: .35; overflow: hidden; }
 .nb-learn-arrival { display: grid; grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr); align-items: center; gap: var(--space-12); }
 .nb-learn-atmosphere-circle { width: 100%; max-width: 22rem; aspect-ratio: 1; border-radius: 50%; overflow: hidden; justify-self: end; }
