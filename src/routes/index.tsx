@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LaboratoryWordmark } from "@/components/site/LaboratoryWordmark";
+import { EMPTY_SEARCH } from "@/lib/explore";
 
 export const Route = createFileRoute("/")({
   head: () => ({
