@@ -17,7 +17,7 @@ const base = {
   name: z.string().trim().min(1, "Please tell us your name.").max(100),
   email: z.string().trim().toLowerCase().email("Please enter a valid email address.").max(254),
   message: z.string().trim().max(2000).optional(),
-  consent: z.literal(true, { error: "Please tick the box so we can reply to you." }),
+  consent: z.literal(true, { message: "Please tick the box so we can reply to you." }),
 };
 
 export const submissionSchema = z.discriminatedUnion("tab", [

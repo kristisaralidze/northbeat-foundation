@@ -1,5 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
+import type { Database } from "@/integrations/supabase/types";
 import { submissionSchema, type SubmissionInput } from "./submit";
+
+type SubmissionRow = Database["public"]["Tables"]["submissions"]["Insert"];
 
 /** Public submission form. Visitors have no table access; this uses the admin client. */
 export const sendSubmission = createServerFn({ method: "POST" })
@@ -12,7 +15,7 @@ export const sendSubmission = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
-function toRow(data: SubmissionInput) {
+function toRow(data: SubmissionInput): SubmissionRow {
   const common = {
     name: data.name,
     email: data.email,
