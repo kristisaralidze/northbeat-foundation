@@ -454,6 +454,26 @@
 }
 
 /* ---------- Directory patterns ---------- */
+@utility nb-profile-layout {
+  display: grid;
+  gap: var(--space-8);
+  @media (min-width: 48rem) {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: var(--space-16);
+  }
+}
+@utility nb-profile-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 8rem;
+  height: 8rem;
+  flex-shrink: 0;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  background: var(--snow);
+}
 @utility nb-directory-layout {
   display: grid;
   gap: var(--space-8);

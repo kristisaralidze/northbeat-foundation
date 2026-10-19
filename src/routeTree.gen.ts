@@ -24,6 +24,11 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminNewsletterRouteImport } from './routes/admin.newsletter'
 import { Route as AdminTagsRouteImport } from './routes/admin.tags'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
+import { Route as EventSlugRouteImport } from './routes/event.$slug'
+import { Route as OpportunitySlugRouteImport } from './routes/opportunity.$slug'
+import { Route as OrgSlugRouteImport } from './routes/org.$slug'
+import { Route as PersonSlugRouteImport } from './routes/person.$slug'
+import { Route as PodcastSlugRouteImport } from './routes/podcast.$slug'
 import { Route as AdminEpisodesIndexRouteImport } from './routes/admin.episodes.index'
 import { Route as AdminEpisodesIdRouteImport } from './routes/admin.episodes.$id'
 import { Route as AdminEventsIndexRouteImport } from './routes/admin.events.index'
@@ -112,6 +117,31 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventSlugRoute = EventSlugRouteImport.update({
+  id: '/event/$slug',
+  path: '/event/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OpportunitySlugRoute = OpportunitySlugRouteImport.update({
+  id: '/opportunity/$slug',
+  path: '/opportunity/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrgSlugRoute = OrgSlugRouteImport.update({
+  id: '/org/$slug',
+  path: '/org/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonSlugRoute = PersonSlugRouteImport.update({
+  id: '/person/$slug',
+  path: '/person/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PodcastSlugRoute = PodcastSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => PodcastRoute,
+} as any)
 const AdminEpisodesIndexRoute = AdminEpisodesIndexRouteImport.update({
   id: '/episodes/',
   path: '/episodes/',
@@ -181,13 +211,18 @@ export interface FileRoutesByFullPath {
   '/explore': typeof ExploreRoute
   '/newsletter': typeof NewsletterRoute
   '/opportunities': typeof OpportunitiesRoute
-  '/podcast': typeof PodcastRoute
+  '/podcast': typeof PodcastRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/submit': typeof SubmitRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/event/$slug': typeof EventSlugRoute
+  '/opportunity/$slug': typeof OpportunitySlugRoute
+  '/org/$slug': typeof OrgSlugRoute
+  '/person/$slug': typeof PersonSlugRoute
+  '/podcast/$slug': typeof PodcastSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/episodes/$id': typeof AdminEpisodesIdRoute
   '/admin/events/$id': typeof AdminEventsIdRoute
@@ -209,13 +244,18 @@ export interface FileRoutesByTo {
   '/explore': typeof ExploreRoute
   '/newsletter': typeof NewsletterRoute
   '/opportunities': typeof OpportunitiesRoute
-  '/podcast': typeof PodcastRoute
+  '/podcast': typeof PodcastRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/submit': typeof SubmitRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/event/$slug': typeof EventSlugRoute
+  '/opportunity/$slug': typeof OpportunitySlugRoute
+  '/org/$slug': typeof OrgSlugRoute
+  '/person/$slug': typeof PersonSlugRoute
+  '/podcast/$slug': typeof PodcastSlugRoute
   '/admin': typeof AdminIndexRoute
   '/admin/episodes/$id': typeof AdminEpisodesIdRoute
   '/admin/events/$id': typeof AdminEventsIdRoute
@@ -239,13 +279,18 @@ export interface FileRoutesById {
   '/explore': typeof ExploreRoute
   '/newsletter': typeof NewsletterRoute
   '/opportunities': typeof OpportunitiesRoute
-  '/podcast': typeof PodcastRoute
+  '/podcast': typeof PodcastRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/submit': typeof SubmitRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin_/login': typeof AdminLoginRoute
+  '/event/$slug': typeof EventSlugRoute
+  '/opportunity/$slug': typeof OpportunitySlugRoute
+  '/org/$slug': typeof OrgSlugRoute
+  '/person/$slug': typeof PersonSlugRoute
+  '/podcast/$slug': typeof PodcastSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/admin/episodes/$id': typeof AdminEpisodesIdRoute
   '/admin/events/$id': typeof AdminEventsIdRoute
@@ -277,6 +322,11 @@ export interface FileRouteTypes {
     | '/admin/newsletter'
     | '/admin/tags'
     | '/admin/login'
+    | '/event/$slug'
+    | '/opportunity/$slug'
+    | '/org/$slug'
+    | '/person/$slug'
+    | '/podcast/$slug'
     | '/admin/'
     | '/admin/episodes/$id'
     | '/admin/events/$id'
@@ -305,6 +355,11 @@ export interface FileRouteTypes {
     | '/admin/newsletter'
     | '/admin/tags'
     | '/admin/login'
+    | '/event/$slug'
+    | '/opportunity/$slug'
+    | '/org/$slug'
+    | '/person/$slug'
+    | '/podcast/$slug'
     | '/admin'
     | '/admin/episodes/$id'
     | '/admin/events/$id'
@@ -334,6 +389,11 @@ export interface FileRouteTypes {
     | '/admin/newsletter'
     | '/admin/tags'
     | '/admin_/login'
+    | '/event/$slug'
+    | '/opportunity/$slug'
+    | '/org/$slug'
+    | '/person/$slug'
+    | '/podcast/$slug'
     | '/admin/'
     | '/admin/episodes/$id'
     | '/admin/events/$id'
@@ -357,11 +417,15 @@ export interface RootRouteChildren {
   ExploreRoute: typeof ExploreRoute
   NewsletterRoute: typeof NewsletterRoute
   OpportunitiesRoute: typeof OpportunitiesRoute
-  PodcastRoute: typeof PodcastRoute
+  PodcastRoute: typeof PodcastRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SubmitRoute: typeof SubmitRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  EventSlugRoute: typeof EventSlugRoute
+  OpportunitySlugRoute: typeof OpportunitySlugRoute
+  OrgSlugRoute: typeof OrgSlugRoute
+  PersonSlugRoute: typeof PersonSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -470,6 +534,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/event/$slug': {
+      id: '/event/$slug'
+      path: '/event/$slug'
+      fullPath: '/event/$slug'
+      preLoaderRoute: typeof EventSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/opportunity/$slug': {
+      id: '/opportunity/$slug'
+      path: '/opportunity/$slug'
+      fullPath: '/opportunity/$slug'
+      preLoaderRoute: typeof OpportunitySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/org/$slug': {
+      id: '/org/$slug'
+      path: '/org/$slug'
+      fullPath: '/org/$slug'
+      preLoaderRoute: typeof OrgSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/person/$slug': {
+      id: '/person/$slug'
+      path: '/person/$slug'
+      fullPath: '/person/$slug'
+      preLoaderRoute: typeof PersonSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/podcast/$slug': {
+      id: '/podcast/$slug'
+      path: '/$slug'
+      fullPath: '/podcast/$slug'
+      preLoaderRoute: typeof PodcastSlugRouteImport
+      parentRoute: typeof PodcastRoute
     }
     '/admin/episodes/': {
       id: '/admin/episodes/'
@@ -596,6 +695,17 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface PodcastRouteChildren {
+  PodcastSlugRoute: typeof PodcastSlugRoute
+}
+
+const PodcastRouteChildren: PodcastRouteChildren = {
+  PodcastSlugRoute: PodcastSlugRoute,
+}
+
+const PodcastRouteWithChildren =
+  PodcastRoute._addFileChildren(PodcastRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -604,11 +714,15 @@ const rootRouteChildren: RootRouteChildren = {
   ExploreRoute: ExploreRoute,
   NewsletterRoute: NewsletterRoute,
   OpportunitiesRoute: OpportunitiesRoute,
-  PodcastRoute: PodcastRoute,
+  PodcastRoute: PodcastRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SubmitRoute: SubmitRoute,
   AdminLoginRoute: AdminLoginRoute,
+  EventSlugRoute: EventSlugRoute,
+  OpportunitySlugRoute: OpportunitySlugRoute,
+  OrgSlugRoute: OrgSlugRoute,
+  PersonSlugRoute: PersonSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
