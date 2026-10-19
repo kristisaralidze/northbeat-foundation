@@ -18,7 +18,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { SiteLayout } from "@/components/site/SiteLayout";
 
 // Admin and auth-helper screens keep the plain look; everything else gets the site layout.
-const isPlainPath = (p: string) => p === "/admin" || p.startsWith("/admin/") || p.startsWith("/reset-password");
+const isPlainPath = (p: string) => p === "/directions" || p === "/admin" || p.startsWith("/admin/") || p.startsWith("/reset-password");
 
 function NotFoundComponent() {
   return (

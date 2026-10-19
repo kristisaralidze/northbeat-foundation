@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as DirectionsRouteImport } from './routes/directions'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as NewsletterRouteImport } from './routes/newsletter'
@@ -64,6 +65,11 @@ const AboutRoute = AboutRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DirectionsRoute = DirectionsRouteImport.update({
+  id: '/directions',
+  path: '/directions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsRoute = EventsRouteImport.update({
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/directions': typeof DirectionsRoute
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/newsletter': typeof NewsletterRouteWithChildren
@@ -303,6 +310,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/directions': typeof DirectionsRoute
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/opportunities': typeof OpportunitiesRoute
@@ -346,6 +354,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/directions': typeof DirectionsRoute
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
   '/newsletter': typeof NewsletterRouteWithChildren
@@ -391,6 +400,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/directions'
     | '/events'
     | '/explore'
     | '/newsletter'
@@ -433,6 +443,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/directions'
     | '/events'
     | '/explore'
     | '/opportunities'
@@ -475,6 +486,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/directions'
     | '/events'
     | '/explore'
     | '/newsletter'
@@ -519,6 +531,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
+  DirectionsRoute: typeof DirectionsRoute
   EventsRoute: typeof EventsRoute
   ExploreRoute: typeof ExploreRoute
   NewsletterRoute: typeof NewsletterRouteWithChildren
@@ -559,6 +572,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/directions': {
+      id: '/directions'
+      path: '/directions'
+      fullPath: '/directions'
+      preLoaderRoute: typeof DirectionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events': {
@@ -894,6 +914,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
+  DirectionsRoute: DirectionsRoute,
   EventsRoute: EventsRoute,
   ExploreRoute: ExploreRoute,
   NewsletterRoute: NewsletterRouteWithChildren,

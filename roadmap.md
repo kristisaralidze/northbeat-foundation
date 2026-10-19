@@ -1,3 +1,7 @@
+# Design directions
+- [x] Build /directions with three isolated visual treatments and the same supplied content.
+- [x] Verify all three treatments, real entry links, and phone layouts without changing existing pages or data.
+
 # Explore directory
 - [x] Update guide hub lists to match journey steps alone, include published events, and verify with real entries.
 - [x] Review public copy against the voice rules, remove dash punctuation, and verify page titles and text without changing layout or data.
