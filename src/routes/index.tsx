@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { LaboratoryWordmark } from "@/components/site/LaboratoryWordmark";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -14,11 +15,10 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-// Home content and hero come later; the global layout wraps this page.
 function Index() {
   return (
-    <div className="nb-container nb-section min-h-[40vh]">
-      <h1 className="sr-only">Northbeat</h1>
+    <div className="nb-home-wordmark-section">
+      <LaboratoryWordmark />
     </div>
   );
 }
