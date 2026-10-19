@@ -9,7 +9,9 @@ export type FieldKind =
   | "select"
   | "boolean"
   | "multi"
-  | "image";
+  | "image"
+  | "term"
+  | "sources";
 
 export type FieldDef = {
   name: string;
@@ -18,9 +20,11 @@ export type FieldDef = {
   options?: readonly string[];
   required?: boolean;
   help?: string;
+  /** For kind "term": which tag list to pick one value from. */
+  termKind?: string;
 };
 
-export type EntityKey = "organisations" | "people" | "events" | "opportunities" | "episodes";
+export type EntityKey = "organisations" | "people" | "events" | "opportunities" | "episodes" | "guides" | "glossary";
 
 export type LinkDef = {
   table: string;
@@ -32,6 +36,8 @@ export type LinkDef = {
   roleColumn?: string;
   /** When set, the role is picked from these values instead of free text. */
   roleOptions?: readonly string[];
+  /** Link table has no role column. */
+  noRole?: boolean;
 };
 export const ORG_RELATIONS = ["invested_in", "spun_out_of", "acquired", "partner_of"] as const;
 
@@ -47,7 +53,13 @@ export type EntityConfig = {
   termFk: string;
   fields: FieldDef[];
   links: LinkDef[];
+  /** Tag lists offered in the tag picker (default: field, sub-area, country, stage). */
+  tagKinds?: readonly string[];
 };
+
+export const DEFAULT_TAG_KINDS = ["field", "sub_area", "country", "stage"] as const;
+const WITH_JOURNEY = [...DEFAULT_TAG_KINDS, "journey_step"] as const;
+export const GUIDE_LEVELS = ["beginner", "intermediate"] as const;
 
 export const STATUS = ["draft", "published", "archived"] as const;
 export const ORG_TYPES = [
@@ -71,7 +83,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
   organisations: {
     key: "organisations", table: "organisations", singular: "Organisation", plural: "Organisations",
     titleField: "name", typeField: "type", typeOptions: ORG_TYPES,
-    termTable: "organisation_terms", termFk: "organisation_id",
+    termTable: "organisation_terms", termFk: "organisation_id", tagKinds: WITH_JOURNEY,
     fields: [
       { name: "name", label: "Name", kind: "text", required: true },
       { name: "type", label: "Type", kind: "select", options: ORG_TYPES, required: true },
@@ -120,7 +132,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
   events: {
     key: "events", table: "events", singular: "Event", plural: "Events",
     titleField: "title", typeField: "event_type", typeOptions: EVENT_TYPES,
-    termTable: "event_terms", termFk: "event_id",
+    termTable: "event_terms", termFk: "event_id", tagKinds: WITH_JOURNEY,
     fields: [
       { name: "title", label: "Title", kind: "text", required: true },
       { name: "event_type", label: "Event type", kind: "select", options: EVENT_TYPES, required: true },
@@ -145,7 +157,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
   opportunities: {
     key: "opportunities", table: "opportunities", singular: "Opportunity", plural: "Opportunities",
     titleField: "title", typeField: "type", typeOptions: OPP_TYPES,
-    termTable: "opportunity_terms", termFk: "opportunity_id",
+    termTable: "opportunity_terms", termFk: "opportunity_id", tagKinds: WITH_JOURNEY,
     fields: [
       { name: "title", label: "Title", kind: "text", required: true },
       { name: "type", label: "Type", kind: "select", options: OPP_TYPES, required: true },
@@ -186,6 +198,43 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
     links: [
       L("organisation_episodes", "episode_id", "organisation_id", "organisations", "Organisations"),
       L("person_episodes", "episode_id", "person_id", "people", "People"),
+    ],
+  },
+  guides: {
+    key: "guides", table: "guides", singular: "Guide", plural: "Guides",
+    titleField: "title",
+    termTable: "guide_terms", termFk: "guide_id",
+    fields: [
+      { name: "title", label: "Title", kind: "text", required: true },
+      { name: "level", label: "Level", kind: "select", options: GUIDE_LEVELS, required: true },
+      { name: "area_id", label: "Area", kind: "term", termKind: "area" },
+      { name: "journey_step_id", label: "Journey step", kind: "term", termKind: "journey_step" },
+      { name: "one_sentence", label: "One sentence (shown at the top)", kind: "textarea" },
+      { name: "summary", label: "Summary", kind: "textarea" },
+      { name: "body", label: "Body", kind: "textarea" },
+      { name: "next_step", label: "Next step (shown at the end)", kind: "textarea" },
+      { name: "sources", label: "Sources", kind: "sources", help: "One per line: Title | https://link" },
+      { name: "reviewed_by", label: "Reviewed by", kind: "text" },
+      { name: "reading_minutes", label: "Reading minutes", kind: "number" },
+      { name: "cover_url", label: "Cover image", kind: "image" },
+    ],
+    links: [
+      { table: "glossary_term_guides", selfFk: "guide_id", otherFk: "glossary_term_id", other: "glossary", label: "Glossary terms", noRole: true },
+    ],
+  },
+  glossary: {
+    key: "glossary", table: "glossary_terms", singular: "Glossary term", plural: "Glossary",
+    titleField: "term",
+    termTable: "glossary_term_terms", termFk: "glossary_term_id",
+    tagKinds: ["field", "area"],
+    fields: [
+      { name: "term", label: "Term", kind: "text", required: true },
+      { name: "short_definition", label: "Short definition (one or two sentences)", kind: "textarea", required: true },
+      { name: "explanation", label: "Explanation", kind: "textarea" },
+    ],
+    links: [
+      { table: "glossary_term_relations", selfFk: "from_term_id", otherFk: "to_term_id", other: "glossary", label: "Related terms", noRole: true },
+      { table: "glossary_term_guides", selfFk: "glossary_term_id", otherFk: "guide_id", other: "guides", label: "Related guides", noRole: true },
     ],
   },
 };

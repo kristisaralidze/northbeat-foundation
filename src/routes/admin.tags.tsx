@@ -17,6 +17,8 @@ const KINDS = [
   { kind: "sub_area", label: "Sub-areas" },
   { kind: "country", label: "Countries" },
   { kind: "stage", label: "Stages" },
+  { kind: "area", label: "Areas" },
+  { kind: "journey_step", label: "Journey steps" },
 ] as const;
 
 function err(e: { message: string } | null) {
