@@ -1,7 +1,7 @@
 # Home globe and grouped ecosystem
-- [ ] Add the Design Lab Nordic globe with page colours, touch rotation, bounded zoom, click-gated wheel and a still fallback.
-- [ ] Replace entry nodes with eleven labelled ecosystem groups, published-entry dot clouds and the requested group connections.
-- [ ] Verify group links, label bounds, globe interaction and reduced motion on desktop and phones.
+- [x] Add the Design Lab Nordic globe with page colours, touch rotation, bounded zoom, click-gated wheel and a still fallback.
+- [x] Replace entry nodes with eleven labelled ecosystem groups, published-entry dot clouds and the requested group connections.
+- [x] Verify group links, label bounds, globe interaction and reduced motion on desktop and phones; Chromium and WebKit render the scene.
 
 # Home ecosystem network
 - [x] Adapt the Design Lab network using all published organisations, events and opportunities with real relationships.
