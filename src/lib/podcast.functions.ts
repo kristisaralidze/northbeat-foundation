@@ -20,14 +20,14 @@ export const getPodcast = createServerFn({ method: 'GET' }).handler(async (): Pr
   }
   const guestLinks: { episode_id: string; person_id: string }[] = [];
   for (let offset = 0; ; offset += 1000) {
-    const { data, error } = await client.from('person_episodes').select('episode_id,person_id').eq('role', 'guest').order('id').range(offset, offset + 999);
+    const { data, error } = await client.from('person_episodes').select('episode_id,person_id').eq('role', 'guest').order('episode_id').range(offset, offset + 999);
     if (error) throw new Error('Episode guests could not be loaded.');
     guestLinks.push(...(data ?? []));
     if (!data || data.length < 1000) break;
   }
   const topicLinks: { episode_id: string; term_id: string }[] = [];
   for (let offset = 0; ; offset += 1000) {
-    const { data, error } = await client.from('episode_terms').select('episode_id,term_id').order('id').range(offset, offset + 999);
+    const { data, error } = await client.from('episode_terms').select('episode_id,term_id').order('episode_id').range(offset, offset + 999);
     if (error) throw new Error('Episode topics could not be loaded.');
     topicLinks.push(...(data ?? []));
     if (!data || data.length < 1000) break;
