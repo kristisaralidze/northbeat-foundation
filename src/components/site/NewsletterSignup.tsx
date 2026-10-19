@@ -16,7 +16,7 @@ export function NewsletterSignup({ source = "footer" }: { source?: string }) {
     try {
       await subscribe({ data: { email, consent: true, source } });
       setState("done");
-      setMsg("You're on the list. The next issue lands in your inbox.");
+      setMsg("You're on the list. We'll email you when the next issue is out.");
       setEmail("");
       setConsent(false);
     } catch {

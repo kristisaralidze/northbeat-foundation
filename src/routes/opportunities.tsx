@@ -20,9 +20,9 @@ export const Route = createFileRoute('/opportunities')({
   search: { middlewares: [({ search, next }) => compactSearch(next(search))] },
   loader: ({ context }) => context.queryClient.ensureQueryData(opportunitiesQuery),
   head: () => ({ meta: [
-    { title: 'Opportunities — Northbeat' },
+    { title: 'Opportunities: Northbeat' },
     { name: 'description', content: 'Programme intakes, grant calls, competitions and jobs in Nordic health innovation, sorted by nearest deadline.' },
-    { property: 'og:title', content: 'Opportunities — Northbeat' },
+    { property: 'og:title', content: 'Opportunities: Northbeat' },
     { property: 'og:description', content: 'Programme intakes, grant calls, competitions and jobs in Nordic health innovation, sorted by nearest deadline.' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: '/opportunities' },
@@ -97,7 +97,7 @@ function Opportunities() {
     </ul>}
     {opportunities.length === 0 && <div className="py-12">
       <h2 className="nb-h3">{search.archive ? 'No closed opportunities found' : 'No open opportunities found'}</h2>
-      <p className="nb-body mt-3 text-muted-foreground">{hasFilters ? 'No published opportunities match these filters.' : 'Published opportunities will appear here.'}</p>
+      <p className="nb-body mt-3 text-muted-foreground">{hasFilters ? 'No opportunities match these filters.' : 'We’re adding opportunities. Check back soon.'}</p>
     </div>}
   </div>;
 }

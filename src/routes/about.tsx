@@ -3,9 +3,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — Northbeat" },
+      { title: "About: Northbeat" },
       { name: "description", content: "Northbeat is the reference hub for Nordic health, medtech and biotech startups." },
-      { property: "og:title", content: "About — Northbeat" },
+      { property: "og:title", content: "About: Northbeat" },
       { property: "og:description", content: "Northbeat is the reference hub for Nordic health, medtech and biotech startups." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -24,19 +24,19 @@ function AboutPage() {
       </header>
       <div className="nb-body max-w-2xl space-y-6">
         <p>
-          Building a health startup in the Nordics means keeping up with a lot at once: grant calls that open and close quietly, programme intakes with short windows, pitch competitions, conferences, the investors who actually write cheques in health, and the researchers and clinicians who can validate an idea. The information exists — it's just scattered across dozens of websites, newsletters and LinkedIn posts.
+          Building a health venture means tracking funding calls, programme intakes and events. It also means finding investors, researchers and clinicians who can help test an idea. That information is scattered across websites, newsletters and LinkedIn posts.
         </p>
         <p>
-          Northbeat started in Finland with a simple frustration: we kept missing things. A deadline here, a demo day there, a fund we only heard about after it had closed. So we started tracking it all in one place — companies, investors, programmes, funding, events, research groups, clinical advisors, jobs — and turned that list into Northbeat.
+          We started Northbeat in Finland because we kept missing deadlines and hearing about opportunities too late. We began keeping a shared list of companies, investors, programmes, funding calls, events, researchers, clinical advisors and jobs. That list became Northbeat.
         </p>
         <p>
-          Everything here is curated by hand. An entry belongs only if it helps someone build, fund, validate, join or research a health startup in the Nordics. No general tech events, no global health news, no noise. And everything links to everything else, so you can follow the thread from a startup to its investors, its people and its next deadline.
+          We curate every entry by hand. It belongs here only if it helps someone build, fund, validate, join or research a new health venture in the Nordics. We don't list general tech events or global health news. Related entries link to each other, so you can find a company's investors, people and upcoming events.
         </p>
         <p>
-          Alongside the directory, we run a podcast with the people building and funding Nordic health innovation, and a newsletter that rounds up what matters. One calm email, when there's something worth knowing.
+          Our podcast features people building and funding Nordic health innovation. Our newsletter covers funding calls, programme intakes and events.
         </p>
         <p>
-          Something missing? <Link to="/submit" className="nb-link">Tell us</Link> — the hub gets better every time someone does.
+          <Link to="/submit" className="nb-link">Suggest an entry</Link> if we've missed a company, event or opportunity.
         </p>
       </div>
     </div>

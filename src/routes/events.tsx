@@ -15,8 +15,8 @@ export const Route = createFileRoute('/events')({
   search: { middlewares: [({ search, next }) => compactSearch(next(search), { view: 'list' })] },
   loader: ({ context }) => context.queryClient.ensureQueryData(eventsQuery),
   head: () => ({ meta: [
-    { title: 'Health innovation events & deadlines — Northbeat' }, { name: 'description', content: 'Upcoming Nordic health innovation conferences, pitch competitions, hackathons, demo days and meetups. Browse the calendar and deadlines closing soon.' },
-    { property: 'og:title', content: 'Health innovation events & deadlines — Northbeat' }, { property: 'og:description', content: 'Discover Nordic health innovation events, application deadlines and past events.' }, { property: 'og:type', content: 'website' }, { property: 'og:url', content: '/events' }, { name: 'twitter:card', content: 'summary' },
+    { title: 'Health innovation events & deadlines: Northbeat' }, { name: 'description', content: 'Upcoming Nordic health innovation conferences, pitch competitions, hackathons, demo days and meetups. Browse the calendar and deadlines closing soon.' },
+    { property: 'og:title', content: 'Health innovation events & deadlines: Northbeat' }, { property: 'og:description', content: 'Nordic health innovation events, application deadlines and past events.' }, { property: 'og:type', content: 'website' }, { property: 'og:url', content: '/events' }, { name: 'twitter:card', content: 'summary' },
   ], links: [{ rel: 'canonical', href: '/events' }] }),
   component: Events,
   errorComponent: ({ reset }) => { const client = useQueryClient(); return <div className="nb-container nb-section"><h1 className="nb-h2">Events couldn’t be loaded</h1><p className="nb-body mt-4 text-danger" role="alert">Please try again in a moment.</p><Button variant="ghost" className="nb-btn nb-btn-primary mt-6" onClick={async () => { await client.resetQueries({ queryKey: ['public-events'] }); reset(); }}>Try again</Button></div>; },
@@ -49,7 +49,7 @@ function Events() {
       <div className="my-6 flex flex-wrap items-center justify-between gap-4"><p className="nb-small text-muted-foreground" role="status">{events.length} {search.archive ? 'past' : 'upcoming'} {events.length === 1 ? 'event' : 'events'}{(calendar || chosenMonth) && ` · ${monthLabel(month)}`}</p>{calendar && <div className="flex items-center gap-3"><Button variant="ghost" className="nb-btn nb-btn-quiet" aria-label="Previous month" title="Previous month" onClick={() => update({ month: shiftMonth(month, -1) })}><ChevronLeft className="h-4 w-4" /></Button><span className="nb-small font-medium">{monthLabel(month)}</span><Button variant="ghost" className="nb-btn nb-btn-quiet" aria-label="Next month" title="Next month" onClick={() => update({ month: shiftMonth(month, 1) })}><ChevronRight className="h-4 w-4" /></Button></div>}</div>
       {calendar && <EventCalendar events={events} month={month} today={dayKey(data.now)} />}
       {!calendar && events.length > 0 && <EventList events={events} />}
-      {events.length === 0 && <div className="py-12"><h2 className="nb-h3">{search.archive ? 'No past events found' : 'No upcoming events found'}</h2><p className="nb-body mt-3 text-muted-foreground">{search.type || search.city || chosenMonth ? 'No published events match these filters.' : 'Published events will appear here.'}</p></div>}
+      {events.length === 0 && <div className="py-12"><h2 className="nb-h3">{search.archive ? 'No past events found' : 'No upcoming events found'}</h2><p className="nb-body mt-3 text-muted-foreground">{search.type || search.city || chosenMonth ? 'No events match these filters.' : 'We’re adding events. Check back soon.'}</p></div>}
       {calendar && !chosenMonth && undated.length > 0 && <section className="mt-8 border-t border-hairline pt-6"><h2 className="nb-h3">Dates to be announced</h2><EventList events={undated} /></section>}
     </div>
   </>;
