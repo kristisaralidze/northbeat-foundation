@@ -1,4 +1,7 @@
 # Home scroll story
+- [ ] Pin the network for two screen-heights with reversible 0-40% dots, 40-80% connections and 80-100% labels.
+- [ ] Shrink the network into the rising globe, scrub scale and Nordic orientation, briefly pin the settled globe and preserve controls.
+- [ ] Add real nearest-first Happening now horizontal scroll, a short Learn teaser and the existing newsletter signup.
 - [ ] Add a full-screen opening, reversible wordmark docking and sequential introduction/action reveal.
 - [ ] Verify the opening, dock, reversal, reduced motion and navigation on desktop and phones.
 - [x] Add home-only smooth scrolling and one coordinated scroll-linked sequence with soft background shifts and no section dividers.
