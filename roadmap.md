@@ -1,3 +1,7 @@
+# Atmospheric image
+- [ ] Transfer Concept B fabric waves as desktop/phone WebP assets under 300 KB.
+- [ ] Add only to home arrival, home signup and Learn intro circle; check contrast and reduced motion.
+
 # Home transition safeguards
 - [x] Replace globe buttons and wheel zoom with reversible scroll zoom, touch pinch and eased rotation recovery; verify interactions (touch pinch simulated).
 - [x] Keep globe rendering dimensions stable and remeasure/recentre on entry and resize.
