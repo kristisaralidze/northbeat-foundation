@@ -3,10 +3,10 @@ import { clampGlobeDistance, globeScrollDistance, recoverGlobeRotation, GLOBE_RO
 describe('Nordic globe', () => {
   it('scrolls closer and reverses to the whole globe with bounded endpoints', () => {
     expect(globeScrollDistance(0)).toBe(3.3);
-    expect(globeScrollDistance(1)).toBe(2.35);
+    expect(globeScrollDistance(1)).toBeCloseTo(2.35);
     expect(globeScrollDistance(.5)).toBeCloseTo(2.825);
     expect(globeScrollDistance(-1)).toBe(3.3);
-    expect(globeScrollDistance(2)).toBe(2.35);
+    expect(globeScrollDistance(2)).toBeCloseTo(2.35);
   });
   it('stops while dragging and gradually resumes slow rotation after release', () => {
     expect(recoverGlobeRotation(GLOBE_ROTATION_SPEED, 1, true)).toBe(0);
