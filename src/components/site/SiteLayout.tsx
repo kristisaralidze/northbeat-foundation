@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { Menu, X } from "lucide-react";
 import { PulseLine, Wordmark } from "./PulseLine";
@@ -99,8 +99,9 @@ function Footer() {
 }
 
 export function SiteLayout({ children }: { children: ReactNode }) {
+  const isHome = useLocation({ select: location => location.pathname === '/' });
   return (
-    <div className="theme-site flex min-h-screen flex-col">
+    <div className={`theme-site flex min-h-screen flex-col${isHome ? ' nb-home-shell' : ''}`}>
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 nb-btn nb-btn-primary nb-btn-sm">
         Skip to content
       </a>

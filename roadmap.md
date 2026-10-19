@@ -1,3 +1,7 @@
+# Home scroll story
+- [x] Add home-only smooth scrolling and one coordinated scroll-linked sequence with soft background shifts and no section dividers.
+- [x] Verify reduced motion, globe scrolling and cleanup when leaving home.
+
 # Home globe and grouped ecosystem
 - [x] Add the Design Lab Nordic globe with page colours, touch rotation, bounded zoom, click-gated wheel and a still fallback.
 - [x] Replace entry nodes with eleven labelled ecosystem groups, published-entry dot clouds and the requested group connections.

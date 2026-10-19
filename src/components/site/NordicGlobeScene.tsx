@@ -21,7 +21,7 @@ function World({ palette }: Pick<Props, 'palette'>) {
   }, [palette]);
   useEffect(() => () => { resources.land.dispose(); resources.nordic.dispose(); resources.texture.dispose(); resources.diskTexture.dispose(); }, [resources]);
   return <>
-    <mesh><sphereGeometry args={[1,48,32]} /><meshBasicMaterial color={palette.background} /></mesh>
+    <mesh><sphereGeometry args={[1,48,32]} /><meshBasicMaterial colorWrite={false} /></mesh>
     <points geometry={resources.land}><pointsMaterial color={palette.land} alphaMap={resources.diskTexture} alphaTest={.5} size={.009} sizeAttenuation /></points>
     <points geometry={resources.nordic}><pointsMaterial color={palette.berry} alphaMap={resources.diskTexture} alphaTest={.5} size={.015} sizeAttenuation /></points>
     {NORDIC_CITIES.map(city => <sprite key={city.name} position={globePosition(city.lat,city.lng,1.01)} scale={[.035,.035,1]}><spriteMaterial map={resources.texture} transparent depthWrite={false} /></sprite>)}
@@ -47,5 +47,5 @@ function Interaction({ visible, reduced, touched, wheel, zoom, reset, onFailure 
   return <OrbitControls enablePan={false} enableZoom={false} enableDamping={false} autoRotate={visible && !reduced && !touched} autoRotateSpeed={GLOBE_ROTATION_SPEED} rotateSpeed={.5} />;
 }
 export default function NordicGlobeScene(props: Props) {
-  return <Canvas flat dpr={[1,1.5]} frameloop={props.visible && !props.reduced && !props.touched ? 'always' : 'demand'} camera={{ position: globePosition(60,14,3.3), fov: 42, near: .05, far: 20 }} gl={{ antialias: true, alpha: true }}><color attach="background" args={[props.palette.background]} /><World palette={props.palette} /><Interaction {...props} /></Canvas>;
+  return <Canvas flat dpr={[1,1.5]} frameloop={props.visible && !props.reduced && !props.touched ? 'always' : 'demand'} camera={{ position: globePosition(60,14,3.3), fov: 42, near: .05, far: 20 }} gl={{ antialias: true, alpha: true }}><World palette={props.palette} /><Interaction {...props} /></Canvas>;
 }
