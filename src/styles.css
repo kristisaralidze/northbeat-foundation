@@ -265,6 +265,20 @@ html.lenis, html.lenis body { height: auto; }
 .nb-home-header-logo { display: flex; align-items: center; width: 9rem; height: 2.5rem; }
 .nb-home-intro-section { min-height: calc(100svh - 4rem); display: flex; align-items: center; padding-block: var(--space-16); }
 .nb-home-intro-word { display: inline-block; white-space: pre; }
+.nb-home-world-scene .nb-network-section { display: flex; flex-direction: column; }
+.nb-home-world-scene .nb-network-figure { flex: 1; min-height: 0; }
+.nb-home-world-scene .nb-globe-section { display: flex; flex-direction: column; padding-bottom: var(--space-4); }
+.nb-home-world-scene .nb-globe-stage { flex: 1; min-height: 0; }
+.nb-home-globe-line { margin: var(--space-4) var(--gutter); text-align: center; font-size: 1.125rem; color: var(--ink-soft); }
+.nb-home-happening { min-height: calc(100svh - 4rem); display: flex; flex-direction: column; justify-content: center; gap: var(--space-12); padding-block: var(--space-16); }
+.nb-home-happening-window { overflow: hidden; width: 100%; }
+.nb-home-happening-track { display: flex; width: max-content; gap: var(--space-16); padding-inline: var(--gutter); }
+.nb-home-happening-item { flex: 0 0 auto; width: min(22rem, 78vw); }
+.nb-home-happening-item time { color: var(--berry); font-variant-numeric: tabular-nums; }
+.nb-home-happening-item h3 { font-family: 'Schibsted Grotesk', var(--font-body); font-weight: 400; font-size: 1.75rem; line-height: 1.25; margin-block: var(--space-4); }
+.nb-home-happening-item p { color: var(--ink-soft); }
+.nb-home-learn { padding-block: var(--space-24); }
+.nb-home-learn p { max-width: 36rem; margin-block: var(--space-6); color: var(--ink-soft); }
 .nb-laboratory-wordmark {
   width: 100%;
   margin: 0;
@@ -313,6 +327,10 @@ html.lenis, html.lenis body { height: auto; }
 @media (prefers-reduced-motion: reduce) {
   .nb-home-wordmark-section { height: auto; min-height: 55svh; }
   .nb-home-intro-section { min-height: auto; }
+  .nb-home-happening { min-height: auto; }
+  .nb-home-happening-track { width: 100%; flex-wrap: wrap; gap: var(--space-12); }
+  .nb-home-world-scene .nb-network-section,
+  .nb-home-world-scene .nb-globe-section { display: block; }
 }
 
 .theme-site ::selection {

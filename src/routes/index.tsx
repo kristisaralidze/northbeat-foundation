@@ -10,7 +10,11 @@ import { eventsQuery } from "@/lib/events.query";
 import { opportunitiesQuery } from "@/lib/opportunities.query";
 
 export const Route = createFileRoute("/")({
-  loader: ({ context }) => Promise.all([ecosystemQuery, eventsQuery, opportunitiesQuery].map(query => context.queryClient.ensureQueryData(query))),
+  loader: ({ context }) => Promise.all([
+    context.queryClient.ensureQueryData(ecosystemQuery),
+    context.queryClient.ensureQueryData(eventsQuery),
+    context.queryClient.ensureQueryData(opportunitiesQuery),
+  ]),
   head: () => ({
     links: [{ rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&display=swap" }],
     meta: [
@@ -53,7 +57,7 @@ function Index() {
     <section className="nb-home-learn nb-container">
       <h2 className="nb-network-heading">Start with Learn</h2>
       <p>From your first idea to funding and validation. Guides and a glossary for building in health.</p>
-      <Link to="/learn" search={{ step: undefined }} className="nb-link">Explore Learn</Link>
+      <Link to="/learn" search={{}} className="nb-link">Explore Learn</Link>
     </section>
     </HomeScrollStory>
   );
