@@ -76,7 +76,7 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
         {facts.some(([, value]) => value) && <dl className="space-y-4">{facts.filter(([, value]) => value).map(([name, value]) => <div key={name}><dt className="nb-eyebrow mb-1">{name}</dt><dd className="nb-body break-words">{value}</dd></div>)}</dl>}
         <div className="nb-body flex flex-col items-start gap-4">
           <WebLink url={text(row, 'website')}>Website</WebLink><WebLink url={text(row, 'linkedin_url')}>LinkedIn</WebLink>
-          <WebLink url={text(row, 'registration_url')}>Register</WebLink><WebLink url={text(row, 'apply_url')}>Apply</WebLink><WebLink url={text(row, 'embed_url')}>Listen to episode</WebLink>
+          <WebLink url={text(row, 'registration_url')}>Register</WebLink><WebLink url={text(row, 'apply_url')}>Apply</WebLink>{kind !== 'episodes' && <WebLink url={text(row, 'embed_url')}>Listen to episode</WebLink>}
           {email && <a href={`mailto:${encodeURIComponent(email)}`} className="nb-link break-all">{email}</a>}
         </div>
         {text(row, 'last_checked') && <p className="nb-small text-muted-foreground">Last checked {date(text(row, 'last_checked'))}</p>}
