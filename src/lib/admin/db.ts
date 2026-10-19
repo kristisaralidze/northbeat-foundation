@@ -79,7 +79,7 @@ export async function getEntry(cfg: EntityConfig, id: string): Promise<EntryBund
   const links: Record<string, LinkRow[]> = {};
   for (const l of cfg.links) {
     const rc = l.roleColumn ?? "role";
-    const cols = l.roleColumn ? `${l.otherFk}, ${rc}, note` : `${l.otherFk}, ${rc}`;
+    const cols = l.noRole ? l.otherFk : l.roleColumn ? `${l.otherFk}, ${rc}, note` : `${l.otherFk}, ${rc}`;
     const { data, error: lErr } = await db.from(l.table).select(cols).eq(l.selfFk, id);
     fail(lErr);
     links[l.table] = recs(data).map((r) => ({ otherId: String(r[l.otherFk]), role: r[rc] ?? "", ...(l.roleColumn ? { note: r["note"] ?? null } : {}) }));
@@ -124,7 +124,8 @@ export async function saveEntry(
     const rows = (links[l.table] ?? [])
       .filter((r) => r.otherId && !seen.has(`${r.otherId}|${r.role}`) && seen.add(`${r.otherId}|${r.role}`))
       .filter((r) => !l.roleOptions || l.roleOptions.includes(r.role))
-      .map((r) => ({
+      .filter((r) => !(l.other === cfg.key && r.otherId === entryId))
+      .map((r) => l.noRole ? { [l.selfFk]: entryId, [l.otherFk]: r.otherId } : ({
         [l.selfFk]: entryId, [l.otherFk]: r.otherId, [l.roleColumn ?? "role"]: r.role.trim(),
         ...(l.roleColumn ? { note: r.note ?? null } : {}),
       }));

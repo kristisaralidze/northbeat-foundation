@@ -143,7 +143,7 @@ function Detail() {
             <div className="space-y-1">
               <Label htmlFor="entity">Entry type</Label>
               <select id="entity" className={selectClass} value={entity} onChange={(e) => setEntity(e.target.value as EntityKey)}>
-                {(Object.keys(ENTITIES) as EntityKey[]).map((k) => <option key={k} value={k}>{ENTITIES[k].singular}</option>)}
+                {(Object.keys(ENTITIES) as EntityKey[]).filter((k) => k !== "guides" && k !== "glossary").map((k) => <option key={k} value={k}>{ENTITIES[k].singular}</option>)}
               </select>
             </div>
             <Button disabled={busy} onClick={() => approve.mutate()}>{approve.isPending ? "Creating…" : "Approve → create draft"}</Button>

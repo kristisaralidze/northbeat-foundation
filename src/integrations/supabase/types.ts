@@ -269,6 +269,147 @@ export type Database = {
         }
         Relationships: []
       }
+      glossary_term_guides: {
+        Row: {
+          glossary_term_id: string
+          guide_id: string
+          id: string
+        }
+        Insert: {
+          glossary_term_id: string
+          guide_id: string
+          id?: string
+        }
+        Update: {
+          glossary_term_id?: string
+          guide_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "glossary_term_guides_glossary_term_id_fkey"
+            columns: ["glossary_term_id"]
+            isOneToOne: false
+            referencedRelation: "glossary_terms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "glossary_term_guides_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      glossary_term_relations: {
+        Row: {
+          from_term_id: string
+          id: string
+          to_term_id: string
+        }
+        Insert: {
+          from_term_id: string
+          id?: string
+          to_term_id: string
+        }
+        Update: {
+          from_term_id?: string
+          id?: string
+          to_term_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "glossary_term_relations_from_term_id_fkey"
+            columns: ["from_term_id"]
+            isOneToOne: false
+            referencedRelation: "glossary_terms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "glossary_term_relations_to_term_id_fkey"
+            columns: ["to_term_id"]
+            isOneToOne: false
+            referencedRelation: "glossary_terms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      glossary_term_terms: {
+        Row: {
+          glossary_term_id: string
+          term_id: string
+        }
+        Insert: {
+          glossary_term_id: string
+          term_id: string
+        }
+        Update: {
+          glossary_term_id?: string
+          term_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "glossary_term_terms_glossary_term_id_fkey"
+            columns: ["glossary_term_id"]
+            isOneToOne: false
+            referencedRelation: "glossary_terms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "glossary_term_terms_term_id_fkey"
+            columns: ["term_id"]
+            isOneToOne: false
+            referencedRelation: "terms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      glossary_terms: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          explanation: string | null
+          id: string
+          last_checked: string | null
+          published_at: string | null
+          short_definition: string
+          slug: string
+          source_url: string | null
+          status: Database["public"]["Enums"]["entry_status"]
+          term: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          explanation?: string | null
+          id?: string
+          last_checked?: string | null
+          published_at?: string | null
+          short_definition: string
+          slug: string
+          source_url?: string | null
+          status?: Database["public"]["Enums"]["entry_status"]
+          term: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          explanation?: string | null
+          id?: string
+          last_checked?: string | null
+          published_at?: string | null
+          short_definition?: string
+          slug?: string
+          source_url?: string | null
+          status?: Database["public"]["Enums"]["entry_status"]
+          term?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       guide_links: {
         Row: {
           entry_id: string
@@ -333,54 +474,90 @@ export type Database = {
       }
       guides: {
         Row: {
+          area_id: string | null
           body: string | null
           cover_url: string | null
           created_at: string
           created_by: string | null
           id: string
+          journey_step_id: string | null
           last_checked: string | null
+          level: Database["public"]["Enums"]["guide_level"]
+          next_step: string | null
+          one_sentence: string | null
           published_at: string | null
           reading_minutes: number | null
+          reviewed_by: string | null
           slug: string
           source_url: string | null
+          sources: Json
           status: Database["public"]["Enums"]["entry_status"]
           summary: string | null
           title: string
           updated_at: string
         }
         Insert: {
+          area_id?: string | null
           body?: string | null
           cover_url?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
+          journey_step_id?: string | null
           last_checked?: string | null
+          level?: Database["public"]["Enums"]["guide_level"]
+          next_step?: string | null
+          one_sentence?: string | null
           published_at?: string | null
           reading_minutes?: number | null
+          reviewed_by?: string | null
           slug: string
           source_url?: string | null
+          sources?: Json
           status?: Database["public"]["Enums"]["entry_status"]
           summary?: string | null
           title: string
           updated_at?: string
         }
         Update: {
+          area_id?: string | null
           body?: string | null
           cover_url?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
+          journey_step_id?: string | null
           last_checked?: string | null
+          level?: Database["public"]["Enums"]["guide_level"]
+          next_step?: string | null
+          one_sentence?: string | null
           published_at?: string | null
           reading_minutes?: number | null
+          reviewed_by?: string | null
           slug?: string
           source_url?: string | null
+          sources?: Json
           status?: Database["public"]["Enums"]["entry_status"]
           summary?: string | null
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "guides_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "terms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guides_journey_step_id_fkey"
+            columns: ["journey_step_id"]
+            isOneToOne: false
+            referencedRelation: "terms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       newsletter_issue_links: {
         Row: {
@@ -1322,6 +1499,7 @@ export type Database = {
         | "episode"
         | "newsletter_issue"
         | "guide"
+        | "glossary_term"
       entry_status: "draft" | "published" | "archived"
       event_format: "in_person" | "online" | "hybrid"
       event_type:
@@ -1332,6 +1510,7 @@ export type Database = {
         | "meetup"
         | "workshop"
         | "volunteering"
+      guide_level: "beginner" | "intermediate"
       open_to_kind:
         | "advising"
         | "mentoring"
@@ -1361,7 +1540,13 @@ export type Database = {
         | "care_provider"
       submission_status: "new" | "in_review" | "accepted" | "rejected" | "done"
       submission_type: "new_entry" | "correction" | "contact" | "podcast_guest"
-      term_kind: "field" | "sub_area" | "country" | "stage"
+      term_kind:
+        | "field"
+        | "sub_area"
+        | "country"
+        | "stage"
+        | "area"
+        | "journey_step"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1498,6 +1683,7 @@ export const Constants = {
         "episode",
         "newsletter_issue",
         "guide",
+        "glossary_term",
       ],
       entry_status: ["draft", "published", "archived"],
       event_format: ["in_person", "online", "hybrid"],
@@ -1510,6 +1696,7 @@ export const Constants = {
         "workshop",
         "volunteering",
       ],
+      guide_level: ["beginner", "intermediate"],
       open_to_kind: [
         "advising",
         "mentoring",
@@ -1542,7 +1729,14 @@ export const Constants = {
       ],
       submission_status: ["new", "in_review", "accepted", "rejected", "done"],
       submission_type: ["new_entry", "correction", "contact", "podcast_guest"],
-      term_kind: ["field", "sub_area", "country", "stage"],
+      term_kind: [
+        "field",
+        "sub_area",
+        "country",
+        "stage",
+        "area",
+        "journey_step",
+      ],
     },
   },
 } as const

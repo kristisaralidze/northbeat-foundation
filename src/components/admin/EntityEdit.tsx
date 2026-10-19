@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ENTITIES, STATUS, humanize, type EntityKey, type FieldDef, type LinkDef } from "@/lib/admin/entities";
+import { DEFAULT_TAG_KINDS, ENTITIES, STATUS, humanize, type EntityKey, type FieldDef, type LinkDef } from "@/lib/admin/entities";
 import { deleteEntry, getEntry, listIncomingRelations, listOptions, listTerms, saveEntry, type LinkRow, type Term } from "@/lib/admin/db";
 import { selectClass } from "./EntityList";
 import { ImageField } from "./ImageField";
@@ -32,6 +32,7 @@ function normalise(fields: FieldDef[], v: Values): Values {
   for (const f of fields) {
     const raw = v[f.name];
     if (f.kind === "boolean") out[f.name] = Boolean(raw);
+    else if (f.kind === "sources") out[f.name] = Array.isArray(raw) ? raw : [];
     else if (f.kind === "multi") out[f.name] = Array.isArray(raw) ? raw : [];
     else if (f.kind === "number") out[f.name] = raw === "" || raw == null ? null : Number(raw);
     else if (f.kind === "datetime") out[f.name] = raw ? new Date(String(raw)).toISOString() : null;
@@ -138,10 +139,10 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2">
-        {cfg.fields.map((f) => <FieldInput key={f.name} field={f} value={values[f.name]} onChange={(v) => set(f.name, v)} />)}
+        {cfg.fields.map((f) => <FieldInput key={f.name} field={f} terms={terms.data ?? []} value={values[f.name]} onChange={(v) => set(f.name, v)} />)}
       </section>
 
-      <TagPicker terms={terms.data ?? []} selected={termIds} onChange={setTermIds} />
+      <TagPicker kinds={cfg.tagKinds ?? DEFAULT_TAG_KINDS} terms={terms.data ?? []} selected={termIds} onChange={setTermIds} />
 
       {cfg.links.map((l) => (
         <LinkPicker key={l.table} def={l} rows={links[l.table] ?? []} onChange={(rows) => setLinks((p) => ({ ...p, [l.table]: rows }))} />
@@ -176,10 +177,22 @@ function IncomingRelations({ orgId }: { orgId: string }) {
   );
 }
 
-function FieldInput({ field: f, value, onChange }: { field: FieldDef; value: unknown; onChange: (v: unknown) => void }) {
-  const wide = f.kind === "textarea" || f.kind === "multi";
+function FieldInput({ field: f, terms, value, onChange }: { field: FieldDef; terms: Term[]; value: unknown; onChange: (v: unknown) => void }) {
+  const wide = f.kind === "textarea" || f.kind === "multi" || f.kind === "sources";
   const wrap = wide ? "space-y-1 sm:col-span-2" : "space-y-1";
   const label = `${f.label}${f.required ? " *" : ""}`;
+
+  if (f.kind === "term")
+    return (
+      <div className={wrap}>
+        <Label htmlFor={f.name}>{label}</Label>
+        <select id={f.name} className={`${selectClass} w-full`} value={String(value ?? "")} onChange={(e) => onChange(e.target.value || null)}>
+          <option value="">None</option>
+          {terms.filter((t) => t.kind === f.termKind).map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+        </select>
+      </div>
+    );
+  if (f.kind === "sources") return <SourcesField field={f} value={value} onChange={onChange} />;
 
   if (f.kind === "boolean")
     return (
@@ -237,14 +250,34 @@ function FieldInput({ field: f, value, onChange }: { field: FieldDef; value: unk
   );
 }
 
-const KINDS = [
-  { kind: "field", label: "Fields" },
-  { kind: "sub_area", label: "Sub-areas" },
-  { kind: "country", label: "Countries" },
-  { kind: "stage", label: "Stages" },
-] as const;
+type Source = { title: string; url: string };
+const sourcesToText = (v: unknown) => (Array.isArray(v) ? (v as Source[]).map((s) => `${s.title} | ${s.url}`).join("\n") : "");
+export function parseSources(text: string): Source[] {
+  return text.split("\n").map((line) => {
+    const i = line.lastIndexOf("|");
+    return i < 0 ? null : { title: line.slice(0, i).trim(), url: line.slice(i + 1).trim() };
+  }).filter((s): s is Source => !!s && !!s.title && /^https?:\/\//.test(s.url));
+}
 
-function TagPicker({ terms, selected, onChange }: { terms: Term[]; selected: string[]; onChange: (ids: string[]) => void }) {
+function SourcesField({ field: f, value, onChange }: { field: FieldDef; value: unknown; onChange: (v: unknown) => void }) {
+  const [text, setText] = useState(() => sourcesToText(value));
+  useEffect(() => { setText((t) => (JSON.stringify(parseSources(t)) === JSON.stringify(value ?? []) ? t : sourcesToText(value))); }, [value]);
+  const skipped = text.split("\n").filter((l) => l.trim()).length - parseSources(text).length;
+  return (
+    <div className="space-y-1 sm:col-span-2">
+      <Label htmlFor={f.name}>{f.label}</Label>
+      <Textarea id={f.name} rows={4} placeholder="Title | https://link" value={text} onChange={(e) => { setText(e.target.value); onChange(parseSources(e.target.value)); }} />
+      <p className="text-sm text-muted-foreground">{f.help}{skipped > 0 ? `. ${skipped} line(s) need a title and a link starting with http.` : ""}</p>
+    </div>
+  );
+}
+
+const KIND_LABELS: Record<string, string> = {
+  field: "Fields", sub_area: "Sub-areas", country: "Countries", stage: "Stages", area: "Areas", journey_step: "Journey steps",
+};
+
+function TagPicker({ kinds, terms, selected, onChange }: { kinds: readonly string[]; terms: Term[]; selected: string[]; onChange: (ids: string[]) => void }) {
+  const KINDS = kinds.map((kind) => ({ kind, label: KIND_LABELS[kind] ?? kind }));
   const toggle = (id: string) => onChange(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
   return (
     <section className="space-y-3">
@@ -297,7 +330,7 @@ function LinkPicker({ def, rows, onChange }: { def: LinkDef; rows: LinkRow[]; on
         {rows.map((r, i) => (
           <li key={`${r.otherId}-${i}`} className="flex items-center gap-2">
             <span className="min-w-0 flex-1 truncate text-sm">{byId.get(r.otherId) ?? "…"}</span>
-            {def.roleOptions ? (
+            {def.noRole ? null : def.roleOptions ? (
               <select
                 aria-label="Relation"
                 className={`${selectClass} w-56`}

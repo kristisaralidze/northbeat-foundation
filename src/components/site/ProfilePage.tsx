@@ -15,6 +15,7 @@ export function EntryLink({ kind, entry, children, className }: { kind: EntityKe
     case 'events': return <Link to="/event/$slug" {...props} />;
     case 'opportunities': return <Link to="/opportunity/$slug" {...props} />;
     case 'episodes': return <Link to="/podcast/$slug" {...props} />;
+    default: return <span className={className}>{children}</span>;
   }
 }
 function ProfileImage({ image, name, kind, small = false }: { image: string | null; name: string; kind: EntityKey; small?: boolean }) {

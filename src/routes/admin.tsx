@@ -42,6 +42,8 @@ const items = [
   { title: "Events", to: "/admin/events" },
   { title: "Opportunities", to: "/admin/opportunities" },
   { title: "Episodes", to: "/admin/episodes" },
+  { title: "Guides", to: "/admin/guides" },
+  { title: "Glossary", to: "/admin/glossary" },
   { title: "Newsletter", to: "/admin/newsletter" },
   { title: "Submissions", to: "/admin/submissions" },
   { title: "Tags", to: "/admin/tags" },

@@ -6,6 +6,7 @@ const COLUMNS: Record<EntityKey, string> = {
   events: 'id,slug,status,title,event_type,summary,description,starts_at,ends_at,apply_deadline_at,timezone,format,venue,city,registration_url,price_note,source_url,last_checked',
   opportunities: 'id,slug,status,title,type,summary,description,opens_at,deadline_at,amount_min_eur,amount_max_eur,apply_url,location,employment_type,remote_ok,source_url,last_checked',
   episodes: 'id,slug,status,title,episode_number,season,summary,show_notes,transcript,audio_url,embed_url,duration_seconds,published_on,cover_url,source_url,last_checked',
+  guides: '', glossary: '',
 };
 async function readEntries(client: SupabaseClient, kind: EntityKey, filter: { slug: string } | { ids: string[] }): Promise<ProfileRow[]> {
   if ('ids' in filter && filter.ids.length === 0) return [];

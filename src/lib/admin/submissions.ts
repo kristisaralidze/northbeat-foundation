@@ -35,6 +35,8 @@ export const ENTITY_TO_KIND: Record<EntityKey, string> = {
   events: "event",
   opportunities: "opportunity",
   episodes: "episode",
+  guides: "guide",
+  glossary: "glossary_term",
 };
 
 /** Guess which entry type a submission describes. */
