@@ -1,0 +1,1 @@
+ALTER TYPE public.organisation_type ADD VALUE IF NOT EXISTS 'care_provider';

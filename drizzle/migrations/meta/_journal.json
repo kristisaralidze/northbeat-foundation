@@ -29,6 +29,13 @@
       "when": 1792175423155,
       "tag": "0003_organisation_relations",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792407185118,
+      "tag": "0004_add_care_provider_org_type",
+      "breakpoints": true
     }
   ]
 }

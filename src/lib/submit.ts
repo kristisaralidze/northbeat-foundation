@@ -2,9 +2,9 @@ import { z } from "zod";
 
 export const SUBMIT_TABS = [
   { id: "company", label: "Add a company", heading: "Add a company", intro: "Know a health, medtech or biotech startup, investor or programme we should track? Tell us." },
-  { id: "event", label: "Add an event", heading: "Add an event", intro: "A conference, pitch competition, hackathon or meetup for Nordic healthtech? Send it over." },
+  { id: "event", label: "Add an event", heading: "Add an event", intro: "A conference, pitch competition, hackathon or meetup for Nordic health innovation? Send it over." },
   { id: "opportunity", label: "Add an opportunity", heading: "Add an opportunity", intro: "A grant call, programme intake, competition or job opening? Share the details." },
-  { id: "guest", label: "Be a podcast guest", heading: "Apply to be a podcast guest", intro: "Building, funding or researching Nordic healthtech? We'd love to hear your story." },
+  { id: "guest", label: "Be a podcast guest", heading: "Apply to be a podcast guest", intro: "Building, funding or researching Nordic health innovation? We'd love to hear your story." },
 ] as const;
 
 export type SubmitTab = (typeof SUBMIT_TABS)[number]["id"];

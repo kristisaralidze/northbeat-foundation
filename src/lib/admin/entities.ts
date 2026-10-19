@@ -53,7 +53,7 @@ export const STATUS = ["draft", "published", "archived"] as const;
 export const ORG_TYPES = [
   "startup", "investor", "incubator", "accelerator", "funder", "research_group", "lab",
   "hospital_innovation_unit", "service_provider", "university", "public_agency",
-  "patient_organisation", "community",
+  "patient_organisation", "community", "care_provider",
 ] as const;
 export const OPP_TYPES = ["programme_intake", "grant_call", "competition", "job"] as const;
 export const EVENT_TYPES = ["conference", "pitch_competition", "hackathon", "demo_day", "meetup", "workshop", "volunteering"] as const;

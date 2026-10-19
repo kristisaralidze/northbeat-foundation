@@ -47,7 +47,7 @@ function Explore() {
   const clear = () => { void navigate({ search: EMPTY_SEARCH, resetScroll: false }); };
   return <div className="nb-container py-12 md:py-16">
     <div className="mb-10 border-b border-hairline pb-8">
-      <p className="nb-eyebrow mb-3">The Nordic healthtech directory</p>
+      <p className="nb-eyebrow mb-3">The Nordic health innovation directory</p>
       <h1 className="nb-h1">Explore</h1>
     </div>
     <div className="nb-directory-layout">

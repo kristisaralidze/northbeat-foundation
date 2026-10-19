@@ -21,9 +21,9 @@ export const Route = createFileRoute('/opportunities')({
   loader: ({ context }) => context.queryClient.ensureQueryData(opportunitiesQuery),
   head: () => ({ meta: [
     { title: 'Opportunities — Northbeat' },
-    { name: 'description', content: 'Programme intakes, grant calls, competitions and jobs in Nordic healthtech, sorted by nearest deadline.' },
+    { name: 'description', content: 'Programme intakes, grant calls, competitions and jobs in Nordic health innovation, sorted by nearest deadline.' },
     { property: 'og:title', content: 'Opportunities — Northbeat' },
-    { property: 'og:description', content: 'Programme intakes, grant calls, competitions and jobs in Nordic healthtech, sorted by nearest deadline.' },
+    { property: 'og:description', content: 'Programme intakes, grant calls, competitions and jobs in Nordic health innovation, sorted by nearest deadline.' },
     { property: 'og:type', content: 'website' },
     { property: 'og:url', content: '/opportunities' },
     { name: 'twitter:card', content: 'summary' },
@@ -48,7 +48,7 @@ function Opportunities() {
 
   return <div className="nb-container nb-section">
     <header className="mb-8 flex flex-wrap items-end justify-between gap-6">
-      <div><p className="nb-eyebrow mb-3">Nordic healthtech</p><h1 className="nb-h1">Opportunities</h1></div>
+      <div><p className="nb-eyebrow mb-3">Nordic health innovation</p><h1 className="nb-h1">Opportunities</h1></div>
       <div className="flex gap-2" aria-label="Opportunity period">
         <Button variant="ghost" className={`nb-btn ${!search.archive ? 'nb-btn-primary' : 'nb-btn-quiet'}`} aria-pressed={!search.archive} onClick={() => update({ archive: false })}>Open</Button>
         <Button variant="ghost" className={`nb-btn ${search.archive ? 'nb-btn-primary' : 'nb-btn-quiet'}`} aria-pressed={search.archive} onClick={() => update({ archive: true })}>Closed</Button>

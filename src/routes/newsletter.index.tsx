@@ -9,9 +9,9 @@ export const Route = createFileRoute("/newsletter/")({
   head: () => ({
     meta: [
       { title: "Newsletter — Northbeat" },
-      { name: "description", content: "The Northbeat newsletter: funding calls, intakes and events in Nordic healthtech." },
+      { name: "description", content: "The Northbeat newsletter: funding calls, intakes and events in Nordic health innovation." },
       { property: "og:title", content: "Newsletter — Northbeat" },
-      { property: "og:description", content: "The Northbeat newsletter: funding calls, intakes and events in Nordic healthtech." },
+      { property: "og:description", content: "The Northbeat newsletter: funding calls, intakes and events in Nordic health innovation." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -33,7 +33,7 @@ function NewsletterPage() {
       <header className="nb-page-header">
         <p className="nb-eyebrow">Newsletter</p>
         <h1 className="nb-h1">The Northbeat letter</h1>
-        <p className="nb-lead">Funding calls, programme intakes and events in Nordic healthtech — tracked so you don't miss them.</p>
+        <p className="nb-lead">Funding calls, programme intakes and events in Nordic health innovation — tracked so you don't miss them.</p>
       </header>
       <section aria-label="Sign up" className="nb-card max-w-xl">
         <h2 className="nb-h3">Get the next issue</h2>
