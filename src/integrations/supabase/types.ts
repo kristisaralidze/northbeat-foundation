@@ -1322,6 +1322,7 @@ export type Database = {
         | "episode"
         | "newsletter_issue"
         | "guide"
+        | "glossary_term"
       entry_status: "draft" | "published" | "archived"
       event_format: "in_person" | "online" | "hybrid"
       event_type:
@@ -1332,6 +1333,7 @@ export type Database = {
         | "meetup"
         | "workshop"
         | "volunteering"
+      guide_level: "beginner" | "intermediate"
       open_to_kind:
         | "advising"
         | "mentoring"
@@ -1361,7 +1363,13 @@ export type Database = {
         | "care_provider"
       submission_status: "new" | "in_review" | "accepted" | "rejected" | "done"
       submission_type: "new_entry" | "correction" | "contact" | "podcast_guest"
-      term_kind: "field" | "sub_area" | "country" | "stage"
+      term_kind:
+        | "field"
+        | "sub_area"
+        | "country"
+        | "stage"
+        | "area"
+        | "journey_step"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1498,6 +1506,7 @@ export const Constants = {
         "episode",
         "newsletter_issue",
         "guide",
+        "glossary_term",
       ],
       entry_status: ["draft", "published", "archived"],
       event_format: ["in_person", "online", "hybrid"],
@@ -1510,6 +1519,7 @@ export const Constants = {
         "workshop",
         "volunteering",
       ],
+      guide_level: ["beginner", "intermediate"],
       open_to_kind: [
         "advising",
         "mentoring",
@@ -1542,7 +1552,14 @@ export const Constants = {
       ],
       submission_status: ["new", "in_review", "accepted", "rejected", "done"],
       submission_type: ["new_entry", "correction", "contact", "podcast_guest"],
-      term_kind: ["field", "sub_area", "country", "stage"],
+      term_kind: [
+        "field",
+        "sub_area",
+        "country",
+        "stage",
+        "area",
+        "journey_step",
+      ],
     },
   },
 } as const
