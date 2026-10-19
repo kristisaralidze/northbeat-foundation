@@ -1,21 +1,16 @@
-import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import { cardTags, type DirectoryOrganisation, type DirectoryTerm } from "@/lib/explore";
 import { humanize } from "@/lib/admin/entities";
 import { networkGroup } from '@/lib/ecosystem';
+import { OrganisationLogo } from './OrganisationLogo';
 
 export function OrganisationCard({ organisation: org, terms }: { organisation: DirectoryOrganisation; terms: DirectoryTerm[] }) {
-  const [failed, setFailed] = useState(false);
   const { shown, extra } = cardTags(org, terms);
   return (
     <article data-result-id={org.id} className="nb-card flex h-full min-w-0 flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
-        <div className="nb-org-logo">
-          {org.logo_url && !failed
-            ? <img src={org.logo_url} alt={`${org.name} logo`} loading="lazy" onError={() => setFailed(true)} className="h-full w-full object-contain" />
-            : <span className="nb-monogram" aria-hidden>{org.name.trim().charAt(0).toLocaleUpperCase()}</span>}
-        </div>
+        <OrganisationLogo name={org.name} slug={org.slug} uploaded={org.logo_url} website={org.website} />
         <span className="nb-small text-muted-foreground text-right"><span className={`nb-group-dot nb-network-group-${networkGroup('organisation', org.type)}`} aria-hidden />{humanize(org.type)}</span>
       </div>
       <div className="min-w-0">

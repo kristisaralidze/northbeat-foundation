@@ -7,6 +7,7 @@ import { humanize, type EntityKey } from '@/lib/admin/entities';
 import { EMPTY_SEARCH } from '@/lib/explore';
 import { safeWebUrl, text, type PublicProfile, type RelatedEntry } from '@/lib/profiles';
 import { RelationshipMap } from './RelationshipMap';
+import { OrganisationLogo } from './OrganisationLogo';
 
 export function EntryLink({ kind, entry, children, className }: { kind: EntityKey; entry: { slug: string }; children: ReactNode; className?: string }) {
   const props = { params: { slug: entry.slug }, className, children };
@@ -28,7 +29,7 @@ function ProfileImage({ image, name, kind, small = false }: { image: string | nu
 }
 function RelatedCard({ kind, entry }: { kind: EntityKey; entry: RelatedEntry }) {
   return <article className="nb-card flex min-w-0 flex-col gap-4">
-    {['organisations', 'people', 'episodes'].includes(kind) && <ProfileImage image={entry.image} name={entry.title} kind={kind} small />}
+    {kind === 'organisations' ? <OrganisationLogo name={entry.title} slug={entry.slug} /> : ['people', 'episodes'].includes(kind) && <ProfileImage image={entry.image} name={entry.title} kind={kind} small />}
     {entry.roles.length > 0 && <p className="nb-small text-muted-foreground break-words">{entry.roles.map(humanize).join(' · ')}</p>}
     <h3 className="nb-h3"><EntryLink kind={kind} entry={entry} className="nb-org-link break-words">{entry.title}<ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden /></EntryLink></h3>
     {entry.summary && <p className="nb-small text-muted-foreground break-words">{entry.summary}</p>}
@@ -59,7 +60,7 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
     <div className="mb-8"><Link to="/explore" search={EMPTY_SEARCH} className="nb-link inline-flex items-center gap-2"><ArrowLeft className="h-4 w-4" aria-hidden />Explore</Link></div>
     <header data-profile-identity data-profile-detail={isOrg ? [label, text(row, 'city')].filter(Boolean).join(', ') : undefined} className="pb-10">
       <div className={isOrg ? 'flex items-start gap-4' : 'flex flex-col gap-6 sm:flex-row sm:items-start'}>
-        {(isOrg || isPerson || (profile.image && kind !== 'episodes')) && <ProfileImage image={profile.image} name={profile.title} kind={kind} />}
+        {isOrg ? <OrganisationLogo name={profile.title} slug={profile.row.slug} uploaded={profile.image} website={text(row, 'website')} eager /> : (isPerson || (profile.image && kind !== 'episodes')) && <ProfileImage image={profile.image} name={profile.title} kind={kind} />}
         <div className="min-w-0 flex-1"><p className="nb-eyebrow mb-3">{label}</p><h1 className="nb-h1 break-words">{profile.title}</h1>{isOrg && text(row, 'city') && <p className="nb-small mt-3 text-muted-foreground">{text(row, 'city')}</p>}{profile.summary && kind !== 'episodes' && <p className="nb-lead mt-4 break-words">{profile.summary}</p>}</div>
       </div>
       {profile.terms.length > 0 && <div className="mt-6 flex flex-wrap gap-2" aria-label="Tags">{profile.terms.map((term) => <span key={term.id} className="nb-chip max-w-full"><span className="truncate">{term.name}</span></span>)}</div>}

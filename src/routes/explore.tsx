@@ -1,17 +1,16 @@
 import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
+import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OrganisationCard } from "@/components/site/OrganisationCard";
 import { DirectoryFilters } from "@/components/site/DirectoryFilters";
-import { getDirectory } from "@/lib/explore.functions";
+import { directoryQuery } from '@/lib/directory.query';
 import { EMPTY_SEARCH, FACETS, cleanExploreSearch, filterOrganisations, parseExploreSearch, type ExploreSearch, type Facet } from "@/lib/explore";
 import { humanize } from "@/lib/admin/entities";
 import { LayoutResults } from '@/components/site/LayoutResults';
 import { FilterSheet } from '@/components/site/FilterSheet';
 
-const directoryQuery = queryOptions({ queryKey: ["public-organisations"], queryFn: () => getDirectory(), staleTime: 60_000 });
 
 export const Route = createFileRoute("/explore")({
   validateSearch: parseExploreSearch,

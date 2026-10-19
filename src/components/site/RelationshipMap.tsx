@@ -2,6 +2,8 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import { networkGroup } from '@/lib/ecosystem';
 import type { EntityKey } from '@/lib/admin/entities';
 import type { PublicProfile, RelatedEntry } from '@/lib/profiles';
+import { text } from '@/lib/profiles';
+import { OrganisationLogo } from './OrganisationLogo';
 export function RelationshipMap({ profile, link }: { profile: PublicProfile; link: (kind: EntityKey, entry: RelatedEntry) => ReactNode }) {
   const host = useRef<HTMLElement>(null);
   const seen = new Set<string>();
@@ -23,7 +25,7 @@ export function RelationshipMap({ profile, link }: { profile: PublicProfile; lin
     <svg viewBox={`0 0 700 ${height}`} preserveAspectRatio="none" aria-hidden="true" className="nb-relationship-lines">
       {nodes.map((node, i) => <path key={`${node.kind}:${node.entry.id}`} d={`M350,${height / 2} L${i % 2 ? 570 : 130},${48 + Math.floor(i / 2) * (height / rows)}`} pathLength="1" />)}
     </svg>
-    <div className="nb-relationship-centre"><span className={`nb-group-dot nb-network-group-${networkGroup('organisation', String(profile.row['type'] ?? ''))}`} />{profile.title}</div>
-    <ul className="nb-relationship-nodes">{nodes.map(node => <li key={`${node.kind}:${node.entry.id}`}><span className={`nb-group-dot nb-network-group-${node.colour}`} aria-hidden />{link(node.kind, node.entry)}</li>)}</ul>
+    <div className="nb-relationship-centre"><OrganisationLogo name={profile.title} uploaded={profile.image} website={text(profile.row, 'website')} /><span><span className={`nb-group-dot nb-network-group-${networkGroup('organisation', String(profile.row['type'] ?? ''))}`} />{profile.title}</span></div>
+    <ul className="nb-relationship-nodes">{nodes.map(node => <li key={`${node.kind}:${node.entry.id}`}>{node.kind === 'organisations' && <OrganisationLogo name={node.entry.title} slug={node.entry.slug} />}<span><span className={`nb-group-dot nb-network-group-${node.colour}`} aria-hidden />{link(node.kind, node.entry)}</span></li>)}</ul>
   </section>;
 }
