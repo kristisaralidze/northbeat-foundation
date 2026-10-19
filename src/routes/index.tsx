@@ -5,9 +5,12 @@ import { EcosystemNetwork } from "@/components/site/EcosystemNetwork";
 import { ecosystemQuery } from "@/lib/ecosystem.query";
 import { NordicGlobe } from "@/components/site/NordicGlobe";
 import { HomeScrollStory } from "@/components/site/HomeScrollStory";
+import { HomeHappening } from "@/components/site/HomeHappening";
+import { eventsQuery } from "@/lib/events.query";
+import { opportunitiesQuery } from "@/lib/opportunities.query";
 
 export const Route = createFileRoute("/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(ecosystemQuery),
+  loader: ({ context }) => Promise.all([ecosystemQuery, eventsQuery, opportunitiesQuery].map(query => context.queryClient.ensureQueryData(query))),
   head: () => ({
     links: [{ rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&display=swap" }],
     meta: [
@@ -42,8 +45,16 @@ function Index() {
         </div>
       </div>
     </section>
-    <EcosystemNetwork />
-    <NordicGlobe />
+    <div className="nb-home-world-scene">
+      <EcosystemNetwork />
+      <NordicGlobe />
+    </div>
+    <HomeHappening />
+    <section className="nb-home-learn nb-container">
+      <h2 className="nb-network-heading">Start with Learn</h2>
+      <p>From your first idea to funding and validation. Guides and a glossary for building in health.</p>
+      <Link to="/learn" search={{ step: undefined }} className="nb-link">Explore Learn</Link>
+    </section>
     </HomeScrollStory>
   );
 }
