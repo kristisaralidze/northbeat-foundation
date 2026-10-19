@@ -79,7 +79,7 @@ function Opportunities() {
       {hasFilters && <Button variant="ghost" className="nb-btn nb-btn-quiet" onClick={() => update({ type: '', field: '', stage: '' })}>Clear filters</Button>}
     </div>
     <p className="nb-small my-6 text-muted-foreground" role="status">{opportunities.length} {search.archive ? 'closed' : 'open'} {opportunities.length === 1 ? 'opportunity' : 'opportunities'}{!search.archive && opportunities.length > 0 ? ' · nearest deadline first' : ''}</p>
-    {opportunities.length > 0 && <DateTimeline items={opportunities} date={opportunity => opportunity.deadline_at} now={data.now} earlier={search.archive}>
+    {opportunities.length > 0 && <DateTimeline items={opportunities} date={opportunity => opportunity.deadline_at} now={data.now} earlier={search.archive} undatedHeading="Rolling and open now">
       {(opportunity) => {
         const amount = amountLabel(opportunity);
         const job = opportunity.type === 'job';

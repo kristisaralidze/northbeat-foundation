@@ -37,8 +37,8 @@ function Guide() {
   return <article className="nb-container nb-section">
     <div className="mx-auto max-w-2xl">
       <nav aria-label="Breadcrumb" className="nb-small mb-6"><Link to="/learn" className="nb-link">Learn</Link></nav>
-      <h1 className="nb-h1">{guide.title}</h1>
-      <p className="nb-small mt-4 text-muted-foreground">{meta.join(' · ')}</p>
+      <h1 data-page-title className="nb-h1">{guide.title}</h1>
+      <div className="nb-small mt-4 flex flex-wrap gap-x-6 gap-y-2 text-muted-foreground">{meta.map(item => <span key={item}>{item}</span>)}</div>
       {guide.one_sentence && <div data-one-sentence className="mt-8 border-l-2 border-primary pl-5">
         <p className="nb-eyebrow mb-2">In one sentence</p>
         <p className="nb-lead text-ink">{guide.one_sentence}</p>

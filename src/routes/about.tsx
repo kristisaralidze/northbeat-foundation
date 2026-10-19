@@ -3,10 +3,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About: Northbeat" },
-      { name: "description", content: "Northbeat is the reference hub for Nordic health, medtech and biotech startups." },
-      { property: "og:title", content: "About: Northbeat" },
-      { property: "og:description", content: "Northbeat is the reference hub for Nordic health, medtech and biotech startups." },
+      { title: "About Northbeat" },
+      { name: "description", content: "Northbeat is the reference hub for Nordic health ventures." },
+      { property: "og:title", content: "About Northbeat" },
+      { property: "og:description", content: "Northbeat is the reference hub for Nordic health ventures." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -19,8 +19,8 @@ function AboutPage() {
     <div className="nb-page">
       <header className="nb-page-header">
         
-        <h1 className="nb-h1">We track it so you don't miss it.</h1>
-        <p className="nb-lead">Northbeat is the reference hub for anyone starting, joining, funding or researching a health, medtech or biotech startup in the Nordics.</p>
+        <h1 className="nb-h1">About Northbeat</h1>
+        <p className="nb-lead">Northbeat is the reference hub for anyone starting, joining, funding or researching a health venture in the Nordics.</p>
       </header>
       <div className="nb-body max-w-2xl space-y-6">
         <p>

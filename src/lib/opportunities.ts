@@ -4,6 +4,7 @@ export type OpportunityRow = {
   amount_min_eur: number | null; amount_max_eur: number | null;
   location: string | null; employment_type: string | null; remote_ok: boolean | null;
   termIds: string[];
+  description?: string | null;
 };
 export type OpportunityTerm = { id: string; kind: string; name: string; slug: string; parent_id: string | null; sort_order: number };
 export type OpportunitiesData = { opportunities: OpportunityRow[]; terms: OpportunityTerm[]; now: string };
@@ -37,7 +38,7 @@ export function amountLabel(opportunity: OpportunityRow): string {
 }
 
 export function deadlineLabel(opportunity: OpportunityRow, now: string): string {
-  if (!opportunity.deadline_at) return opportunity.type === 'job' || opportunity.type === 'programme_intake' ? 'Rolling' : 'Dates TBA';
+  if (!opportunity.deadline_at) return isRolling(opportunity) ? 'Open now' : 'Dates to be announced';
   const date = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
     .format(new Date(opportunity.deadline_at));
   const dayOf = (value: string) => Math.floor(Date.parse(value) / 86_400_000);
@@ -46,4 +47,9 @@ export function deadlineLabel(opportunity: OpportunityRow, now: string): string 
   if (days === 0) return 'Closes today';
   if (days === 1) return 'Closes tomorrow';
   return `${date} · ${days} days left`;
+}
+export function isRolling(opportunity: OpportunityRow): boolean {
+  const timing = `${opportunity.summary ?? ''} ${opportunity.description ?? ''}`;
+  if (/dates? (?:to be announced|not (?:yet )?announced)|deadline (?:to be announced|not (?:yet )?announced)|intake (?:to be announced|not (?:yet )?announced)/i.test(timing)) return false;
+  return /\b(?:rolling|continuous|continuously|ongoing call|year.round|any time|anytime|no (?:fixed )?deadline)\b/i.test(timing) || opportunity.type === 'job';
 }
