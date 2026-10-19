@@ -20,14 +20,16 @@ describe('home scroll progress', () => {
     expect(networkScrollPhases(0, 10, true)).toEqual({ entry: 1, connections: 10, labels: 1 });
   });
   it('keeps only upcoming dated events and deadlines, nearest first', () => {
-    const events = { now: '2026-10-19T18:39:00Z', events: [
-      { id: 'past', slug: 'past', title: 'Past', starts_at: '2026-10-18', event_type: 'conference' },
-      { id: 'future', slug: 'future', title: 'Future', starts_at: '2026-11-18', apply_deadline_at: '2026-10-28', event_type: 'conference' },
-    ], opportunities: [] } as EventsData;
-    const opportunities = { now: events.now, opportunities: [
-      { id: 'grant', slug: 'grant', title: 'Grant', deadline_at: '2027-01-14', type: 'grant_call' },
-      { id: 'rolling', slug: 'rolling', title: 'Rolling', deadline_at: null, type: 'programme_intake' },
-    ], terms: [] } as OpportunitiesData;
+    const eventDefaults = { summary: null, ends_at: null, apply_deadline_at: null, timezone: null, city: null, venue: null, format: null };
+    const opportunityDefaults = { summary: null, opens_at: null, amount_min_eur: null, amount_max_eur: null, location: null, employment_type: null, remote_ok: null, termIds: [] };
+    const events: EventsData = { now: '2026-10-19T18:39:00Z', events: [
+      { ...eventDefaults, id: 'past', slug: 'past', title: 'Past', starts_at: '2026-10-18', event_type: 'conference' },
+      { ...eventDefaults, id: 'future', slug: 'future', title: 'Future', starts_at: '2026-11-18', apply_deadline_at: '2026-10-28', event_type: 'conference' },
+    ], opportunities: [] };
+    const opportunities: OpportunitiesData = { now: events.now, opportunities: [
+      { ...opportunityDefaults, id: 'grant', slug: 'grant', title: 'Grant', deadline_at: '2027-01-14', type: 'grant_call' },
+      { ...opportunityDefaults, id: 'rolling', slug: 'rolling', title: 'Rolling', deadline_at: null, type: 'programme_intake' },
+    ], terms: [] };
     expect(happeningItems(events, opportunities).map(i => i.id)).toEqual(['application:future', 'event:future', 'opportunity:grant']);
   });
 });

@@ -268,7 +268,7 @@ html.lenis, html.lenis body { height: auto; }
 .nb-home-world-scene .nb-network-section { display: flex; flex-direction: column; }
 .nb-home-world-scene .nb-network-figure { flex: 1; min-height: 0; }
 .nb-home-world-scene .nb-globe-section { display: flex; flex-direction: column; padding-bottom: var(--space-4); }
-.nb-home-world-scene .nb-globe-stage { flex: 1; min-height: 0; }
+.nb-home-world-scene .nb-globe-stage { flex: 1; min-height: 0; max-height: 660px; margin-block: auto; }
 .nb-home-globe-line { margin: var(--space-4) var(--gutter); text-align: center; font-size: 1.125rem; color: var(--ink-soft); }
 .nb-home-happening { min-height: calc(100svh - 4rem); display: flex; flex-direction: column; justify-content: center; gap: var(--space-12); padding-block: var(--space-16); }
 .nb-home-happening-window { overflow: hidden; width: 100%; }
