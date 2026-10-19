@@ -1,3 +1,8 @@
+# Home ecosystem network
+- [x] Adapt the Design Lab network using all published organisations, events and opportunities with real relationships.
+- [x] Add bounded labels, full legend, scroll animation, touch selection and reduced-motion support.
+- [x] Test publication and connection rules and verify populated desktop and phone interactions.
+
 # Home wordmark
 - [x] Transfer the Design Lab wordmark and show it full width at the top of the home page, with serif fallbacks for missing images.
 - [x] Verify the wordmark and missing-image fallback on desktop and phone screens.
