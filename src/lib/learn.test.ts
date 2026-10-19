@@ -24,6 +24,6 @@ describe('learn', () => {
   it('glossary groups A to Z and searches definitions', () => {
     const terms = [{ term: 'Seed', short_definition: 'Early money' }, { term: 'CE mark', short_definition: 'EU approval' }];
     expect(groupGlossary(terms).map((x) => x.letter)).toEqual(['C', 'S']);
-    expect(groupGlossary(terms, 'money').map((x) => x.terms[0].term)).toEqual(['Seed']);
+    expect(groupGlossary(terms, 'money').map((x) => x.terms[0]?.term)).toEqual(['Seed']);
   });
 });

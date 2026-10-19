@@ -9,7 +9,7 @@ const TITLE = 'Learn: Northbeat';
 const DESC = 'Plain guides for building a health venture in the Nordics, step by step, from first idea to growth.';
 
 export const Route = createFileRoute('/learn/')({
-  validateSearch: (search: Record<string, unknown>): { step?: string } => (typeof search.step === 'string' && search.step ? { step: search.step } : {}),
+  validateSearch: (search: Record<string, unknown>): { step?: string } => (typeof search['step'] === 'string' && search['step'] ? { step: search['step'] } : {}),
   loader: ({ context }) => context.queryClient.ensureQueryData(learnHubQuery),
   head: () => ({
     meta: [

@@ -40,7 +40,7 @@ async function tagged(c: Client, kind: Kind, termIds: string[]) {
   if (!termIds.length) return [];
   const cfg = LINK[kind];
   const hits = await all<Record<string, string>>((a, b) => c.from(cfg.table).select(`${cfg.fk},term_id`).in('term_id', termIds).order(cfg.fk).order('term_id').range(a, b) as never);
-  const ids = [...new Set(hits.map((h) => h[cfg.fk]))];
+  const ids = [...new Set(hits.map((h) => h[cfg.fk]).filter((id): id is string => Boolean(id)))];
   const out: (HubItem & { id: string; termIds: string[] })[] = [];
   const now = Date.now();
   for (let i = 0; i < ids.length; i += 100) {
@@ -48,8 +48,8 @@ async function tagged(c: Client, kind: Kind, termIds: string[]) {
     const rows = await all<Record<string, string | null>>((a, b) => c.from(kind).select(cfg.cols).eq('status', 'published').in('id', chunk).order('id').range(a, b) as never);
     const links = await all<Record<string, string>>((a, b) => c.from(cfg.table).select(`${cfg.fk},term_id`).in(cfg.fk, chunk).order(cfg.fk).order('term_id').range(a, b) as never);
     for (const r of rows) {
-      if (kind === 'events') { const end = r.ends_at ?? r.starts_at; if (end && new Date(end).getTime() < now) continue; }
-      out.push({ id: r.id!, slug: r.slug!, title: publicTitle(r[cfg.title] ?? ''), summary: r[cfg.summary] ?? null, termIds: links.filter((l) => l[cfg.fk] === r.id).map((l) => l.term_id) });
+      if (kind === 'events') { const end = r['ends_at'] ?? r['starts_at']; if (end && new Date(end).getTime() < now) continue; }
+      out.push({ id: r['id']!, slug: r['slug']!, title: publicTitle(r[cfg.title] ?? ''), summary: r[cfg.summary] ?? null, termIds: links.filter((l) => l[cfg.fk] === r['id']).map((l) => l['term_id']).filter((id): id is string => Boolean(id)) });
     }
   }
   return out.sort((a, b) => a.title.localeCompare(b.title));
@@ -62,7 +62,7 @@ export const getLearnHub = createServerFn({ method: 'GET' }).handler(async (): P
   const stepTerms = list.filter((t) => t.kind === 'journey_step');
   const stepIds = stepTerms.map((t) => t.id);
   const stepOrder = new Map(stepTerms.map((t, i) => [t.id, i]));
-  const [orgs, opps, events] = await Promise.all((['organisations', 'opportunities', 'events'] as const).map((k) => tagged(c, k, stepIds)));
+  const [orgs, opps, events] = await Promise.all([tagged(c, 'organisations', stepIds), tagged(c, 'opportunities', stepIds), tagged(c, 'events', stepIds)]);
   const pick = ({ id, name, slug, sort_order }: LearnTerm): LearnTerm => ({ id, name, slug, sort_order });
   return {
     steps: stepTerms.map((s) => ({ ...pick(s), guides: guideRows.filter((g) => g.journey_step_id === s.id).sort((a, b) => a.title.localeCompare(b.title)),

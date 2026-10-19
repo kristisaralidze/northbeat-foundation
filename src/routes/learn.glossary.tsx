@@ -8,7 +8,7 @@ const TITLE = 'Glossary: Northbeat Learn';
 const DESC = 'Health innovation and startup terms explained in plain language, A to Z.';
 
 export const Route = createFileRoute('/learn/glossary')({
-  validateSearch: (search: Record<string, unknown>): { q?: string } => (typeof search.q === 'string' && search.q ? { q: search.q } : {}),
+  validateSearch: (search: Record<string, unknown>): { q?: string } => (typeof search['q'] === 'string' && search['q'] ? { q: search['q'] } : {}),
   loader: ({ context }) => context.queryClient.ensureQueryData(glossaryQuery),
   head: () => ({
     meta: [
