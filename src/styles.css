@@ -318,18 +318,18 @@
 .nb-network-ring { fill: none; stroke: var(--node-color); opacity: 0; stroke-width: 1.5; }
 .nb-network-node[data-selected='true'] .nb-network-ring, .nb-network-node:focus-visible .nb-network-ring { opacity: 1; }
 .nb-network-label { fill: var(--ink); stroke: var(--network-label-halo); stroke-width: 5; paint-order: stroke; font-size: 12px; letter-spacing: 0; pointer-events: none; }
-.nb-network-selection { min-height: 64px; display: flex; align-content: start; flex-wrap: wrap; gap: var(--space-2) var(--space-4); padding-bottom: var(--space-4); }
-.nb-network-selection a { overflow-wrap: anywhere; }
-.nb-network-selection span { color: var(--ink-soft); font-size: .875rem; }
-.nb-network-legend { list-style: none; margin: 0; padding: var(--space-6) 0 0; border-top: 1px solid var(--hairline); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4) var(--space-6); }
-.nb-network-legend li { display: flex; align-items: baseline; gap: var(--space-2); font-size: .8125rem; line-height: 1.45; }
-.nb-network-legend i { flex: 0 0 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--node-color); }
-@media (max-width: 900px) { .nb-network-legend { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.nb-network-cloud { fill: var(--node-color); pointer-events: none; }
+.nb-network-cloud[data-dimmed='true'] { opacity: .18; }
 @media (max-width: 600px) {
-  .nb-network-figure { height: 500px; }
-  .nb-network-legend { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
-  .nb-network-selection { min-height: 88px; }
+  .nb-network-figure { height: 670px; }
+  .nb-network-label { font-size: 11px; }
 }
+.nb-globe-section { --globe-background: var(--background); --globe-land: oklch(.85 .035 300); --globe-berry: var(--berry); padding-block: var(--space-8) var(--space-16); border-top: 1px solid var(--hairline); font-family: 'Schibsted Grotesk', var(--font-body); }
+.nb-globe-stage { width: 100%; height: 660px; background: var(--globe-background); cursor: grab; touch-action: none; }
+.nb-globe-stage:active { cursor: grabbing; }
+.nb-globe-still { width: 100%; height: 100%; object-fit: contain; }
+.nb-globe-controls { display: flex; justify-content: center; gap: var(--space-3); }
+@media (max-width: 600px) { .nb-globe-stage { height: 420px; } }
 
 .theme-site :focus-visible {
   outline: 2px solid var(--berry);

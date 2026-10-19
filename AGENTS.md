@@ -10,7 +10,8 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
-- The home ecosystem uses a paginated public server reader, publication-checked relationship endpoints and a stopped d3-force layout; SVG labels are measured and bounded, and animation runs only once on intersection. Why: every published entry remains visible without invented links, clipped names or continuous motion.
+- The home ecosystem groups the paginated published reader into fixed group anchors and one cloud dot per entry; group links use Explore's canonical type search and separate conceptual edges. Why: group browsing stays distinct from individual database relationships.
+- The home globe lazy-loads an R3F scene with locally sampled Design Lab country geometry and a matching still; OrbitControls handles rotation while zoom is bounded and wheel-gated. Why: SSR stays safe and scrolling works without external runtime assets.
 - The home object wordmark uses local asset pointers and measured serif lettering; object images replace letters only after loading and failed images revert to letters. Why: the imported composition stays readable even when media is unavailable.
 - Public entry titles use the shared publicTitle formatter for dash punctuation; stored titles are never rewritten during copy reviews. Why: public copy can follow the voice rules without changing editorial data.
 - Events use a paginated public read and URL-backed browsing state; past is a date-based view of published entries, not an entry status mutation. Why: past events remain publicly readable and linked while upcoming lists stay current.

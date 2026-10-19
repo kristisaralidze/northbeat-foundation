@@ -1,120 +1,83 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ecosystemQuery } from '@/lib/ecosystem.query';
-import { ECOSYSTEM_GROUPS, layoutNetwork, networkTiming, profileHref, type NetworkNode } from '@/lib/ecosystem';
+import { ECOSYSTEM_GROUPS, GROUP_CONNECTIONS, groupCounts, groupHref, groupPositions, networkTiming } from '@/lib/ecosystem';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
+const SHORT_LABELS = ['Startups', 'Investors', 'Incubators and accelerators', 'Funders and grants', 'Universities and research', 'Labs and validation', 'Hospitals and care', 'Public agencies', 'Patient organisations', 'Communities and events', 'Services'];
 export function EcosystemNetwork() {
   const { data } = useSuspenseQuery(ecosystemQuery);
   const svgRef = useRef<SVGSVGElement>(null);
-  const [selected, setSelected] = useState<NetworkNode | null>(null);
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const phone = window.matchMedia('(max-width: 600px)');
-    const touch = window.matchMedia('(hover: none)');
-    let frame = 0, hasEntered = reduced.matches, completed = reduced.matches;
-    let activeId: string | null = null;
+    let frame = 0, entered = false, completed = false, visible = false, active: number | null = null;
+    let drawFrame: ((now: number) => void) | undefined;
     const render = () => {
       cancelAnimationFrame(frame); svg.replaceChildren();
       const width = svg.clientWidth, height = svg.clientHeight;
-      if (width < 1 || height < 1) return;
+      if (!width || !height) return;
+      const phone = width < 600, positions = groupPositions(width, height);
       svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-      const nodes = layoutNetwork(data, width, height);
-      const byId = new Map(nodes.map(n => [n.id, n]));
       const element = (tag: string) => document.createElementNS(SVG_NS, tag);
-      const paths = data.links.map(e => {
-        const path = element('path'); path.setAttribute('class', 'nb-network-edge');
-        path.dataset['source'] = e.source; path.dataset['target'] = e.target;
-        const title = element('title'); title.textContent = e.relation.replace(/_/g, ' '); path.append(title); svg.append(path); return path;
-      });
+      const paths = GROUP_CONNECTIONS.map(() => { const path = element('path'); path.setAttribute('class', 'nb-network-edge'); svg.append(path); return path; });
       const anchors: SVGElement[] = [];
-      const boxes: { x: number; y: number; w: number; h: number }[] = [];
-      const measureCanvas = document.createElement('canvas').getContext('2d');
-      if (measureCanvas) measureCanvas.font = '12px "Schibsted Grotesk"';
-      const degree = (id: string) => data.links.filter(e => e.source === id || e.target === id).length;
-      const labelIds = new Set([...nodes].sort((a, b) => degree(b.id) - degree(a.id)).slice(0, phone.matches ? 5 : 15).map(n => n.id));
-      const highlight = (id: string | null) => {
-        activeId = id;
-        const connected = new Set<string>(id ? [id] : []);
-        data.links.forEach(e => { if (e.source === id) connected.add(e.target); if (e.target === id) connected.add(e.source); });
-        anchors.forEach((a, i) => { const n = nodes[i]; if (!n) return; a.setAttribute('data-dimmed', String(Boolean(id && !connected.has(n.id)))); a.setAttribute('data-selected', String(n.id === id)); });
-        paths.forEach((p, i) => { const e = data.links[i]; if (!e) return; const on = e.source === id || e.target === id; p.setAttribute('data-active', String(on)); p.setAttribute('data-dimmed', String(Boolean(id && !on))); });
-        setSelected(id ? byId.get(id) ?? null : null);
+      const dots: { el: SVGElement; group: number; dx: number; dy: number }[] = [];
+      const highlight = (group: number | null) => {
+        active = group;
+        const connected = new Set<number>(group === null ? [] : [group]);
+        GROUP_CONNECTIONS.forEach(([a, b]) => { if (a === group) connected.add(b); if (b === group) connected.add(a); });
+        anchors.forEach((el, i) => { el.dataset['dimmed'] = String(group !== null && !connected.has(i)); el.dataset['selected'] = String(i === group); });
+        dots.forEach(dot => { dot.el.dataset['dimmed'] = String(group !== null && !connected.has(dot.group)); });
+        paths.forEach((el, i) => { const pair = GROUP_CONNECTIONS[i]; const on = pair?.includes(group ?? -1) ?? false; el.dataset['active'] = String(on); el.dataset['dimmed'] = String(group !== null && !on); });
       };
-      nodes.forEach(n => {
-        const a = element('a'); a.setAttribute('href', profileHref(n)); a.setAttribute('class', `nb-network-node nb-network-group-${n.group}`);
-        a.setAttribute('aria-label', `${n.name}, ${n.type}`); a.setAttribute('data-node-id', n.id); a.setAttribute('tabindex', '0');
-        const title = element('title'); title.textContent = `${n.name}: ${n.type}`; a.append(title);
-        const hit = element('circle'); hit.setAttribute('r', '22'); hit.setAttribute('class', 'nb-network-hit'); a.append(hit);
-        const ring = element('circle'); ring.setAttribute('r', '11'); ring.setAttribute('class', 'nb-network-ring'); a.append(ring);
-        const dot = element('circle'); dot.setAttribute('r', n.kind === 'organisation' ? '5' : '4'); dot.setAttribute('class', 'nb-network-dot'); a.append(dot);
-        if (labelIds.has(n.id)) {
-          const x = n.x ?? width / 2, y = n.y ?? height / 2;
-          const w = Math.min(width - 24, (measureCanvas?.measureText(n.name).width ?? n.name.length * 7) + 8);
-          const left = Math.max(12, Math.min(width - w - 12, x - w / 2));
-          const top = y > height - 48 ? y - 28 : y + 13;
-          const box = { x: left, y: top, w, h: 18 };
-          const overlaps = boxes.some(b => box.x < b.x + b.w + 6 && box.x + box.w + 6 > b.x && box.y < b.y + b.h + 4 && box.y + box.h + 4 > b.y);
-          if (!overlaps) {
-            boxes.push(box);
-            const label = element('text'); label.setAttribute('x', String(left - x + 4)); label.setAttribute('y', String(top - y + 12));
-            label.setAttribute('class', 'nb-network-label'); label.textContent = n.name;
-            if ((measureCanvas?.measureText(n.name).width ?? 0) > w - 8) { label.setAttribute('textLength', String(w - 8)); label.setAttribute('lengthAdjust', 'spacingAndGlyphs'); }
-            a.append(label);
-          }
+      groupCounts(data).forEach((count, group) => {
+        for (let i = 0; i < count; i++) {
+          const angle = i * 2.399963, radius = 17 + Math.sqrt(i) * 5;
+          const dot = element('circle'); dot.setAttribute('r', '2'); dot.setAttribute('class', `nb-network-cloud nb-network-group-${group}`); dot.setAttribute('aria-hidden', 'true');
+          svg.append(dot); dots.push({ el: dot, group, dx: Math.cos(angle) * radius, dy: Math.sin(angle) * radius });
         }
-        a.addEventListener('pointerenter', e => { if ((e as PointerEvent).pointerType !== 'touch' && !touch.matches) highlight(n.id); });
-        a.addEventListener('pointerleave', () => { if (!touch.matches) highlight(null); });
-        a.addEventListener('focus', () => { if (!touch.matches && !phone.matches) highlight(n.id); });
-        a.addEventListener('blur', () => { if (!touch.matches) highlight(null); });
-        a.addEventListener('click', e => { if ((touch.matches || phone.matches) && activeId !== n.id) { e.preventDefault(); highlight(n.id); } });
-        a.addEventListener('keydown', e => { const key = (e as KeyboardEvent).key; if (key === 'Escape') highlight(null); });
-        svg.append(a); anchors.push(a);
+      });
+      ECOSYSTEM_GROUPS.forEach((name, group) => {
+        const anchor = element('a'); anchor.setAttribute('href', groupHref(group)); anchor.setAttribute('class', `nb-network-node nb-network-group-${group}`); anchor.setAttribute('aria-label', name); anchor.setAttribute('tabindex', '0');
+        const hit = element('circle'); hit.setAttribute('r', '26'); hit.setAttribute('class', 'nb-network-hit'); anchor.append(hit);
+        const ring = element('circle'); ring.setAttribute('r', '12'); ring.setAttribute('class', 'nb-network-ring'); anchor.append(ring);
+        const dot = element('circle'); dot.setAttribute('r', group === 0 ? '8' : '6'); dot.setAttribute('class', 'nb-network-dot'); anchor.append(dot);
+        const text = element('text'); text.setAttribute('class', 'nb-network-label'); text.setAttribute('text-anchor', 'middle');
+        const label = phone ? SHORT_LABELS[group] ?? name : name;
+        const lines = label.includes(' and ') ? label.split(' and ').map((s, i) => i ? `and ${s}` : s) : [label];
+        lines.forEach((line, i) => { const span = element('tspan'); span.setAttribute('x', '0'); span.setAttribute('y', String(39 + i * 15)); span.textContent = line; text.append(span); });
+        anchor.append(text); svg.append(anchor); anchors.push(anchor);
+        anchor.addEventListener('pointerenter', e => { if ((e as PointerEvent).pointerType !== 'touch') highlight(group); });
+        anchor.addEventListener('pointerleave', e => { if ((e as PointerEvent).pointerType !== 'touch') highlight(null); });
+        anchor.addEventListener('focus', () => highlight(group));
+        anchor.addEventListener('blur', () => highlight(null));
+        anchor.addEventListener('pointerdown', e => { if ((e as PointerEvent).pointerType === 'touch' && active !== group) { anchor.dataset['firstTap'] = 'true'; highlight(group); } });
+        anchor.addEventListener('click', e => { if (anchor.dataset['firstTap'] === 'true') { e.preventDefault(); delete anchor.dataset['firstTap']; } });
+        anchor.addEventListener('keydown', e => { if ((e as KeyboardEvent).key === 'Escape') highlight(null); });
       });
       let start: number | undefined;
-      const draw = (now: number) => {
+      drawFrame = (now: number) => {
         start ??= now;
-        const timing = networkTiming(now - start, reduced.matches || completed, data.links.length);
+        const elapsed = now - start, timing = networkTiming(elapsed, reduced.matches || completed, paths.length);
         const ease = 1 - Math.pow(1 - timing.entry, 3);
-        const positions = new Map<string, { x: number; y: number }>();
-        nodes.forEach((n, i) => {
-          const edge = i % 4, offset = (i * .618033) % 1;
-          const sx = edge === 0 ? -width * .3 : edge === 1 ? width * 1.3 : offset * width;
-          const sy = edge === 2 ? -height * .3 : edge === 3 ? height * 1.3 : offset * height;
-          const x = sx + ((n.x ?? width / 2) - sx) * ease, y = sy + ((n.y ?? height / 2) - sy) * ease;
-          positions.set(n.id, { x, y }); anchors[i]?.setAttribute('transform', `translate(${x},${y})`);
-        });
-        paths.forEach((p, i) => { const e = data.links[i]; if (!e) return; const s = positions.get(e.source), t = positions.get(e.target); if (!s || !t) return;
-          const progress = Math.max(0, Math.min(1, timing.connections - i));
-          p.setAttribute('d', `M${s.x},${s.y}L${s.x + (t.x - s.x) * progress},${s.y + (t.y - s.y) * progress}`);
-        });
-        svg.dataset['phase'] = timing.entry < 1 ? 'entering' : timing.connections < data.links.length ? 'connecting' : 'settled';
-        if (timing.entry < 1 || timing.connections < data.links.length) frame = requestAnimationFrame(draw); else completed = true;
+        const current = positions.map((p, i) => ({ x: p.x + (completed && !reduced.matches ? Math.sin(now / 12000 + i) * 2 : 0), y: p.y + (completed && !reduced.matches ? Math.cos(now / 14000 + i) * 2 : 0) }));
+        const fly = (x: number, y: number, i: number) => { const edge = i % 4, f = (i * .618033) % 1; const sx = edge === 0 ? -60 : edge === 1 ? width + 60 : f * width, sy = edge === 2 ? -60 : edge === 3 ? height + 60 : f * height; return { x: sx + (x - sx) * ease, y: sy + (y - sy) * ease }; };
+        anchors.forEach((a, i) => { const p = current[i]; if (!p) return; const pos = fly(p.x, p.y, i); a.setAttribute('transform', `translate(${pos.x},${pos.y})`); });
+        dots.forEach((dot, i) => { const p = current[dot.group]; if (!p) return; const pos = fly(p.x + dot.dx, p.y + dot.dy, i + 11); dot.el.setAttribute('cx', String(pos.x)); dot.el.setAttribute('cy', String(pos.y)); });
+        paths.forEach((path, i) => { const pair = GROUP_CONNECTIONS[i]; if (!pair) return; const a = current[pair[0]], b = current[pair[1]]; if (!a || !b) return; const progress = Math.max(0, Math.min(1, timing.connections - i)); path.setAttribute('d', `M${a.x},${a.y}L${a.x + (b.x - a.x) * progress},${a.y + (b.y - a.y) * progress}`); });
+        completed = timing.entry === 1 && timing.connections === paths.length;
+        svg.dataset['phase'] = completed ? 'settled' : timing.entry < 1 ? 'entering' : 'connecting';
+        if (visible && !reduced.matches) frame = requestAnimationFrame(drawFrame ?? (() => {}));
       };
-      if (hasEntered || reduced.matches) draw(performance.now());
-      else svg.dataset['phase'] = 'waiting';
-      if (activeId) highlight(activeId);
+      if (entered || reduced.matches) drawFrame(performance.now()); else svg.dataset['phase'] = 'waiting';
     };
-    const observer = new IntersectionObserver(entries => { if (entries.some(e => e.isIntersecting) && !hasEntered) { hasEntered = true; render(); observer.disconnect(); } }, { threshold: .15 });
+    const observer = new IntersectionObserver(([entry]) => { visible = entry?.isIntersecting ?? false; cancelAnimationFrame(frame); if (visible) { if (!entered) { entered = true; render(); } else if (drawFrame) frame = requestAnimationFrame(drawFrame); } }, { threshold: .1 });
     observer.observe(svg);
     const resize = new ResizeObserver(render); resize.observe(svg);
-    const motionChange = () => { if (reduced.matches) { hasEntered = true; completed = true; } render(); };
-    reduced.addEventListener('change', motionChange);
-    phone.addEventListener('change', render);
-    render();
-    void document.fonts.ready.then(render);
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); resize.disconnect(); reduced.removeEventListener('change', motionChange); phone.removeEventListener('change', render); };
+    reduced.addEventListener('change', render); render();
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); resize.disconnect(); reduced.removeEventListener('change', render); };
   }, [data]);
-  return <section className="nb-network-section" aria-labelledby="ecosystem-heading">
-    <div className="nb-container"><h2 id="ecosystem-heading" className="nb-network-heading">The ecosystem</h2></div>
-    <svg ref={svgRef} className="nb-network-figure" role="group" aria-label="Published Nordic health organisations, events and opportunities" />
-    <div className="nb-container">
-      <div className="nb-network-selection" aria-live="polite">
-        {selected && <><a href={profileHref(selected)} className="nb-link">{selected.name}</a><span>{selected.type}</span></>}
-      </div>
-      <ul className="nb-network-legend" aria-label="Ecosystem groups">{ECOSYSTEM_GROUPS.map((group, i) => <li key={group} className={`nb-network-group-${i}`}><i aria-hidden="true" />{group}</li>)}</ul>
-    </div>
-  </section>;
+  return <section className="nb-network-section" aria-labelledby="ecosystem-heading"><div className="nb-container"><h2 id="ecosystem-heading" className="nb-network-heading">The ecosystem</h2></div><svg ref={svgRef} className="nb-network-figure" role="group" aria-label="Nordic health ecosystem groups" /></section>;
 }

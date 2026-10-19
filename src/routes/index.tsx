@@ -3,6 +3,7 @@ import { LaboratoryWordmark } from "@/components/site/LaboratoryWordmark";
 import { EMPTY_SEARCH } from "@/lib/explore";
 import { EcosystemNetwork } from "@/components/site/EcosystemNetwork";
 import { ecosystemQuery } from "@/lib/ecosystem.query";
+import { NordicGlobe } from "@/components/site/NordicGlobe";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(ecosystemQuery),
@@ -36,6 +37,7 @@ function Index() {
       </div>
     </div>
     <EcosystemNetwork />
+    <NordicGlobe />
     </>
   );
 }
