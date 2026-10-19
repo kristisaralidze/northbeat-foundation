@@ -221,6 +221,33 @@
   font-feature-settings: "ss01", "cv11";
 }
 
+.nb-home-wordmark-section {
+  width: 100%;
+  padding: var(--space-16) var(--gutter) var(--space-24);
+}
+.nb-laboratory-wordmark {
+  width: 100%;
+  margin: 0;
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 144, "SOFT" 0;
+}
+.nb-laboratory-lettering {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.nb-laboratory-lettering text {
+  font-family: var(--font-display);
+  font-size: 200px;
+  font-weight: 300;
+  fill: var(--foreground);
+  letter-spacing: 0;
+}
+@media (max-width: 40rem) {
+  .nb-home-wordmark-section { padding-block: var(--space-12) var(--space-16); }
+}
+
 .theme-site ::selection {
   background: var(--berry-soft);
   color: var(--ink);
