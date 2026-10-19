@@ -4,6 +4,6 @@
 - [x] Test filtering and verify URL restoration, clearing, and mobile filters in the preview. Populated cards await published entries; all 15 current organisations are drafts.
 
 # Public profiles
-- [ ] Build organisation and person profiles with privacy-safe published data and related links.
-- [ ] Add detail pages for linked events, opportunities, and episodes; connect Explore cards.
-- [ ] Test visibility and contact privacy, and verify populated profiles end-to-end.
+- [x] Build organisation and person profiles with privacy-safe published data and related links.
+- [x] Add detail pages for linked events, opportunities, and episodes; connect Explore cards.
+- [x] Test visibility and contact privacy, and verify populated profiles end-to-end on desktop and mobile using temporary entries; remove verification data afterward.
