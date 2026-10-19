@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { loadPublicProfile } from './profiles.server';
-import { orgRelationLabel, safeWebUrl, publicProfileTerms, showRelationshipMap, type PublicProfile } from './profiles';
+import { orgRelationLabel, safeWebUrl, publicProfileTerms, showRelationshipMap, text, type PublicProfile } from './profiles';
 function fixture() {
   const tables: Record<string, Record<string, unknown>[]> = {
     organisations: [{ id: 'org-1', slug: 'public-org', name: 'Public org', status: 'published', contact_email: 'private@example.org', contact_email_public: false }],
@@ -29,6 +29,11 @@ function fixture() {
   return { client, calls };
 }
 describe('public profiles', () => {
+  it('preserves organisation types and URLs during public copy reviews', () => {
+    expect(text({ type: 'startup' }, 'type')).toBe('startup');
+    expect(text({ website: 'https://healthstartups.fi' }, 'website')).toBe('https://healthstartups.fi');
+    expect(text({ slug: 'health-startup' }, 'slug')).toBe('health-startup');
+  });
   it('does not display journey steps as public profile tags', () => {
     const tags = [{ id: 'step', slug: 'idea', name: 'Idea', kind: 'journey_step' }, { id: 'field', slug: 'medtech', name: 'Medtech', kind: 'field' }];
     expect(publicProfileTerms(tags).map(term => term.id)).toEqual(['field']);

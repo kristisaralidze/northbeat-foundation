@@ -1,6 +1,7 @@
 import { Link, useRouter, type ErrorComponentProps } from '@tanstack/react-router';
 import type { HubItem } from '@/lib/learn';
 import { OrganisationLogo } from './OrganisationLogo';
+import { publicCopy } from '@/lib/profiles';
 
 export function LearnError({ reset }: ErrorComponentProps) {
   const router = useRouter();
@@ -25,7 +26,7 @@ export function HubList({ title, kind, items }: { title: string; kind: keyof typ
         {kind === 'organisations' && <OrganisationLogo name={item.title} slug={item.slug} />}
         <div className="min-w-0">
         <Link to={ROUTE[kind]} params={{ slug: item.slug }} className="nb-org-link nb-body font-medium">{item.title}</Link>
-        {item.summary && <p className="nb-small mt-1 line-clamp-2 text-muted-foreground">{item.summary}</p>}
+        {item.summary && <p className="nb-small mt-1 line-clamp-2 text-muted-foreground">{publicCopy(item.summary)}</p>}
         </div>
       </li>)}
     </ul>

@@ -2,10 +2,11 @@ import { Link } from '@tanstack/react-router';
 import { ArrowUpRight, CalendarDays, MapPin } from 'lucide-react';
 import { humanize } from '@/lib/admin/entities';
 import { calendarDays, dateLabel, eventDays, type EventRow } from '@/lib/events';
+import { publicCopy } from '@/lib/profiles';
 export function EventList({ events }: { events: EventRow[] }) {
   return <div className="divide-y divide-hairline">{events.map((event) => <article key={event.id} className="grid gap-4 py-7 sm:grid-cols-[12rem_minmax(0,1fr)]">
     <div className="nb-small text-muted-foreground"><p className="flex items-start gap-2"><CalendarDays className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /><span>{event.starts_at ? dateLabel(event.starts_at, event.timezone) : 'Date to be announced'}{event.ends_at && eventDays(event).end !== eventDays(event).start && <> to {dateLabel(event.ends_at, event.timezone)}</>}</span></p>{event.city && <p className="mt-2 flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0" aria-hidden />{event.city}</p>}</div>
-    <div className="min-w-0"><div className="mb-3 flex flex-wrap gap-2"><span className="nb-chip nb-chip-frost">{humanize(event.event_type)}</span>{event.format && <span className="nb-chip">{humanize(event.format)}</span>}</div><h2 className="nb-h3"><Link to="/event/$slug" params={{ slug: event.slug }} className="nb-org-link break-words">{event.title}<ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden /></Link></h2>{event.summary && <p className="nb-body mt-2 break-words text-muted-foreground">{event.summary}</p>}</div>
+    <div className="min-w-0"><div className="mb-3 flex flex-wrap gap-2"><span className="nb-chip nb-chip-frost">{humanize(event.event_type)}</span>{event.format && <span className="nb-chip">{humanize(event.format)}</span>}</div><h2 className="nb-h3"><Link to="/event/$slug" params={{ slug: event.slug }} className="nb-org-link break-words">{event.title}<ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden /></Link></h2>{event.summary && <p className="nb-body mt-2 break-words text-muted-foreground">{publicCopy(event.summary)}</p>}</div>
   </article>)}</div>;
 }
 export function EventCalendar({ events, month, today }: { events: EventRow[]; month: string; today: string }) {

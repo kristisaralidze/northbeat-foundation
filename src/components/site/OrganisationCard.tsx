@@ -4,6 +4,7 @@ import { cardTags, type DirectoryOrganisation, type DirectoryTerm } from "@/lib/
 import { humanize } from "@/lib/admin/entities";
 import { networkGroup } from '@/lib/ecosystem';
 import { OrganisationLogo } from './OrganisationLogo';
+import { publicCopy } from '@/lib/profiles';
 
 export function OrganisationCard({ organisation: org, terms }: { organisation: DirectoryOrganisation; terms: DirectoryTerm[] }) {
   const { shown, extra } = cardTags(org, terms);
@@ -15,7 +16,7 @@ export function OrganisationCard({ organisation: org, terms }: { organisation: D
       </div>
       <div className="min-w-0">
         <h2 className="nb-h3 break-words"><Link to="/org/$slug" params={{ slug: org.slug }} className="nb-org-link">{org.name}<ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden /></Link></h2>
-        {org.short_description && <p className="nb-small mt-3 line-clamp-2 text-muted-foreground" title={org.short_description}>{org.short_description}</p>}
+        {org.short_description && <p className="nb-small mt-3 line-clamp-2 text-muted-foreground" title={publicCopy(org.short_description)}>{publicCopy(org.short_description)}</p>}
       </div>
       <div className="mt-auto flex flex-wrap gap-2">
         {shown.map((term) => <span className="nb-chip max-w-full" key={term.id}><span className="truncate">{term.name}</span></span>)}

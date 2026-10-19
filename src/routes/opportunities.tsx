@@ -7,7 +7,7 @@ import { OPP_TYPES, humanize } from '@/lib/admin/entities';
 import { opportunitiesQuery } from '@/lib/opportunities.query';
 import { compactSearch } from '@/lib/search-params';
 import { amountLabel, deadlineLabel, filterOpportunities } from '@/lib/opportunities';
-import { publicTitle } from '@/lib/profiles';
+import { publicTitle, publicCopy } from '@/lib/profiles';
 import { DateTimeline } from '@/components/site/DateTimeline';
 import { closingDays } from '@/lib/timeline';
 
@@ -89,7 +89,7 @@ function Opportunities() {
             <p className={`nb-small ${closingDays(opportunity.deadline_at, data.now) !== null ? 'text-primary' : 'text-muted-foreground'}`}>{closingDays(opportunity.deadline_at, data.now) !== null ? `Closes in ${closingDays(opportunity.deadline_at, data.now)} days` : deadlineLabel(opportunity, data.now)}</p>
           </div>
           <h2 className="nb-h3 mt-2"><Link to="/opportunity/$slug" params={{ slug: opportunity.slug }} className="nb-org-link break-words">{publicTitle(opportunity.title)}</Link></h2>
-          {opportunity.summary && <p className="nb-body mt-2 text-muted-foreground">{opportunity.summary}</p>}
+          {opportunity.summary && <p className="nb-body mt-2 text-muted-foreground">{publicCopy(opportunity.summary)}</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             {amount && <span className="nb-chip">{amount}</span>}
             {job && opportunity.location && <span className="nb-chip">{opportunity.location}{opportunity.remote_ok ? ' · remote OK' : ''}</span>}
