@@ -51,7 +51,7 @@ function Index() {
     </section>
     <div className="nb-home-world-scene">
       <EcosystemNetwork />
-      <NordicGlobe />
+      <div className="nb-home-globe-wrapper"><NordicGlobe /></div>
     </div>
     <HomeHappening />
     <section className="nb-home-learn nb-container">
