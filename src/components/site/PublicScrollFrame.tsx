@@ -16,7 +16,7 @@ export function PublicScrollFrame({ children, pathname }: { children: ReactNode;
     if (!page || !compact) return () => {};
     let disposed = false;
     let clean = () => {};
-    const heading = page.querySelector<HTMLElement>('h1');
+    const heading = page.querySelector<HTMLElement>('[data-page-title], h1:not(.nb-laboratory-wordmark)');
     if (!heading) return () => {};
     const identityHost = heading.closest('[data-profile-identity]');
     const sentence = page.querySelector<HTMLElement>('[data-one-sentence]');

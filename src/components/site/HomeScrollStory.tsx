@@ -95,6 +95,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
                 .set(intro, { autoAlpha: 1 }, 1)
                 .fromTo('.nb-home-intro-word', { opacity: 0 }, { opacity: 1, duration: 0.06, stagger: 0.008, ease: 'none' }, 1)
                 .fromTo('.nb-home-actions', { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.08, ease: 'none' }, 1.22);
+              docking.set(dock.children, { autoAlpha: 1 }, 1).set(wordmark, { autoAlpha: 0 }, 1);
             }
             const world = story.querySelector<HTMLElement>('.nb-home-world-scene');
             const network = story.querySelector<HTMLElement>('.nb-network-section');

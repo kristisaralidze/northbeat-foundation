@@ -8,6 +8,8 @@ import { EMPTY_SEARCH } from '@/lib/explore';
 import { safeWebUrl, text, type PublicProfile, type RelatedEntry } from '@/lib/profiles';
 import { RelationshipMap } from './RelationshipMap';
 import { OrganisationLogo } from './OrganisationLogo';
+import { organisationDomain } from '@/lib/organisation-logo';
+import { relationshipNodes } from '@/lib/profiles';
 
 export function EntryLink({ kind, entry, children, className }: { kind: EntityKey; entry: { slug: string }; children: ReactNode; className?: string }) {
   const props = { params: { slug: entry.slug }, className, children };
@@ -52,6 +54,12 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
   const description = text(row, isPerson ? 'bio' : kind === 'episodes' ? 'show_notes' : 'description');
   const email = text(row, 'contact_email');
   const openTo = Array.isArray(row['open_to']) ? row['open_to'].filter((value): value is string => typeof value === 'string') : [];
+  const compactDetails = isOrg || kind === 'events' || kind === 'opportunities';
+  const tags = profile.terms.filter(term => term.kind !== 'journey_step');
+  const connectionCount = relationshipNodes(profile).length;
+  const details = <aside className="min-w-0 space-y-4" aria-label="Details and contact">
+    {factsPlaceholder()}
+  </aside>;
   const facts: [string, string | null][] = isOrg ? [['Location', text(row, 'city')], ['Founded', row['founded_year'] ? String(row['founded_year']) : null]] : kind === 'events' ? [
     ['Starts', date(text(row, 'starts_at'), text(row, 'timezone'))], ['Ends', date(text(row, 'ends_at'), text(row, 'timezone'))], ['Apply by', date(text(row, 'apply_deadline_at'), text(row, 'timezone'))], ['Timezone', text(row, 'timezone')], ['Location', [text(row, 'venue'), text(row, 'city')].filter(Boolean).join(', ') || null], ['Format', text(row, 'format') ? humanize(String(row['format'])) : null], ['Price', text(row, 'price_note')]
   ] : kind === 'opportunities' ? [['Opens', date(text(row, 'opens_at'))], ['Deadline', date(text(row, 'deadline_at'))], ['Location', text(row, 'location')], ['Employment', text(row, 'employment_type')]] : kind === 'episodes' ? [['Episode', row['episode_number'] ? String(row['episode_number']) : null], ['Published', date(text(row, 'published_on'))]] : [];

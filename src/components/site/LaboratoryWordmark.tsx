@@ -15,6 +15,7 @@ type Metrics = { cap: number; width: number; positions: number[]; widths: number
 export function LaboratoryWordmark({ compact = false }: { compact?: boolean }) {
   const host = useRef<HTMLHeadingElement>(null);
   const [loaded, setLoaded] = useState<number[]>([]);
+  const [phone, setPhone] = useState(false);
   const [metrics, setMetrics] = useState<Metrics>({ cap: 144, width: 1293, positions: LETTERS.map((_, i) => i * 144), widths: LETTERS.map(() => 141) });
 
   useEffect(() => {
@@ -34,6 +35,14 @@ export function LaboratoryWordmark({ compact = false }: { compact?: boolean }) {
   }, []);
 
   useEffect(() => {
+    const query = window.matchMedia('(max-width: 599px)');
+    const update = () => setPhone(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     document.fonts.ready.then(() => {
       if (cancelled || !host.current) return;
@@ -42,7 +51,7 @@ export function LaboratoryWordmark({ compact = false }: { compact?: boolean }) {
       ctx.font = `300 200px ${getComputedStyle(host.current).fontFamily}`;
       const cap = ctx.measureText("H").actualBoundingBoxAscent || 144;
       const widths = LETTERS.map((letter, index) => {
-        const object = OBJECTS.find((item) => item.index === index && loaded.includes(index));
+        const object = OBJECTS.find((item) => item.index === index && loaded.includes(index) && !(phone && index === 3));
         const letterWidth = ctx.measureText(letter).width;
         return object ? Math.max(cap * object.ratio, letterWidth * (index === 3 ? 0.62 : 1)) : letterWidth;
       });
@@ -51,18 +60,19 @@ export function LaboratoryWordmark({ compact = false }: { compact?: boolean }) {
       setMetrics({ cap, width: x - 3, positions, widths });
     });
     return () => { cancelled = true; };
-  }, [loaded]);
+  }, [loaded, phone]);
 
   const Tag = compact ? 'span' : 'h1';
   return <Tag ref={host} className="nb-laboratory-wordmark" aria-label="Northbeat">
+    <span className="sr-only">Northbeat</span>
     <svg viewBox={`0 0 ${metrics.width} ${metrics.cap}`} className="nb-laboratory-lettering" aria-hidden="true">
       {LETTERS.map((letter, index) => {
-        const object = OBJECTS.find((item) => item.index === index && loaded.includes(index));
+        const object = OBJECTS.find((item) => item.index === index && loaded.includes(index) && !(phone && index === 3));
         const x = metrics.positions[index] ?? 0;
         const width = metrics.widths[index] ?? 0;
         if (!object) return <text key={index} x={x} y={metrics.cap}>{letter}</text>;
         const imageWidth = metrics.cap * object.ratio;
-        return <image key={index} href={object.src} x={x + (width - imageWidth) / 2} y={0} width={imageWidth} height={metrics.cap} preserveAspectRatio="xMidYMid meet" onError={() => setLoaded((current) => current.filter((item) => item !== index))}><title>{object.name}</title></image>;
+        return <foreignObject key={index} x={x + (width - imageWidth) / 2} y={0} width={imageWidth} height={metrics.cap}><img src={object.src} alt="" className="h-full w-full object-contain" onError={() => setLoaded((current) => current.filter((item) => item !== index))} /></foreignObject>;
       })}
     </svg>
   </Tag>;
