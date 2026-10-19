@@ -9,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ENTITIES, STATUS, humanize, type EntityKey, type FieldDef, type LinkDef } from "@/lib/admin/entities";
 import { deleteEntry, getEntry, listIncomingRelations, listOptions, listTerms, saveEntry, type LinkRow, type Term } from "@/lib/admin/db";
-import { orgRelationLabel } from "@/lib/profiles";
 import { selectClass } from "./EntityList";
 import { ImageField } from "./ImageField";
 
@@ -168,7 +167,7 @@ function IncomingRelations({ orgId }: { orgId: string }) {
         {incoming.data.map((rel) => (
           <li key={rel.id} className="flex flex-wrap items-baseline gap-x-2 px-3 py-2 text-sm">
             <span className="font-medium text-foreground">{rel.fromName}</span>
-            <span className="text-muted-foreground">— {orgRelationLabel(rel.relation, "outgoing").toLowerCase()} this organisation</span>
+            <span className="text-muted-foreground">— {humanize(rel.relation)} this organisation</span>
             {rel.note ? <span className="text-muted-foreground">({rel.note})</span> : null}
           </li>
         ))}
