@@ -46,24 +46,31 @@ export const getNewsletterIssue = createServerFn({ method: 'GET' })
     const { data: rawLinks, error: linkError } = await client.from('newsletter_issue_links').select('id,entry_kind,entry_id,sort_order').eq('newsletter_issue_id', issue.id).order('sort_order');
     if (linkError) throw new Error('The issue links could not be loaded.');
     const links: IssueLink[] = [];
+    const pushRows = (kind: string, ids: string[], rows: Record<string, string | null>[], titleKey: string, summaryKey: string) => {
+      for (const entry of rows.filter((row) => ids.includes(String(row['id'])))) {
+        links.push({ id: String(entry['id']), kind, slug: String(entry['slug']), title: String(entry[titleKey] ?? ''), summary: entry[summaryKey] ?? null });
+      }
+    };
     for (const [kind, cfg] of Object.entries(LINK_TABLES)) {
       const ids = (rawLinks ?? []).filter((link) => link.entry_kind === kind).map((link) => link.entry_id);
       if (!ids.length) continue;
-      let rows: Record<string, string | null>[];
       if (kind === 'organisation') {
         // Masking RPC: returns only published organisations.
         const { data, error: rpcError } = await client.rpc('public_organisations');
         if (rpcError) throw new Error('The issue links could not be loaded.');
-        rows = (data ?? []).filter((entry) => ids.includes(entry.id));
+        pushRows(kind, ids, (data ?? []) as unknown as Record<string, string | null>[], cfg.title, cfg.summary);
       } else {
         const { data, error: readError } = await client.from(cfg.table).select(`id,slug,${cfg.title},${cfg.summary}`).eq('status', 'published').in('id', ids);
         if (readError) throw new Error('The issue links could not be loaded.');
-        rows = (data ?? []) as unknown as Record<string, string | null>[];
+        pushRows(kind, ids, (data ?? []) as unknown as Record<string, string | null>[], cfg.title, cfg.summary);
       }
-      for (const entry of rows) {
-        const link = (rawLinks ?? []).find((item) => item.entry_id === entry['id']);
-        links.push({ id: String(entry['id']), kind, slug: String(entry['slug']), title: String(entry[cfg.title] ?? ''), summary: entry[cfg.summary] ?? null, ...(link ? {} : {}) });
-      }
+    }
+    const personIds = (rawLinks ?? []).filter((link) => link.entry_kind === 'person').map((link) => link.entry_id);
+    if (personIds.length) {
+      // Masking RPC: returns only published people.
+      const { data, error: rpcError } = await client.rpc('public_people');
+      if (rpcError) throw new Error('The issue links could not be loaded.');
+      pushRows('person', personIds, (data ?? []) as unknown as Record<string, string | null>[], 'full_name', 'headline');
     }
     const order = new Map((rawLinks ?? []).map((link) => [link.entry_id, link.sort_order]));
     links.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
