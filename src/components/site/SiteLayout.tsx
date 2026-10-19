@@ -8,8 +8,8 @@ const NAV = [
   { to: "/explore", label: "Explore" },
   { to: "/events", label: "Events" },
   { to: "/opportunities", label: "Opportunities" },
+  { to: "/learn", label: "Learn" },
   { to: "/podcast", label: "Podcast" },
-  { to: "/newsletter", label: "Newsletter" },
 ] as const;
 
 function Header() {
@@ -36,6 +36,7 @@ function Header() {
           </ul>
         </nav>
         <div className="flex items-center gap-2">
+          <Link to="/newsletter" className="nb-navlink nb-small hidden sm:inline">Subscribe</Link>
           <Link to="/submit" className="nb-btn nb-btn-secondary nb-btn-sm">Submit</Link>
           <button
             type="button"
@@ -63,6 +64,7 @@ function Header() {
           <div className="nb-container pb-10">
             <PulseLine className="mb-6" />
             <Link to="/submit" onClick={() => setOpen(false)} className="nb-btn nb-btn-primary nb-btn-block">Submit an entry</Link>
+            <Link to="/newsletter" onClick={() => setOpen(false)} className="nb-link nb-small mt-4 inline-block">Subscribe to the newsletter</Link>
           </div>
         </nav>
       )}

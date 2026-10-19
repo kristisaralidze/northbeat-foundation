@@ -25,6 +25,9 @@ import { Route as AdminNewsletterRouteImport } from './routes/admin.newsletter'
 import { Route as AdminTagsRouteImport } from './routes/admin.tags'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as EventSlugRouteImport } from './routes/event.$slug'
+import { Route as LearnIndexRouteImport } from './routes/learn.index'
+import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
+import { Route as LearnGlossaryRouteImport } from './routes/learn.glossary'
 import { Route as NewsletterIndexRouteImport } from './routes/newsletter.index'
 import { Route as NewsletterSlugRouteImport } from './routes/newsletter.$slug'
 import { Route as OpportunitySlugRouteImport } from './routes/opportunity.$slug'
@@ -126,6 +129,21 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
 const EventSlugRoute = EventSlugRouteImport.update({
   id: '/event/$slug',
   path: '/event/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnIndexRoute = LearnIndexRouteImport.update({
+  id: '/learn/',
+  path: '/learn/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnSlugRoute = LearnSlugRouteImport.update({
+  id: '/learn/$slug',
+  path: '/learn/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnGlossaryRoute = LearnGlossaryRouteImport.update({
+  id: '/learn/glossary',
+  path: '/learn/glossary',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewsletterIndexRoute = NewsletterIndexRouteImport.update({
@@ -255,12 +273,15 @@ export interface FileRoutesByFullPath {
   '/admin/tags': typeof AdminTagsRoute
   '/admin/login': typeof AdminLoginRoute
   '/event/$slug': typeof EventSlugRoute
+  '/learn/$slug': typeof LearnSlugRoute
+  '/learn/glossary': typeof LearnGlossaryRoute
   '/newsletter/$slug': typeof NewsletterSlugRoute
   '/opportunity/$slug': typeof OpportunitySlugRoute
   '/org/$slug': typeof OrgSlugRoute
   '/person/$slug': typeof PersonSlugRoute
   '/podcast/$slug': typeof PodcastSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/learn/': typeof LearnIndexRoute
   '/newsletter/': typeof NewsletterIndexRoute
   '/admin/episodes/$id': typeof AdminEpisodesIdRoute
   '/admin/events/$id': typeof AdminEventsIdRoute
@@ -293,12 +314,15 @@ export interface FileRoutesByTo {
   '/admin/tags': typeof AdminTagsRoute
   '/admin/login': typeof AdminLoginRoute
   '/event/$slug': typeof EventSlugRoute
+  '/learn/$slug': typeof LearnSlugRoute
+  '/learn/glossary': typeof LearnGlossaryRoute
   '/newsletter/$slug': typeof NewsletterSlugRoute
   '/opportunity/$slug': typeof OpportunitySlugRoute
   '/org/$slug': typeof OrgSlugRoute
   '/person/$slug': typeof PersonSlugRoute
   '/podcast/$slug': typeof PodcastSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/learn': typeof LearnIndexRoute
   '/newsletter': typeof NewsletterIndexRoute
   '/admin/episodes/$id': typeof AdminEpisodesIdRoute
   '/admin/events/$id': typeof AdminEventsIdRoute
@@ -334,12 +358,15 @@ export interface FileRoutesById {
   '/admin/tags': typeof AdminTagsRoute
   '/admin_/login': typeof AdminLoginRoute
   '/event/$slug': typeof EventSlugRoute
+  '/learn/$slug': typeof LearnSlugRoute
+  '/learn/glossary': typeof LearnGlossaryRoute
   '/newsletter/$slug': typeof NewsletterSlugRoute
   '/opportunity/$slug': typeof OpportunitySlugRoute
   '/org/$slug': typeof OrgSlugRoute
   '/person/$slug': typeof PersonSlugRoute
   '/podcast_/$slug': typeof PodcastSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/learn/': typeof LearnIndexRoute
   '/newsletter/': typeof NewsletterIndexRoute
   '/admin/episodes/$id': typeof AdminEpisodesIdRoute
   '/admin/events/$id': typeof AdminEventsIdRoute
@@ -376,12 +403,15 @@ export interface FileRouteTypes {
     | '/admin/tags'
     | '/admin/login'
     | '/event/$slug'
+    | '/learn/$slug'
+    | '/learn/glossary'
     | '/newsletter/$slug'
     | '/opportunity/$slug'
     | '/org/$slug'
     | '/person/$slug'
     | '/podcast/$slug'
     | '/admin/'
+    | '/learn/'
     | '/newsletter/'
     | '/admin/episodes/$id'
     | '/admin/events/$id'
@@ -414,12 +444,15 @@ export interface FileRouteTypes {
     | '/admin/tags'
     | '/admin/login'
     | '/event/$slug'
+    | '/learn/$slug'
+    | '/learn/glossary'
     | '/newsletter/$slug'
     | '/opportunity/$slug'
     | '/org/$slug'
     | '/person/$slug'
     | '/podcast/$slug'
     | '/admin'
+    | '/learn'
     | '/newsletter'
     | '/admin/episodes/$id'
     | '/admin/events/$id'
@@ -454,12 +487,15 @@ export interface FileRouteTypes {
     | '/admin/tags'
     | '/admin_/login'
     | '/event/$slug'
+    | '/learn/$slug'
+    | '/learn/glossary'
     | '/newsletter/$slug'
     | '/opportunity/$slug'
     | '/org/$slug'
     | '/person/$slug'
     | '/podcast_/$slug'
     | '/admin/'
+    | '/learn/'
     | '/newsletter/'
     | '/admin/episodes/$id'
     | '/admin/events/$id'
@@ -493,10 +529,13 @@ export interface RootRouteChildren {
   SubmitRoute: typeof SubmitRoute
   AdminLoginRoute: typeof AdminLoginRoute
   EventSlugRoute: typeof EventSlugRoute
+  LearnSlugRoute: typeof LearnSlugRoute
+  LearnGlossaryRoute: typeof LearnGlossaryRoute
   OpportunitySlugRoute: typeof OpportunitySlugRoute
   OrgSlugRoute: typeof OrgSlugRoute
   PersonSlugRoute: typeof PersonSlugRoute
   PodcastSlugRoute: typeof PodcastSlugRoute
+  LearnIndexRoute: typeof LearnIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -611,6 +650,27 @@ declare module '@tanstack/react-router' {
       path: '/event/$slug'
       fullPath: '/event/$slug'
       preLoaderRoute: typeof EventSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/': {
+      id: '/learn/'
+      path: '/learn'
+      fullPath: '/learn/'
+      preLoaderRoute: typeof LearnIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/$slug': {
+      id: '/learn/$slug'
+      path: '/learn/$slug'
+      fullPath: '/learn/$slug'
+      preLoaderRoute: typeof LearnSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/glossary': {
+      id: '/learn/glossary'
+      path: '/learn/glossary'
+      fullPath: '/learn/glossary'
+      preLoaderRoute: typeof LearnGlossaryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/newsletter/': {
@@ -844,10 +904,13 @@ const rootRouteChildren: RootRouteChildren = {
   SubmitRoute: SubmitRoute,
   AdminLoginRoute: AdminLoginRoute,
   EventSlugRoute: EventSlugRoute,
+  LearnSlugRoute: LearnSlugRoute,
+  LearnGlossaryRoute: LearnGlossaryRoute,
   OpportunitySlugRoute: OpportunitySlugRoute,
   OrgSlugRoute: OrgSlugRoute,
   PersonSlugRoute: PersonSlugRoute,
   PodcastSlugRoute: PodcastSlugRoute,
+  LearnIndexRoute: LearnIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
