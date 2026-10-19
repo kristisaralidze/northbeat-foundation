@@ -25,6 +25,7 @@ import { Route as AdminNewsletterRouteImport } from './routes/admin.newsletter'
 import { Route as AdminTagsRouteImport } from './routes/admin.tags'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as EventSlugRouteImport } from './routes/event.$slug'
+import { Route as NewsletterIndexRouteImport } from './routes/newsletter.index'
 import { Route as NewsletterSlugRouteImport } from './routes/newsletter.$slug'
 import { Route as OpportunitySlugRouteImport } from './routes/opportunity.$slug'
 import { Route as OrgSlugRouteImport } from './routes/org.$slug'
@@ -122,6 +123,11 @@ const EventSlugRoute = EventSlugRouteImport.update({
   id: '/event/$slug',
   path: '/event/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const NewsletterIndexRoute = NewsletterIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => NewsletterRoute,
 } as any)
 const NewsletterSlugRoute = NewsletterSlugRouteImport.update({
   id: '/$slug',
@@ -231,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/person/$slug': typeof PersonSlugRoute
   '/podcast/$slug': typeof PodcastSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/newsletter/': typeof NewsletterIndexRoute
   '/admin/episodes/$id': typeof AdminEpisodesIdRoute
   '/admin/events/$id': typeof AdminEventsIdRoute
   '/admin/opportunities/$id': typeof AdminOpportunitiesIdRoute
@@ -249,7 +256,6 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
-  '/newsletter': typeof NewsletterRouteWithChildren
   '/opportunities': typeof OpportunitiesRoute
   '/podcast': typeof PodcastRoute
   '/privacy': typeof PrivacyRoute
@@ -265,6 +271,7 @@ export interface FileRoutesByTo {
   '/person/$slug': typeof PersonSlugRoute
   '/podcast/$slug': typeof PodcastSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/newsletter': typeof NewsletterIndexRoute
   '/admin/episodes/$id': typeof AdminEpisodesIdRoute
   '/admin/events/$id': typeof AdminEventsIdRoute
   '/admin/opportunities/$id': typeof AdminOpportunitiesIdRoute
@@ -301,6 +308,7 @@ export interface FileRoutesById {
   '/person/$slug': typeof PersonSlugRoute
   '/podcast_/$slug': typeof PodcastSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/newsletter/': typeof NewsletterIndexRoute
   '/admin/episodes/$id': typeof AdminEpisodesIdRoute
   '/admin/events/$id': typeof AdminEventsIdRoute
   '/admin/opportunities/$id': typeof AdminOpportunitiesIdRoute
@@ -338,6 +346,7 @@ export interface FileRouteTypes {
     | '/person/$slug'
     | '/podcast/$slug'
     | '/admin/'
+    | '/newsletter/'
     | '/admin/episodes/$id'
     | '/admin/events/$id'
     | '/admin/opportunities/$id'
@@ -356,7 +365,6 @@ export interface FileRouteTypes {
     | '/about'
     | '/events'
     | '/explore'
-    | '/newsletter'
     | '/opportunities'
     | '/podcast'
     | '/privacy'
@@ -372,6 +380,7 @@ export interface FileRouteTypes {
     | '/person/$slug'
     | '/podcast/$slug'
     | '/admin'
+    | '/newsletter'
     | '/admin/episodes/$id'
     | '/admin/events/$id'
     | '/admin/opportunities/$id'
@@ -407,6 +416,7 @@ export interface FileRouteTypes {
     | '/person/$slug'
     | '/podcast_/$slug'
     | '/admin/'
+    | '/newsletter/'
     | '/admin/episodes/$id'
     | '/admin/events/$id'
     | '/admin/opportunities/$id'
@@ -554,6 +564,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/event/$slug'
       preLoaderRoute: typeof EventSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/newsletter/': {
+      id: '/newsletter/'
+      path: '/'
+      fullPath: '/newsletter/'
+      preLoaderRoute: typeof NewsletterIndexRouteImport
+      parentRoute: typeof NewsletterRoute
     }
     '/newsletter/$slug': {
       id: '/newsletter/$slug'
@@ -717,10 +734,12 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface NewsletterRouteChildren {
   NewsletterSlugRoute: typeof NewsletterSlugRoute
+  NewsletterIndexRoute: typeof NewsletterIndexRoute
 }
 
 const NewsletterRouteChildren: NewsletterRouteChildren = {
   NewsletterSlugRoute: NewsletterSlugRoute,
+  NewsletterIndexRoute: NewsletterIndexRoute,
 }
 
 const NewsletterRouteWithChildren = NewsletterRoute._addFileChildren(
