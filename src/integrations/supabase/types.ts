@@ -1358,6 +1358,7 @@ export type Database = {
         | "public_agency"
         | "patient_organisation"
         | "community"
+        | "care_provider"
       submission_status: "new" | "in_review" | "accepted" | "rejected" | "done"
       submission_type: "new_entry" | "correction" | "contact" | "podcast_guest"
       term_kind: "field" | "sub_area" | "country" | "stage"
@@ -1537,6 +1538,7 @@ export const Constants = {
         "public_agency",
         "patient_organisation",
         "community",
+        "care_provider",
       ],
       submission_status: ["new", "in_review", "accepted", "rejected", "done"],
       submission_type: ["new_entry", "correction", "contact", "podcast_guest"],
