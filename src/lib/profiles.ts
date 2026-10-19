@@ -21,7 +21,10 @@ export const publicTitle = (value: string): string => value.replace(/\s*[—–]
 export const publicCopy = (value: string): string => value
   .replace(/health, medtech (?:or|and) biotech startups?/gi, match => match.endsWith('s') ? 'health ventures' : 'health venture')
   .replace(/health startups?/gi, match => match.endsWith('s') ? 'health ventures' : 'health venture');
-export const text = (row: Record<string, unknown>, key: string): string | null => typeof row[key] === 'string' && row[key] ? publicCopy(String(row[key])) : null;
+export const text = (row: Record<string, unknown>, key: string): string | null => {
+  const value = typeof row[key] === 'string' && row[key] ? String(row[key]) : null;
+  return value && ['description', 'short_description', 'summary', 'bio', 'headline', 'show_notes', 'expertise_note', 'transcript'].includes(key) ? publicCopy(value) : value;
+};
 export function safeWebUrl(value: string | null): string | null {
   if (!value) return null;
   try { const url = new URL(value); return ['https:', 'http:'].includes(url.protocol) ? url.href : null; } catch { return null; }
