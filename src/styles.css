@@ -301,6 +301,7 @@ html.lenis, html.lenis body { height: auto; }
 @media (max-width: 40rem) {
   .nb-home-header-logo { width: 7rem; }
   .nb-home-tagline { max-width: 18rem; margin-inline: auto; }
+  .nb-home-world-scene .nb-globe-stage { max-height: 420px; }
 }
 .nb-home-intro {
   width: 100%;
