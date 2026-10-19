@@ -57,14 +57,16 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
     <div className="mb-8"><Link to="/explore" search={EMPTY_SEARCH} className="nb-link inline-flex items-center gap-2"><ArrowLeft className="h-4 w-4" aria-hidden />Explore</Link></div>
     <header className="border-b border-hairline pb-10">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-        {(isOrg || isPerson || profile.image) && <ProfileImage image={profile.image} name={profile.title} kind={kind} />}
-        <div className="min-w-0 flex-1"><p className="nb-eyebrow mb-3">{label}</p><h1 className="nb-h1 break-words">{profile.title}</h1>{profile.summary && <p className="nb-lead mt-4 break-words">{profile.summary}</p>}</div>
+        {(isOrg || isPerson || (profile.image && kind !== 'episodes')) && <ProfileImage image={profile.image} name={profile.title} kind={kind} />}
+        <div className="min-w-0 flex-1"><p className="nb-eyebrow mb-3">{label}</p><h1 className="nb-h1 break-words">{profile.title}</h1>{profile.summary && kind !== 'episodes' && <p className="nb-lead mt-4 break-words">{profile.summary}</p>}</div>
       </div>
       {profile.terms.length > 0 && <div className="mt-6 flex flex-wrap gap-2" aria-label="Tags">{profile.terms.map((term) => <span key={term.id} className="nb-chip max-w-full"><span className="truncate">{term.name}</span></span>)}</div>}
     </header>
+    {kind === 'episodes' && safeWebUrl(text(row, 'embed_url')) && <div className="mt-10 aspect-video w-full overflow-hidden rounded-[var(--radius)] border border-hairline"><iframe src={safeWebUrl(text(row, 'embed_url')) ?? undefined} title={`Watch ${profile.title}`} className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen loading="lazy" /></div>}
     <div className="nb-profile-layout py-10">
       <section className="min-w-0" aria-label={isPerson ? 'Biography' : 'Description'}>
-        {description && <p className="nb-body whitespace-pre-wrap break-words">{description}</p>}
+        {kind === 'episodes' && profile.summary && <section className="mb-8"><h2 className="nb-h3 mb-3">Key takeaways</h2><p className="nb-body whitespace-pre-wrap break-words">{profile.summary}</p></section>}
+        {description && <>{kind === 'episodes' && <h2 className="nb-h3 mb-3">Show notes</h2>}<p className="nb-body whitespace-pre-wrap break-words">{description}</p></>}
         {isPerson && text(row, 'expertise_note') && <section className="mt-8"><h2 className="nb-h3 mb-3">Expertise</h2><p className="nb-body whitespace-pre-wrap break-words">{text(row, 'expertise_note')}</p></section>}
         {openTo.length > 0 && <section className="mt-8"><h2 className="nb-h3 mb-3">Open to</h2><div className="flex flex-wrap gap-2">{openTo.map((value) => <span className="nb-chip nb-chip-frost" key={value}>{humanize(value)}</span>)}</div></section>}
         {kind === 'episodes' && safeWebUrl(text(row, 'audio_url')) && <audio controls preload="none" src={safeWebUrl(text(row, 'audio_url')) ?? undefined} className="mt-6 w-full" aria-label={`Listen to ${profile.title}`} />}
@@ -74,7 +76,7 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
         {facts.some(([, value]) => value) && <dl className="space-y-4">{facts.filter(([, value]) => value).map(([name, value]) => <div key={name}><dt className="nb-eyebrow mb-1">{name}</dt><dd className="nb-body break-words">{value}</dd></div>)}</dl>}
         <div className="nb-body flex flex-col items-start gap-4">
           <WebLink url={text(row, 'website')}>Website</WebLink><WebLink url={text(row, 'linkedin_url')}>LinkedIn</WebLink>
-          <WebLink url={text(row, 'registration_url')}>Register</WebLink><WebLink url={text(row, 'apply_url')}>Apply</WebLink><WebLink url={text(row, 'embed_url')}>Listen to episode</WebLink>
+          <WebLink url={text(row, 'registration_url')}>Register</WebLink><WebLink url={text(row, 'apply_url')}>Apply</WebLink>{kind !== 'episodes' && <WebLink url={text(row, 'embed_url')}>Listen to episode</WebLink>}
           {email && <a href={`mailto:${encodeURIComponent(email)}`} className="nb-link break-all">{email}</a>}
         </div>
         {text(row, 'last_checked') && <p className="nb-small text-muted-foreground">Last checked {date(text(row, 'last_checked'))}</p>}

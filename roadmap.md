@@ -16,3 +16,7 @@
 # Opportunities
 - [x] Build /opportunities: type/field/stage filters, nearest-deadline sort, open/closed toggle, amount and job chips.
 - [x] Test sorting, filters, archive and deadline labels; verify in preview with temporary entries and remove them.
+
+# Podcast
+- [x] Build /podcast episode grid with covers, guests, topics and duration; add video embed, key takeaways and show notes to episode pages.
+- [x] Test labels and ordering; verify grid, embed, guest links and reciprocal person link in preview with temporary entries and remove them.
