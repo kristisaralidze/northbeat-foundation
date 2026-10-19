@@ -157,6 +157,26 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
   );
 }
 
+function IncomingRelations({ orgId }: { orgId: string }) {
+  const incoming = useQuery({ queryKey: ["organisations", "incoming-relations", orgId], queryFn: () => listIncomingRelations(orgId) });
+  if (!incoming.data?.length) return null;
+  return (
+    <section className="space-y-2">
+      <h2 className="text-sm font-medium text-foreground">Incoming relationships</h2>
+      <p className="text-sm text-muted-foreground">Other organisations pointing at this one. Edit them on that organisation's page.</p>
+      <ul className="divide-y divide-border rounded-md border border-border">
+        {incoming.data.map((rel) => (
+          <li key={rel.id} className="flex flex-wrap items-baseline gap-x-2 px-3 py-2 text-sm">
+            <span className="font-medium text-foreground">{rel.fromName}</span>
+            <span className="text-muted-foreground">— {orgRelationLabel(rel.relation, "outgoing").toLowerCase()} this organisation</span>
+            {rel.note ? <span className="text-muted-foreground">({rel.note})</span> : null}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function FieldInput({ field: f, value, onChange }: { field: FieldDef; value: unknown; onChange: (v: unknown) => void }) {
   const wide = f.kind === "textarea" || f.kind === "multi";
   const wrap = wide ? "space-y-1 sm:col-span-2" : "space-y-1";
