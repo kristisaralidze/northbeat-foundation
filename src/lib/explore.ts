@@ -41,3 +41,18 @@ export function facetCounts(data: DirectoryData, search: ExploreSearch, facet: F
   }
   return counts;
 }
+const TAG_PRIORITY: Record<string, number> = { sub_area: 0, field: 1, stage: 2 };
+/** Card chips: most specific first (sub-area, field, stage), max 3, remainder counted. */
+export function cardTags(org: DirectoryOrganisation, terms: DirectoryTerm[], max = 3) {
+  const tags = terms.filter((t) => org.termIds.includes(t.id))
+    .sort((a, b) => (TAG_PRIORITY[a.kind] ?? 3) - (TAG_PRIORITY[b.kind] ?? 3) || a.sort_order - b.sort_order);
+  return { shown: tags.slice(0, max), extra: Math.max(0, tags.length - max) };
+}
+
+/** Drop empty params so shared URLs stay clean. */
+export function cleanExploreSearch(search: ExploreSearch): Partial<ExploreSearch> {
+  const out: Partial<ExploreSearch> = {};
+  if (search.q) out.q = search.q;
+  for (const facet of FACETS) if (search[facet]?.length) out[facet] = search[facet];
+  return out;
+}

@@ -13,7 +13,7 @@ export function OrganisationCard({ organisation: org, terms }: { organisation: D
         <div className="nb-org-logo">
           {org.logo_url && !failed
             ? <img src={org.logo_url} alt={`${org.name} logo`} loading="lazy" onError={() => setFailed(true)} className="h-full w-full object-contain" />
-            : <span className="font-display text-3xl leading-none text-primary" aria-hidden>{org.name.trim().charAt(0).toLocaleUpperCase()}</span>}
+            : <span className="nb-monogram" aria-hidden>{org.name.trim().charAt(0).toLocaleUpperCase()}</span>}
         </div>
         <span className="nb-small text-muted-foreground text-right">{humanize(org.type)}</span>
       </div>
