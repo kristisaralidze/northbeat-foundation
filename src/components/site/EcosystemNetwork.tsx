@@ -47,8 +47,16 @@ export function EcosystemNetwork() {
         const dot = element('circle'); dot.setAttribute('r', group === 0 ? '8' : '6'); dot.setAttribute('class', 'nb-network-dot'); anchor.append(dot);
         const text = element('text'); text.setAttribute('class', 'nb-network-label'); text.setAttribute('text-anchor', 'middle');
         const label = phone ? SHORT_LABELS[group] ?? name : name;
-        const lines = label.includes(' and ') ? label.split(' and ').map((s, i) => i ? `and ${s}` : s) : [label];
-        lines.forEach((line, i) => { const span = element('tspan'); span.setAttribute('x', '0'); span.setAttribute('y', String(39 + i * 15)); span.textContent = line; text.append(span); });
+        const measure = document.createElement('canvas').getContext('2d');
+        if (measure) measure.font = `${phone ? 13 : 14}px Schibsted Grotesk`;
+        const maxWidth = phone ? width * .42 : width * .22;
+        const lines: string[] = [];
+        for (const word of label.split(' ')) {
+          const last = lines[lines.length - 1];
+          if (last && (measure?.measureText(`${last} ${word}`).width ?? 0) <= maxWidth) lines[lines.length - 1] = `${last} ${word}`;
+          else lines.push(word);
+        }
+        lines.forEach((line, i) => { const span = element('tspan'); span.setAttribute('x', '0'); span.setAttribute('y', String(35 + i * 17)); span.textContent = line; text.append(span); });
         anchor.append(text); svg.append(anchor); anchors.push(anchor);
         anchor.addEventListener('pointerenter', e => { if ((e as PointerEvent).pointerType !== 'touch') highlight(group); });
         anchor.addEventListener('pointerleave', e => { if ((e as PointerEvent).pointerType !== 'touch') highlight(null); });
