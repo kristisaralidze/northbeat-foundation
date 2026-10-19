@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/button';
 import { EventList, EventCalendar } from '@/components/site/EventViews';
 import { EVENT_TYPES, humanize } from '@/lib/admin/entities';
 import { eventsQuery } from '@/lib/events.query';
-import { closingSoon, dayKey, filterEvents, monthLabel, shiftMonth, validMonth, dateLabel } from '@/lib/events';
+import { compactSearch } from '@/lib/search-params';
+import { closingSoon, eventMonths, dayKey, filterEvents, monthLabel, shiftMonth, validMonth, dateLabel } from '@/lib/events';
 const searchSchema = z.object({ type: fallback(z.string(), '').default(''), city: fallback(z.string(), '').default(''), month: fallback(z.string(), '').default(''), view: fallback(z.string(), 'list').default('list'), archive: fallback(z.boolean(), false).default(false) });
 export const Route = createFileRoute('/events')({
   validateSearch: zodValidator(searchSchema),
+  search: { middlewares: [({ search, next }) => compactSearch(next(search), { view: 'list' })] },
   loader: ({ context }) => context.queryClient.ensureQueryData(eventsQuery),
   head: () => ({ meta: [
     { title: 'Healthtech events & deadlines — Northbeat' }, { name: 'description', content: 'Upcoming Nordic healthtech conferences, pitch competitions, hackathons, demo days and meetups. Browse the calendar and deadlines closing soon.' },
@@ -25,18 +27,22 @@ function Events() {
   const calendar = search.view === 'calendar'; const currentMonth = dayKey(data.now).slice(0, 7); const chosenMonth = validMonth(search.month); const month = chosenMonth || currentMonth;
   const filters = { type: search.type, city: search.city, month: calendar ? month : chosenMonth, archive: search.archive };
   const events = filterEvents(data.events, filters, data.now); const deadlines = closingSoon(data);
-  const cities = [...new Set(data.events.map((event) => event.city).filter((city): city is string => Boolean(city)))].sort();
+  const pool = (patch: Partial<typeof filters>) => filterEvents(data.events, { ...filters, ...patch }, data.now);
+  const types = EVENT_TYPES.filter((type) => pool({ type }).length > 0);
+  const months = eventMonths(pool({ month: '' })); const monthValue = calendar ? month : chosenMonth;
+  const monthOptions = monthValue && !months.includes(monthValue) ? [...months, monthValue].sort() : months;
+  const cities = [...new Set(pool({ city: '' }).map((event) => event.city).filter((city): city is string => Boolean(city)))].sort();
   const update = (patch: Partial<typeof search>) => navigate({ search: (prev) => ({ ...prev, ...patch }) });
   const undated = filterEvents(data.events, { ...filters, month: '' }, data.now).filter((event) => !event.starts_at);
   return <>
-    <section className="border-b border-hairline bg-frost-wash" aria-label="Closing soon"><div className="nb-container py-7"><div className="mb-4 flex flex-wrap items-baseline justify-between gap-2"><h2 className="nb-h3">Closing soon</h2><span className="nb-small text-muted-foreground">Next 14 days · {deadlines.length} {deadlines.length === 1 ? 'deadline' : 'deadlines'}</span></div>
-      {deadlines.length === 0 ? <p className="nb-small text-muted-foreground">No published application deadlines in the next 14 days.</p> : <ul className="nb-deadline-strip">{deadlines.map((item) => <li key={`${item.kind}-${item.id}`} className="nb-card"><p className="nb-eyebrow mb-2">{item.kind === 'event' ? 'Event applications' : 'Opportunity'} · {dateLabel(item.deadline)}</p><h3 className="nb-h3">{item.kind === 'event' ? <Link to="/event/$slug" params={{ slug: item.slug }} className="nb-org-link break-words">{item.title}</Link> : <Link to="/opportunity/$slug" params={{ slug: item.slug }} className="nb-org-link break-words">{item.title}</Link>}</h3></li>)}</ul>}
-    </div></section>
+    {deadlines.length > 0 && <section className="border-b border-hairline bg-frost-wash" aria-label="Closing soon"><div className="nb-container py-7"><div className="mb-4 flex flex-wrap items-baseline justify-between gap-2"><h2 className="nb-h3">Closing soon</h2><span className="nb-small text-muted-foreground">Next 14 days · {deadlines.length} {deadlines.length === 1 ? 'deadline' : 'deadlines'}</span></div>
+      {<ul className="nb-deadline-strip">{deadlines.map((item) => <li key={`${item.kind}-${item.id}`} className="nb-card"><p className="nb-eyebrow mb-2">{item.kind === 'event' ? 'Event applications' : 'Opportunity'} · {dateLabel(item.deadline)}</p><h3 className="nb-h3">{item.kind === 'event' ? <Link to="/event/$slug" params={{ slug: item.slug }} className="nb-org-link break-words">{item.title}</Link> : <Link to="/opportunity/$slug" params={{ slug: item.slug }} className="nb-org-link break-words">{item.title}</Link>}</h3></li>)}</ul>}
+    </div></section>}
     <div className="nb-container nb-section"><header className="mb-8 flex flex-wrap items-end justify-between gap-6"><div><p className="nb-eyebrow mb-3">Nordic healthtech</p><h1 className="nb-h1">Events</h1></div><div className="flex gap-2" aria-label="Event period"><Button variant="ghost" className={`nb-btn ${!search.archive ? 'nb-btn-primary' : 'nb-btn-quiet'}`} aria-pressed={!search.archive} onClick={() => update({ archive: false, month: '' })}>Upcoming</Button><Button variant="ghost" className={`nb-btn ${search.archive ? 'nb-btn-primary' : 'nb-btn-quiet'}`} aria-pressed={search.archive} onClick={() => update({ archive: true, month: calendar ? shiftMonth(currentMonth, -1) : '' })}>Archive</Button></div></header>
       <div className="flex flex-wrap items-end gap-4 border-b border-hairline pb-6">
-        <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">Type</span><select aria-label="Event type" className="nb-input" value={search.type} onChange={(e) => update({ type: e.target.value })}><option value="">All types</option>{EVENT_TYPES.map((type) => <option key={type} value={type}>{humanize(type)}</option>)}{search.type && !EVENT_TYPES.some((type) => type === search.type) && <option value={search.type}>{humanize(search.type)}</option>}</select></label>
+        <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">Type</span><select aria-label="Event type" className="nb-input" value={search.type} onChange={(e) => update({ type: e.target.value })}><option value="">All types</option>{types.map((type) => <option key={type} value={type}>{humanize(type)}</option>)}{search.type && !EVENT_TYPES.some((type) => type === search.type) && <option value={search.type}>{humanize(search.type)}</option>}</select></label>
         <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">City</span><select aria-label="City" className="nb-input" value={search.city} onChange={(e) => update({ city: e.target.value })}><option value="">All cities</option>{cities.map((city) => <option key={city}>{city}</option>)}{search.city && !cities.includes(search.city) && <option>{search.city}</option>}</select></label>
-        <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">Month</span><input type="month" aria-label="Month" className="nb-input" value={calendar ? month : chosenMonth} onChange={(e) => update({ month: e.target.value })} /></label>
+        <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">Month</span><select aria-label="Month" className="nb-input" value={monthValue} onChange={(e) => update({ month: e.target.value })}>{!calendar && <option value="">All months</option>}{monthOptions.map((m) => <option key={m} value={m}>{monthLabel(m)}</option>)}</select></label>
         {(search.type || search.city || search.month) && <Button variant="ghost" className="nb-btn nb-btn-quiet" onClick={() => update({ type: '', city: '', month: '' })}>Clear filters</Button>}
         <div className="flex gap-1" aria-label="Event view"><Button variant="ghost" className={`nb-btn ${!calendar ? 'nb-btn-primary' : 'nb-btn-quiet'}`} aria-pressed={!calendar} title="List view" onClick={() => update({ view: 'list' })}><List className="h-4 w-4" aria-hidden /><span>List</span></Button><Button variant="ghost" className={`nb-btn ${calendar ? 'nb-btn-primary' : 'nb-btn-quiet'}`} aria-pressed={calendar} title="Calendar view" onClick={() => update({ view: 'calendar' })}><CalendarDays className="h-4 w-4" aria-hidden /><span>Calendar</span></Button></div>
       </div>

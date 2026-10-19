@@ -63,15 +63,15 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
       {profile.terms.length > 0 && <div className="mt-6 flex flex-wrap gap-2" aria-label="Tags">{profile.terms.map((term) => <span key={term.id} className="nb-chip max-w-full"><span className="truncate">{term.name}</span></span>)}</div>}
     </header>
     {kind === 'episodes' && safeWebUrl(text(row, 'embed_url')) && <div className="mt-10 aspect-video w-full overflow-hidden rounded-[var(--radius)] border border-hairline"><iframe src={safeWebUrl(text(row, 'embed_url')) ?? undefined} title={`Watch ${profile.title}`} className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen loading="lazy" /></div>}
-    <div className="nb-profile-layout py-10">
-      <section className="min-w-0" aria-label={isPerson ? 'Biography' : 'Description'}>
+    <div className={isOrg && !description ? 'max-w-2xl py-10' : 'nb-profile-layout py-10'}>
+      {!(isOrg && !description) && <section className="min-w-0" aria-label={isPerson ? 'Biography' : 'Description'}>
         {kind === 'episodes' && profile.summary && <section className="mb-8"><h2 className="nb-h3 mb-3">Key takeaways</h2><p className="nb-body whitespace-pre-wrap break-words">{profile.summary}</p></section>}
         {description && <>{kind === 'episodes' && <h2 className="nb-h3 mb-3">Show notes</h2>}<p className="nb-body whitespace-pre-wrap break-words">{description}</p></>}
         {isPerson && text(row, 'expertise_note') && <section className="mt-8"><h2 className="nb-h3 mb-3">Expertise</h2><p className="nb-body whitespace-pre-wrap break-words">{text(row, 'expertise_note')}</p></section>}
         {openTo.length > 0 && <section className="mt-8"><h2 className="nb-h3 mb-3">Open to</h2><div className="flex flex-wrap gap-2">{openTo.map((value) => <span className="nb-chip nb-chip-frost" key={value}>{humanize(value)}</span>)}</div></section>}
         {kind === 'episodes' && safeWebUrl(text(row, 'audio_url')) && <audio controls preload="none" src={safeWebUrl(text(row, 'audio_url')) ?? undefined} className="mt-6 w-full" aria-label={`Listen to ${profile.title}`} />}
         {kind === 'episodes' && text(row, 'transcript') && <details className="mt-8 border-t border-hairline pt-6"><summary className="nb-h3 cursor-pointer">Transcript</summary><p className="nb-body mt-4 whitespace-pre-wrap break-words">{text(row, 'transcript')}</p></details>}
-      </section>
+      </section>}
       <aside className="min-w-0 space-y-6" aria-label="Details and contact">
         {facts.some(([, value]) => value) && <dl className="space-y-4">{facts.filter(([, value]) => value).map(([name, value]) => <div key={name}><dt className="nb-eyebrow mb-1">{name}</dt><dd className="nb-body break-words">{value}</dd></div>)}</dl>}
         <div className="nb-body flex flex-col items-start gap-4">
