@@ -27,12 +27,13 @@ export function NordicGlobe() {
     const remeasure = () => { setMeasurement(v => v + 1); setReset(v => v + 1); };
     const settle = () => { setStoryProgress(1); setTouched(false); setWheel(false); remeasure(); };
     let inView=false; const sync=()=>setVisible(inView && !document.hidden); const observer=new IntersectionObserver(([entry])=>{const entering=!inView && entry?.isIntersecting; inView=entry?.isIntersecting ?? false; sync(); if (entering) remeasure(); if (!inView) setWheel(false);},{threshold:.05}); observer.observe(el); document.addEventListener('visibilitychange',sync);
-    const resize = new ResizeObserver(remeasure); resize.observe(el);
+    let resizeFrame = 0;
+    const resize = new ResizeObserver(() => { cancelAnimationFrame(resizeFrame); resizeFrame = requestAnimationFrame(remeasure); }); resize.observe(el);
     window.addEventListener('resize', remeasure);
     el.addEventListener('northbeat:globe-settle', settle);
     const progress = (event: Event) => { const value = (event as CustomEvent<number>).detail; setStoryProgress(value); if (value < 1) { setTouched(false); setWheel(false); } };
     el.addEventListener('northbeat:globe-progress', progress);
-    return () => { el.removeEventListener('northbeat:globe-progress', progress); el.removeEventListener('northbeat:globe-settle', settle); resize.disconnect(); window.removeEventListener('resize', remeasure); observer.disconnect(); query.removeEventListener('change',motion); document.removeEventListener('visibilitychange',sync); };
+    return () => { el.removeEventListener('northbeat:globe-progress', progress); el.removeEventListener('northbeat:globe-settle', settle); resize.disconnect(); cancelAnimationFrame(resizeFrame); window.removeEventListener('resize', remeasure); observer.disconnect(); query.removeEventListener('change',motion); document.removeEventListener('visibilitychange',sync); };
   },[]);
   const image=<img className="nb-globe-still" src={still} width={1200} height={1000} alt="Dotted world globe facing the Nordics. Finland, Sweden, Norway, Denmark and Iceland highlighted in berry, with ten Nordic cities marked." />;
   return <section className="nb-globe-section" aria-labelledby="nordic-globe-heading"><div className="nb-container"><h2 id="nordic-globe-heading" className="nb-network-heading">The Nordics</h2></div>

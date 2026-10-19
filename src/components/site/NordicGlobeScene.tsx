@@ -28,15 +28,15 @@ function World({ palette }: Pick<Props, 'palette'>) {
   </>;
 }
 function Interaction({ visible, reduced, touched, wheel, zoom, reset, measurement, storyProgress, onFailure, onReady }: Props) {
-  const { camera, gl, invalidate, setSize } = useThree();
+  const { camera, gl, invalidate, setSize, size } = useThree();
   const previousZoom = useRef(zoom);
   useEffect(() => {
     const host = gl.domElement.closest<HTMLElement>('.nb-globe-stage');
     if (!host || host.clientWidth <= 0 || host.clientHeight <= 0) return;
-    setSize(host.clientWidth, host.clientHeight);
+    if (size.width !== host.clientWidth || size.height !== host.clientHeight) setSize(host.clientWidth, host.clientHeight);
     camera.updateProjectionMatrix();
     invalidate();
-  }, [measurement, camera, gl, setSize, invalidate]);
+  }, [measurement, camera, gl, setSize, invalidate, size.width, size.height]);
   useEffect(() => { onReady(); }, [onReady]);
   useEffect(() => {
     const change = (factor: number) => { camera.position.setLength(clampGlobeDistance(camera.position.length() * factor)); camera.updateProjectionMatrix(); invalidate(); };

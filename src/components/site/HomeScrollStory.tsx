@@ -159,7 +159,11 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
               .to(shell, { '--home-surface': surfaces[3], duration: 1 });
           }, story);
 
-          const refresh = () => { if (!disposed) ScrollTrigger.refresh(); };
+          let refreshFrame = 0;
+          const refresh = () => {
+            cancelAnimationFrame(refreshFrame);
+            refreshFrame = requestAnimationFrame(() => { if (!disposed) ScrollTrigger.refresh(); });
+          };
           story.addEventListener('northbeat:globe-ready', refresh);
           const resize = new ResizeObserver(refresh);
           resize.observe(story);
@@ -167,6 +171,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
           ScrollTrigger.refresh();
           return () => {
             resize.disconnect();
+            cancelAnimationFrame(refreshFrame);
             story.removeEventListener('northbeat:globe-ready', refresh);
             gsap.ticker.remove(tick);
             lenis.off('scroll', ScrollTrigger.update);
