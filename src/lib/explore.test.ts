@@ -32,4 +32,12 @@ describe("Explore directory", () => {
     expect(parseExploreSearch(JSON.parse(JSON.stringify(search)))).toEqual(search);
     expect(parseExploreSearch({ field: ["medtech", 1, "medtech"], q: 1 }).field).toEqual(["medtech"]);
   });
+});import { cardTags, cleanExploreSearch } from "./explore";
+describe("Explore cards and URLs", () => {
+  it("shows at most 3 chips, sub-area then field then stage, plus a remainder", () => {
+    const r = cardTags(data.organisations[0]!, data.terms);
+    expect(r.shown.map((t) => t.id)).toEqual(["wearables", "medtech", "seed"]);
+    expect(r.extra).toBe(1);
+  });
+  it("drops empty URL params", () => expect(cleanExploreSearch({ ...EMPTY_SEARCH, country: ["finland"] })).toEqual({ country: ["finland"] }));
 });
