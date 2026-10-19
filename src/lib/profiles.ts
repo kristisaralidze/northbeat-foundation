@@ -13,3 +13,15 @@ export function publicEntry(kind: EntityKey, row: ProfileRow): RelatedEntry {
   return { id: row.id, slug: row.slug, title: text(row, kind === 'organisations' ? 'name' : kind === 'people' ? 'full_name' : 'title') ?? '', summary: text(row, kind === 'organisations' ? 'short_description' : kind === 'people' ? 'headline' : 'summary'), image: safeWebUrl(text(row, kind === 'organisations' ? 'logo_url' : kind === 'people' ? 'photo_url' : 'cover_url')), roles: [] };
 }
 export function publishedOnly(rows: (ProfileRow & { status?: unknown })[]): ProfileRow[] { return rows.filter((row) => row.status === 'published'); }
+
+/** Plain-language section labels for organisation relationships, by direction. */
+export const ORG_RELATION_LABELS: Record<string, { outgoing: string; incoming: string }> = {
+  invested_in: { outgoing: 'Portfolio', incoming: 'Backed by' },
+  spun_out_of: { outgoing: 'Spun out of', incoming: 'Spinouts' },
+  acquired: { outgoing: 'Acquired', incoming: 'Acquired by' },
+  partner_of: { outgoing: 'Partners', incoming: 'Partners' },
+};
+export const ORG_RELATION_ORDER = ['Backed by', 'Portfolio', 'Spun out of', 'Spinouts', 'Acquired by', 'Acquired', 'Partners'];
+export function orgRelationLabel(relation: string, direction: 'outgoing' | 'incoming'): string {
+  return ORG_RELATION_LABELS[relation]?.[direction] ?? 'Related organisations';
+}

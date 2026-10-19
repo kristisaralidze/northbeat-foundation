@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ENTITIES, type EntityKey } from './admin/entities';
-import { publicEntry, publishedOnly, type ProfileRow, type ProfileTerm, type PublicProfile, type RelatedGroup } from './profiles';
+import { ORG_RELATION_ORDER, orgRelationLabel, publicEntry, publishedOnly, type ProfileRow, type ProfileTerm, type PublicProfile, type RelatedGroup } from './profiles';
 const COLUMNS: Record<EntityKey, string> = {
   organisations: '', people: '',
   events: 'id,slug,status,title,event_type,summary,description,starts_at,ends_at,apply_deadline_at,timezone,format,venue,city,registration_url,price_note,source_url,last_checked',
@@ -36,7 +36,9 @@ export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey,
     if (error) throw new Error('The profile tags could not be loaded.');
     terms = (data ?? []) as ProfileTerm[];
   }
-  const related: RelatedGroup[] = await Promise.all(cfg.links.map(async (link) => {
+  // Organisation relationships get their own plain-language sections in both directions.
+  const genericLinks = kind === 'organisations' ? cfg.links.filter((link) => link.table !== 'organisation_relations') : cfg.links;
+  const related: RelatedGroup[] = await Promise.all(genericLinks.map(async (link) => {
     const roleColumn = link.roleColumn ?? 'role';
     const links: Record<string, string>[] = [];
     for (let offset = 0; ; offset += 1000) {
@@ -52,6 +54,39 @@ export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey,
     const entries = rows.map((entry) => ({ ...publicEntry(link.other, entry), roles: [...new Set(links.filter((item) => item[link.otherFk] === entry.id).map((item) => item[roleColumn]).filter((role): role is string => Boolean(role)))] })).sort((a, b) => a.title.localeCompare(b.title));
     return { kind: link.other, label: kind === 'organisations' && link.other === 'people' ? 'Founders & people' : link.label, entries };
   }));
+  if (kind === 'organisations') related.push(...await loadOrgRelations(client, row.id));
   const entry = publicEntry(kind, row);
   return { kind, row, title: entry.title, summary: entry.summary, image: entry.image, terms, related: related.filter((group) => group.entries.length) };
+}
+
+/** Organisation relationships in both directions, grouped into plain-language sections. */
+async function loadOrgRelations(client: SupabaseClient, orgId: string): Promise<RelatedGroup[]> {
+  const relations: { from_org_id: string; to_org_id: string; relation: string }[] = [];
+  for (const column of ['from_org_id', 'to_org_id'] as const) {
+    for (let offset = 0; ; offset += 1000) {
+      const { data, error } = await client.from('organisation_relations').select('from_org_id,to_org_id,relation').eq(column, orgId).order('id').range(offset, offset + 999);
+      if (error) throw new Error('Related organisations could not be loaded.');
+      for (const rel of data ?? []) if (!relations.some((seen) => seen.from_org_id === rel.from_org_id && seen.to_org_id === rel.to_org_id && seen.relation === rel.relation)) relations.push(rel);
+      if (!data || data.length < 1000) break;
+    }
+  }
+  if (!relations.length) return [];
+  const otherIds = [...new Set(relations.map((rel) => (rel.from_org_id === orgId ? rel.to_org_id : rel.from_org_id)))];
+  const rows: ProfileRow[] = [];
+  for (let i = 0; i < otherIds.length; i += 100) rows.push(...await readEntries(client, 'organisations', { ids: otherIds.slice(i, i + 100) }));
+  const byId = new Map(rows.map((entry) => [entry.id, entry]));
+  const groups = new Map<string, RelatedGroup['entries']>();
+  for (const rel of relations) {
+    const direction = rel.from_org_id === orgId ? 'outgoing' : 'incoming';
+    const otherId = direction === 'outgoing' ? rel.to_org_id : rel.from_org_id;
+    const other = byId.get(otherId);
+    if (!other) continue; // unpublished organisations stay hidden
+    const label = orgRelationLabel(rel.relation, direction);
+    const entries = groups.get(label) ?? [];
+    if (!entries.some((entry) => entry.id === otherId)) entries.push(publicEntry('organisations', other));
+    groups.set(label, entries);
+  }
+  return [...groups.entries()]
+    .map(([label, entries]) => ({ kind: 'organisations' as const, label, entries: entries.sort((a, b) => a.title.localeCompare(b.title)) }))
+    .sort((a, b) => ORG_RELATION_ORDER.indexOf(a.label) - ORG_RELATION_ORDER.indexOf(b.label));
 }

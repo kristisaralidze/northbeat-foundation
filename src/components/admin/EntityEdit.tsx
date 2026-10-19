@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ENTITIES, STATUS, humanize, type EntityKey, type FieldDef, type LinkDef } from "@/lib/admin/entities";
-import { deleteEntry, getEntry, listOptions, listTerms, saveEntry, type LinkRow, type Term } from "@/lib/admin/db";
+import { deleteEntry, getEntry, listIncomingRelations, listOptions, listTerms, saveEntry, type LinkRow, type Term } from "@/lib/admin/db";
 import { selectClass } from "./EntityList";
 import { ImageField } from "./ImageField";
 
@@ -147,10 +147,32 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
         <LinkPicker key={l.table} def={l} rows={links[l.table] ?? []} onChange={(rows) => setLinks((p) => ({ ...p, [l.table]: rows }))} />
       ))}
 
+      {entity === "organisations" && id !== "new" && <IncomingRelations orgId={id} />}
+
       <div className="flex justify-end">
         <Button type="submit" disabled={save.isPending}>{save.isPending ? "Saving…" : "Save"}</Button>
       </div>
     </form>
+  );
+}
+
+function IncomingRelations({ orgId }: { orgId: string }) {
+  const incoming = useQuery({ queryKey: ["organisations", "incoming-relations", orgId], queryFn: () => listIncomingRelations(orgId) });
+  if (!incoming.data?.length) return null;
+  return (
+    <section className="space-y-2">
+      <h2 className="text-sm font-medium text-foreground">Incoming relationships</h2>
+      <p className="text-sm text-muted-foreground">Other organisations pointing at this one. Edit them on that organisation's page.</p>
+      <ul className="divide-y divide-border rounded-md border border-border">
+        {incoming.data.map((rel) => (
+          <li key={rel.id} className="flex flex-wrap items-baseline gap-x-2 px-3 py-2 text-sm">
+            <span className="font-medium text-foreground">{rel.fromName}</span>
+            <span className="text-muted-foreground">— {humanize(rel.relation)} this organisation</span>
+            {rel.note ? <span className="text-muted-foreground">({rel.note})</span> : null}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

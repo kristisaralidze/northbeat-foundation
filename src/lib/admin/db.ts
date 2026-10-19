@@ -53,6 +53,21 @@ export async function listOptions(key: EntityKey): Promise<{ id: string; label: 
   return recs(data).map((r) => ({ id: String(r["id"]), label: String(r[cfg.titleField] ?? "") }));
 }
 
+export type IncomingRelation = { id: string; fromName: string; relation: string; note: string | null };
+
+/** Relationships where this organisation is the target (read-only on the edit page). */
+export async function listIncomingRelations(orgId: string): Promise<IncomingRelation[]> {
+  const { data, error } = await db.from("organisation_relations").select("id, from_org_id, relation, note").eq("to_org_id", orgId).order("id").limit(1000);
+  fail(error);
+  const rows = recs(data);
+  const fromIds = [...new Set(rows.map((r) => String(r["from_org_id"])))];
+  if (!fromIds.length) return [];
+  const { data: orgs, error: orgError } = await db.from("organisations").select("id, name").in("id", fromIds);
+  fail(orgError);
+  const names = new Map(recs(orgs).map((o) => [String(o["id"]), String(o["name"] ?? "")]));
+  return rows.map((r) => ({ id: String(r["id"]), fromName: names.get(String(r["from_org_id"])) ?? "Unknown", relation: String(r["relation"] ?? ""), note: (r["note"] as string | null) ?? null }));
+}
+
 export type EntryBundle = { row: Row | null; termIds: string[]; links: Record<string, LinkRow[]> };
 
 export async function getEntry(cfg: EntityConfig, id: string): Promise<EntryBundle> {
