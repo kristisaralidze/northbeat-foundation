@@ -10,9 +10,9 @@ export const Route = createFileRoute("/submit")({
   validateSearch: zodValidator(z.object({ tab: z.string().optional() })),
   head: () => ({
     meta: [
-      { title: "Submit — Northbeat" },
+      { title: "Submit: Northbeat" },
       { name: "description", content: "Suggest a company, event or opportunity for Northbeat, or apply to be a podcast guest." },
-      { property: "og:title", content: "Submit — Northbeat" },
+      { property: "og:title", content: "Submit: Northbeat" },
       { property: "og:description", content: "Suggest a company, event or opportunity for Northbeat, or apply to be a podcast guest." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -89,8 +89,8 @@ function SubmitForm({ tab }: { tab: SubmitTab }) {
   if (state === "done") {
     return (
       <div role="status" className="space-y-2 py-4">
-        <p className="nb-h3">Thank you!</p>
-        <p className="nb-body text-muted-foreground">We've received it and will take a look. If it's a fit, you'll see it on Northbeat soon.</p>
+        <p className="nb-h3">Thank you.</p>
+        <p className="nb-body text-muted-foreground">We've received your submission. We'll review it and email you if we need more details.</p>
       </div>
     );
   }
@@ -121,7 +121,7 @@ function SubmitForm({ tab }: { tab: SubmitTab }) {
         </>
       )}
       {tab === "guest" && (
-        <Field label="What would you talk about?" hint="Optional — a sentence is plenty."><input className="nb-input" value={values['topic'] ?? ""} onChange={set("topic")} /></Field>
+        <Field label="What would you talk about?" hint="Optional. A sentence is enough."><input className="nb-input" value={values['topic'] ?? ""} onChange={set("topic")} /></Field>
       )}
       <Field label="Your name"><input className="nb-input" required autoComplete="name" value={values['name'] ?? ""} onChange={set("name")} /></Field>
       <Field label="Your email"><input className="nb-input" type="email" required autoComplete="email" value={values['email'] ?? ""} onChange={set("email")} /></Field>

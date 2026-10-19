@@ -1,6 +1,6 @@
 import type { PublicProfile } from './profiles';
 export function profileHead(profile: PublicProfile | undefined, path: string) {
-  const title = profile ? `${profile.title} — Northbeat` : 'Entry unavailable — Northbeat';
+  const title = profile ? `${profile.title}: Northbeat` : 'Entry unavailable: Northbeat';
   const description = profile?.summary ?? (profile ? `${profile.title}: people, organisations and opportunities in Nordic health innovation.` : 'This Northbeat entry is unavailable.');
   return { meta: [
     { title }, { name: 'description', content: description }, { property: 'og:title', content: title }, { property: 'og:description', content: description },

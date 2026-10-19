@@ -10,9 +10,9 @@ export const Route = createFileRoute('/podcast')({
   loader: ({ context }) => context.queryClient.ensureQueryData(podcastQuery),
   head: () => ({
     meta: [
-      { title: 'Podcast — Northbeat' },
+      { title: 'Podcast: Northbeat' },
       { name: 'description', content: 'Conversations with the people building Nordic health startups.' },
-      { property: 'og:title', content: 'Podcast — Northbeat' },
+      { property: 'og:title', content: 'Podcast: Northbeat' },
       { property: 'og:description', content: 'Conversations with the people building Nordic health startups.' },
       { property: 'og:type', content: 'website' },
       { property: 'og:url', content: '/podcast' },
@@ -45,6 +45,6 @@ function Podcast() {
         </li>;
       })}
     </ul>}
-    {episodes.length === 0 && <div className="py-12"><h2 className="nb-h3">No episodes yet</h2><p className="nb-body mt-3 text-muted-foreground">Published episodes will appear here.</p></div>}
+    {episodes.length === 0 && <div className="py-12"><h2 className="nb-h3">No episodes yet</h2><p className="nb-body mt-3 text-muted-foreground">Our first episode is on its way.</p></div>}
   </div>;
 }

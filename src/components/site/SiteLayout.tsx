@@ -77,7 +77,7 @@ function Footer() {
         <div className="max-w-md space-y-4">
           <p className="nb-eyebrow">The newsletter</p>
           <h2 className="nb-h3 text-ink">We track it so you don't miss it.</h2>
-          <p className="nb-small text-muted-foreground">Funding calls, programme intakes and events across Nordic health innovation, in one calm email.</p>
+          <p className="nb-small text-muted-foreground">Funding calls, programme intakes and events in Nordic health innovation, in one email.</p>
           <NewsletterSignup source="footer" />
         </div>
         <div className="flex flex-col justify-between gap-8 md:items-end">

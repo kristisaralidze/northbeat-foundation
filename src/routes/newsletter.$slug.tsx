@@ -11,9 +11,9 @@ export const Route = createFileRoute("/newsletter/$slug")({
   },
   head: ({ loaderData, params }) => ({
     meta: [
-      { title: loaderData ? `${loaderData.title} — Northbeat newsletter` : "Newsletter issue — Northbeat" },
+      { title: loaderData ? `${loaderData.title}: Northbeat newsletter` : "Newsletter issue: Northbeat" },
       { name: "description", content: loaderData?.summary ?? "A past issue of the Northbeat newsletter on Nordic health innovation." },
-      { property: "og:title", content: loaderData?.title ?? "Newsletter issue — Northbeat" },
+      { property: "og:title", content: loaderData?.title ?? "Newsletter issue: Northbeat" },
       { property: "og:description", content: loaderData?.summary ?? "A past issue of the Northbeat newsletter on Nordic health innovation." },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/newsletter/$slug")({
   notFoundComponent: () => (
     <div className="nb-page">
       <h1 className="nb-h1">Issue not found</h1>
-      <p className="nb-lead">This issue isn't published (yet).</p>
+      <p className="nb-lead">This issue is unavailable.</p>
       <Link to="/newsletter" className="nb-btn nb-btn-secondary">Back to the newsletter</Link>
     </div>
   ),
@@ -54,7 +54,7 @@ function IssuePage() {
         </div>
       ) : null}
       {issue.web_url ? (
-        <p className="mt-6"><a href={issue.web_url} target="_blank" rel="noreferrer" className="nb-link">Read this issue in your email app</a></p>
+        <p className="mt-6"><a href={issue.web_url} target="_blank" rel="noreferrer" className="nb-link">Read the original issue</a></p>
       ) : null}
       {links.length ? (
         <section aria-label="Mentioned in this issue" className="mt-10">

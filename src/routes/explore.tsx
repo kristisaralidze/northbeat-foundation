@@ -17,9 +17,9 @@ export const Route = createFileRoute("/explore")({
   loader: async ({ context }) => { await context.queryClient.ensureQueryData(directoryQuery); },
   head: () => ({
     meta: [
-      { title: "Explore — Northbeat" },
+      { title: "Explore: Northbeat" },
       { name: "description", content: "Browse Nordic health, medtech and biotech startups, investors, programmes and research groups." },
-      { property: "og:title", content: "Explore — Northbeat" },
+      { property: "og:title", content: "Explore: Northbeat" },
       { property: "og:description", content: "Browse Nordic health, medtech and biotech startups, investors, programmes and research groups." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -67,8 +67,8 @@ function Explore() {
         {selected.length > 0 && <div className="flex flex-wrap gap-2">{selected.map(({ facet, value, label }) => <Button key={`${facet}-${value}`} variant="ghost" size="sm" className="nb-chip" data-active="true" onClick={() => toggle(facet, value)} aria-label={`Remove ${label} filter`}>{label}<X className="h-3 w-3" aria-hidden /></Button>)}</div>}
         <p className="nb-small my-6 text-muted-foreground" aria-live="polite">{results.length} {results.length === 1 ? "organisation" : "organisations"}</p>
         {results.length ? <div className="grid grid-cols-1 gap-6 md:grid-cols-2">{results.map((org) => <OrganisationCard key={org.id} organisation={org} terms={data.terms} />)}</div> : <div className="border-y border-hairline py-16">
-          <h2 className="nb-h2">{data.organisations.length ? "No matching organisations" : "No published organisations yet"}</h2>
-          <p className="nb-body mt-4 text-muted-foreground">{data.organisations.length ? "Try a different search or fewer filters." : "The directory will appear here as entries are published."}</p>
+          <h2 className="nb-h2">{data.organisations.length ? "No matching organisations" : "No organisations yet"}</h2>
+          <p className="nb-body mt-4 text-muted-foreground">{data.organisations.length ? "Try a different search or fewer filters." : "We’re adding organisations to the directory."}</p>
           {(selected.length > 0 || search.q) && <Button variant="ghost" onClick={clear} className="nb-btn nb-btn-secondary mt-6">Clear search and filters</Button>}
         </div>}
       </section>
