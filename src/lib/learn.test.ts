@@ -5,12 +5,14 @@ const g = (id: string, area: string | null, step: string | null, title = id): Gu
 
 describe('learn', () => {
   it('in the hub needs the same journey step', () => {
-    expect(sharesHub(['field1'], 'step1', [])).toBe(false);
-    expect(sharesHub(['step1'], 'step1', [])).toBe(true);
+    expect(sharesHub(['field1'], 'step1')).toBe(false);
+    expect(sharesHub(['step1'], 'step1')).toBe(true);
+    expect(sharesHub(['step1'], null)).toBe(false);
   });
-  it('in the hub needs a shared field when the guide has fields', () => {
-    expect(sharesHub(['step1', 'field2'], 'step1', ['field1'])).toBe(false);
-    expect(sharesHub(['step1', 'field1'], 'step1', ['field1'])).toBe(true);
+  it('in the hub matches the journey step regardless of field tags', () => {
+    expect(sharesHub(['step1', 'field2'], 'step1')).toBe(true);
+    expect(sharesHub(['step1'], 'step1')).toBe(true);
+    expect(sharesHub(['step2', 'field1'], 'step1')).toBe(false);
   });
   it('previous and next stay within the same area, in journey order', () => {
     const order = new Map([['s1', 0], ['s2', 1]]);

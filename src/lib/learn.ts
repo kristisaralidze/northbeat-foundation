@@ -10,7 +10,7 @@ export type GuideNeighbour = { slug: string; title: string } | null;
 export type GuidePage = {
   guide: GuideCard & { summary: string | null; body: string | null; next_step: string | null; reviewed_by: string | null; last_checked: string | null };
   area: LearnTerm | null; step: LearnTerm | null; sources: GuideSource[];
-  organisations: HubItem[]; opportunities: HubItem[]; previous: GuideNeighbour; next: GuideNeighbour;
+  organisations: HubItem[]; opportunities: HubItem[]; events: HubItem[]; previous: GuideNeighbour; next: GuideNeighbour;
 };
 export type GlossaryEntry = { id: string; slug: string; term: string; short_definition: string; explanation: string | null; related: { slug: string; term: string }[]; guides: { slug: string; title: string }[] };
 
@@ -18,10 +18,9 @@ export const LEVEL_LABELS: Record<string, string> = { beginner: 'Beginner', inte
 export const levelLabel = (level: string) => LEVEL_LABELS[level] ?? level;
 export const readingLabel = (minutes: number | null) => (minutes && minutes > 0 ? `${minutes} min read` : null);
 
-/** An entry belongs in a guide's "In the hub" list when it carries the guide's journey step and, if the guide has fields, at least one of them. */
-export function sharesHub(itemTermIds: string[], stepId: string | null, fieldIds: string[]): boolean {
-  if (!stepId || !itemTermIds.includes(stepId)) return false;
-  return fieldIds.length === 0 || fieldIds.some((id) => itemTermIds.includes(id));
+/** Guide recommendations match the journey step alone, regardless of field tags. */
+export function sharesHub(itemTermIds: string[], stepId: string | null): boolean {
+  return Boolean(stepId && itemTermIds.includes(stepId));
 }
 
 /** Guides in one area, ordered along the journey, then by title. */

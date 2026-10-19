@@ -30,7 +30,7 @@ export const Route = createFileRoute('/learn/$slug')({
 function Guide() {
   const { slug } = Route.useParams();
   const { data } = useSuspenseQuery(guideQuery(slug));
-  const { guide, area, step, sources, organisations, opportunities, previous, next } = data;
+  const { guide, area, step, sources, organisations, opportunities, events, previous, next } = data;
   const meta = [levelLabel(guide.level), readingLabel(guide.reading_minutes), area?.name, step?.name].filter(Boolean);
   const body = paragraphs(guide.body);
 
@@ -48,11 +48,12 @@ function Guide() {
         <p className="nb-eyebrow mb-2">Your next step</p>
         <p className="nb-body text-ink whitespace-pre-line">{guide.next_step}</p>
       </aside>}
-      {(organisations.length > 0 || opportunities.length > 0) && <section className="mt-14" aria-labelledby="in-hub">
+      {(organisations.length > 0 || opportunities.length > 0 || events.length > 0) && <section className="mt-14" aria-labelledby="in-hub">
         <h2 id="in-hub" className="nb-h3 mb-6">In the hub</h2>
         <div className="grid gap-8 sm:grid-cols-2">
           <HubList title="Organisations" kind="organisations" items={organisations} />
           <HubList title="Opportunities" kind="opportunities" items={opportunities} />
+          <HubList title="Events" kind="events" items={events} />
         </div>
       </section>}
       {sources.length > 0 && <section className="mt-14">
