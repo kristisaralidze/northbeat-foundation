@@ -57,14 +57,21 @@ function Interaction({ visible, reduced, zoomProgress, reset, measurement, story
     const move = (e: PointerEvent) => { if (!pointers.has(e.pointerId)) return; pointers.set(e.pointerId,{x:e.clientX,y:e.clientY}); const values = [...pointers.values()]; const a=values[0], b=values[1]; if (!a || !b) return; const distance=Math.hypot(a.x-b.x,a.y-b.y); if (pinch > 0 && distance > 0) change(pinch / distance); pinch=distance; };
     const up = (e: PointerEvent) => { pointers.delete(e.pointerId); pinch=0; };
     const lost = (e: Event) => { e.preventDefault(); onFailure(); };
-    el.addEventListener('wheel',onWheel,{passive:false,capture:true}); el.addEventListener('pointerdown',down); el.addEventListener('pointermove',move); el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up); el.addEventListener('webglcontextlost',lost);
-    return () => { el.removeEventListener('wheel',onWheel,true); el.removeEventListener('pointerdown',down); el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); el.removeEventListener('pointercancel',up); el.removeEventListener('webglcontextlost',lost); };
-  }, [camera,gl,invalidate,wheel,onFailure]);
-  useEffect(() => { camera.position.setLength(clampGlobeDistance(camera.position.length() * Math.exp((zoom - previousZoom.current) * -.18))); previousZoom.current=zoom; invalidate(); }, [zoom,camera,invalidate]);
-  useEffect(() => { camera.position.set(...globePosition(60,14,3.3)); camera.lookAt(0,0,0); invalidate(); }, [reset,camera,invalidate]);
-  useEffect(() => { if (reduced) return; camera.position.set(...globePosition(20 + storyProgress * 40, -100 + storyProgress * 114, 3.3)); camera.lookAt(0,0,0); invalidate(); }, [storyProgress,reduced,camera,invalidate]);
-  return <OrbitControls enabled={storyProgress >= 1} enablePan={false} enableZoom={false} enableDamping={false} autoRotate={visible && !reduced && !touched && storyProgress >= 1} autoRotateSpeed={GLOBE_ROTATION_SPEED} rotateSpeed={.5} />;
+    el.addEventListener('pointerdown',down); el.addEventListener('pointermove',move); el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up); el.addEventListener('webglcontextlost',lost);
+    return () => { el.removeEventListener('pointerdown',down); el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); el.removeEventListener('pointercancel',up); el.removeEventListener('webglcontextlost',lost); };
+  }, [camera,gl,invalidate,storyProgress,onFailure]);
+  useEffect(() => {
+    camera.position.set(...globePosition(60,14,globeScrollDistance(reduced ? 0 : zoomProgress)));
+    camera.lookAt(0,0,0); controls.current?.target.set(0,0,0); invalidate();
+  }, [reset,camera,invalidate]);
+  useEffect(() => {
+    if (reduced) return;
+    camera.position.set(...globePosition(20 + storyProgress * 40, -100 + storyProgress * 114, globeScrollDistance(zoomProgress)));
+    camera.lookAt(0,0,0); controls.current?.target.set(0,0,0); invalidate();
+  }, [storyProgress,zoomProgress,reduced,camera,invalidate]);
+  return <OrbitControls ref={controls} enabled={storyProgress >= 1} enablePan={false} enableZoom={false} enableDamping={false} autoRotate={visible && !reduced && storyProgress >= 1} autoRotateSpeed={GLOBE_ROTATION_SPEED} rotateSpeed={.5}
+    onStart={() => { dragging.current = true; rotationSpeed.current = 0; }} onEnd={() => { dragging.current = false; invalidate(); }} />;
 }
 export default function NordicGlobeScene(props: Props) {
-  return <Canvas flat resize={{ offsetSize: true }} dpr={[1,1.5]} frameloop={props.visible && !props.reduced && !props.touched ? 'always' : 'demand'} camera={{ position: globePosition(60,14,3.3), fov: 42, near: .05, far: 20 }} gl={{ antialias: true, alpha: true }}><World palette={props.palette} /><Interaction {...props} /></Canvas>;
+  return <Canvas flat resize={{ offsetSize: true }} dpr={[1,1.5]} frameloop={props.visible && !props.reduced ? 'always' : 'demand'} camera={{ position: globePosition(60,14,3.3), fov: 42, near: .05, far: 20 }} gl={{ antialias: true, alpha: true }}><World palette={props.palette} /><Interaction {...props} /></Canvas>;
 }
