@@ -67,7 +67,7 @@ export function EcosystemNetwork() {
         }
         a.addEventListener('pointerenter', e => { if ((e as PointerEvent).pointerType !== 'touch' && !touch.matches) highlight(n.id); });
         a.addEventListener('pointerleave', () => { if (!touch.matches) highlight(null); });
-        a.addEventListener('focus', () => highlight(n.id));
+        a.addEventListener('focus', () => { if (!touch.matches && !phone.matches) highlight(n.id); });
         a.addEventListener('blur', () => { if (!touch.matches) highlight(null); });
         a.addEventListener('click', e => { if ((touch.matches || phone.matches) && activeId !== n.id) { e.preventDefault(); highlight(n.id); } });
         a.addEventListener('keydown', e => { const key = (e as KeyboardEvent).key; if (key === 'Escape') highlight(null); });
