@@ -12,9 +12,9 @@ export const Route = createFileRoute("/newsletter/$slug")({
   head: ({ loaderData, params }) => ({
     meta: [
       { title: loaderData ? `${loaderData.title} — Northbeat newsletter` : "Newsletter issue — Northbeat" },
-      { name: "description", content: loaderData?.summary ?? "A past issue of the Northbeat newsletter on Nordic healthtech." },
+      { name: "description", content: loaderData?.summary ?? "A past issue of the Northbeat newsletter on Nordic health innovation." },
       { property: "og:title", content: loaderData?.title ?? "Newsletter issue — Northbeat" },
-      { property: "og:description", content: loaderData?.summary ?? "A past issue of the Northbeat newsletter on Nordic healthtech." },
+      { property: "og:description", content: loaderData?.summary ?? "A past issue of the Northbeat newsletter on Nordic health innovation." },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary" },
       ...(loaderData ? [] : [{ name: "robots", content: "noindex" }]),

@@ -33,7 +33,7 @@ function AboutPage() {
           Everything here is curated by hand. An entry belongs only if it helps someone build, fund, validate, join or research a health startup in the Nordics. No general tech events, no global health news, no noise. And everything links to everything else, so you can follow the thread from a startup to its investors, its people and its next deadline.
         </p>
         <p>
-          Alongside the directory, we run a podcast with the people building and funding Nordic healthtech, and a newsletter that rounds up what matters. One calm email, when there's something worth knowing.
+          Alongside the directory, we run a podcast with the people building and funding Nordic health innovation, and a newsletter that rounds up what matters. One calm email, when there's something worth knowing.
         </p>
         <p>
           Something missing? <Link to="/submit" className="nb-link">Tell us</Link> — the hub gets better every time someone does.
