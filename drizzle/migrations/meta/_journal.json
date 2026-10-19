@@ -43,6 +43,13 @@
       "when": 1792412278947,
       "tag": "0005_learn_enum_values",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792412314654,
+      "tag": "0006_learn_guides_glossary",
+      "breakpoints": true
     }
   ]
 }
