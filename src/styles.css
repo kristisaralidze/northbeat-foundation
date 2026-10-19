@@ -247,6 +247,29 @@
 @media (max-width: 40rem) {
   .nb-home-wordmark-section { padding-block: var(--space-12) var(--space-16); }
 }
+.nb-home-intro {
+  margin-top: var(--space-8);
+  max-width: 44rem;
+}
+.nb-home-intro-line {
+  margin: 0;
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+.nb-home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8);
+  margin-top: var(--space-6);
+}
+@media (max-width: 40rem) {
+  .nb-home-intro { margin-top: var(--space-6); }
+  .nb-home-intro-line { font-size: 1.0625rem; }
+  .nb-home-actions { gap: var(--space-4); }
+}
 
 .theme-site ::selection {
   background: var(--berry-soft);
