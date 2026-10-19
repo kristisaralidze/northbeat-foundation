@@ -40,7 +40,8 @@ export function deadlineLabel(opportunity: OpportunityRow, now: string): string 
   if (!opportunity.deadline_at) return 'No deadline';
   const date = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' })
     .format(new Date(opportunity.deadline_at));
-  const days = Math.ceil((Date.parse(opportunity.deadline_at) - Date.parse(now)) / 86_400_000);
+  const dayOf = (value: string) => Math.floor(Date.parse(value) / 86_400_000);
+  const days = dayOf(opportunity.deadline_at) - dayOf(now);
   if (days < 0) return `Closed ${date}`;
   if (days === 0) return 'Closes today';
   if (days === 1) return 'Closes tomorrow';
