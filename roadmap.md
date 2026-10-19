@@ -1,14 +1,14 @@
 # Public detail and copy fixes
-- [ ] Correct detail sticky titles, decorative wordmark alt text, solid covering mobile menu and mobile T fallback.
-- [ ] Hide journey tags outside Learn; use compact facts and one main detail column without timezone; website domain link text.
-- [ ] Relationship map requires 3 connections with visible lines below facts; fewer connections use lists.
-- [ ] Group undated opportunities at the end as Rolling and open now, with accurate timing labels.
-- [ ] Separate guide metadata; cap hub recommendations at 5, journey step first then field.
-- [ ] Update Podcast intro/empty state/guest link and About title; review broad-use startup wording.
-- [ ] Verify detail views, mobile menu, opportunity groups, recommendations and copy with tests and browser.
+- [x] Correct detail sticky titles, decorative wordmark alt text, solid covering mobile menu and mobile T fallback.
+- [x] Hide journey tags outside Learn; use compact facts and one main detail column without timezone; website domain link text.
+- [x] Relationship map requires 3 connections with visible lines below facts; fewer connections use lists.
+- [x] Group undated opportunities at the end as Rolling and open now, with timing labels from existing application notes.
+- [x] Separate guide metadata; cap hub recommendations at 5, journey step first then field.
+- [x] Update Podcast intro/empty state/guest link and About title; review broad-use startup wording.
+- [x] Verify detail views, mobile menu, opportunity groups, recommendations and copy with tests and Chrome/Safari.
 
 # Organisation logos
-- [ ] Add shared uploaded-first domain logos and error fallbacks across public organisation listings; test and verify.
+- [x] Add shared uploaded-first domain logos and error fallbacks across public organisation listings; test and verify.
 - [ ] Activate Brandfetch with the actual public client ID (blocked: placeholder supplied, question skipped).
 
 # Atmospheric image
