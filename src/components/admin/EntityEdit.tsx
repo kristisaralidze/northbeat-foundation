@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ENTITIES, STATUS, humanize, type EntityKey, type FieldDef, type LinkDef } from "@/lib/admin/entities";
-import { deleteEntry, getEntry, listOptions, listTerms, saveEntry, type LinkRow, type Term } from "@/lib/admin/db";
+import { deleteEntry, getEntry, listIncomingRelations, listOptions, listTerms, saveEntry, type LinkRow, type Term } from "@/lib/admin/db";
+import { orgRelationLabel } from "@/lib/profiles";
 import { selectClass } from "./EntityList";
 import { ImageField } from "./ImageField";
 
@@ -146,6 +147,8 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
       {cfg.links.map((l) => (
         <LinkPicker key={l.table} def={l} rows={links[l.table] ?? []} onChange={(rows) => setLinks((p) => ({ ...p, [l.table]: rows }))} />
       ))}
+
+      {entity === "organisations" && id !== "new" && <IncomingRelations orgId={id} />}
 
       <div className="flex justify-end">
         <Button type="submit" disabled={save.isPending}>{save.isPending ? "Saving…" : "Save"}</Button>
