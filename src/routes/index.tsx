@@ -5,9 +5,16 @@ import { EcosystemNetwork } from "@/components/site/EcosystemNetwork";
 import { ecosystemQuery } from "@/lib/ecosystem.query";
 import { NordicGlobe } from "@/components/site/NordicGlobe";
 import { HomeScrollStory } from "@/components/site/HomeScrollStory";
+import { HomeHappening } from "@/components/site/HomeHappening";
+import { eventsQuery } from "@/lib/events.query";
+import { opportunitiesQuery } from "@/lib/opportunities.query";
 
 export const Route = createFileRoute("/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(ecosystemQuery),
+  loader: ({ context }) => Promise.all([
+    context.queryClient.ensureQueryData(ecosystemQuery),
+    context.queryClient.ensureQueryData(eventsQuery),
+    context.queryClient.ensureQueryData(opportunitiesQuery),
+  ]),
   head: () => ({
     links: [{ rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&display=swap" }],
     meta: [
@@ -25,20 +32,33 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <HomeScrollStory>
-    <div className="nb-home-wordmark-section">
-      <LaboratoryWordmark />
-      <div className="nb-home-intro">
-        <p className="nb-home-intro-line">
-          Map of the Nordic health ecosystem: the companies, the capital, the science and the people behind them.
+    <section className="nb-home-wordmark-section">
+      <div className="nb-home-opening-content">
+        <div className="nb-home-wordmark-slot"><LaboratoryWordmark /></div>
+        <p className="nb-home-tagline">The heartbeat of Nordic health innovation.</p>
+      </div>
+    </section>
+    <section className="nb-home-intro-section">
+      <div className="nb-home-intro nb-container">
+        <p className="nb-home-intro-line" aria-label="The map of the Nordic health ecosystem: the companies, the capital, the science and the people behind them.">
+          {'The map of the Nordic health ecosystem: the companies, the capital, the science and the people behind them.'.split(' ').map((word, index) => <span key={index} className="nb-home-intro-word" aria-hidden="true">{word}{' '}</span>)}
         </p>
         <div className="nb-home-actions">
           <Link to="/explore" search={EMPTY_SEARCH} className="nb-btn nb-btn-primary">Explore the hub</Link>
           <Link to="/newsletter" className="nb-link">Get the newsletter</Link>
         </div>
       </div>
+    </section>
+    <div className="nb-home-world-scene">
+      <EcosystemNetwork />
+      <NordicGlobe />
     </div>
-    <EcosystemNetwork />
-    <NordicGlobe />
+    <HomeHappening />
+    <section className="nb-home-learn nb-container">
+      <h2 className="nb-network-heading">Start with Learn</h2>
+      <p>From your first idea to funding and validation. Guides and a glossary for building in health.</p>
+      <Link to="/learn" search={{}} className="nb-link">Explore Learn</Link>
+    </section>
     </HomeScrollStory>
   );
 }

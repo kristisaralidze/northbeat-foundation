@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ecosystemQuery } from '@/lib/ecosystem.query';
-import { ECOSYSTEM_GROUPS, GROUP_CONNECTIONS, groupCounts, groupHref, groupPositions, networkTiming } from '@/lib/ecosystem';
+import { ECOSYSTEM_GROUPS, GROUP_CONNECTIONS, groupCounts, groupHref, groupPositions } from '@/lib/ecosystem';
+import { networkScrollPhases } from '@/lib/home-story';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const SHORT_LABELS = ['Startups', 'Investors', 'Incubators and accelerators', 'Funders and grants', 'Universities and research', 'Labs and validation', 'Hospitals and care', 'Public agencies', 'Patient organisations', 'Communities and events', 'Services'];
@@ -12,10 +13,10 @@ export function EcosystemNetwork() {
     const svg = svgRef.current;
     if (!svg) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let frame = 0, entered = false, completed = false, visible = false, active: number | null = null;
-    let drawFrame: ((now: number) => void) | undefined;
+    let progress = 1, active: number | null = null;
+    let drawFrame: (() => void) | undefined;
     const render = () => {
-      cancelAnimationFrame(frame); svg.replaceChildren();
+      svg.replaceChildren();
       const width = svg.clientWidth, height = svg.clientHeight;
       if (!width || !height) return;
       const phone = width < 600, positions = groupPositions(width, height);
@@ -57,27 +58,25 @@ export function EcosystemNetwork() {
         anchor.addEventListener('click', e => { if (anchor.dataset['firstTap'] === 'true') { e.preventDefault(); delete anchor.dataset['firstTap']; } });
         anchor.addEventListener('keydown', e => { if ((e as KeyboardEvent).key === 'Escape') highlight(null); });
       });
-      let start: number | undefined;
-      drawFrame = (now: number) => {
-        start ??= now;
-        const elapsed = now - start, timing = networkTiming(elapsed, reduced.matches || completed, paths.length);
+      drawFrame = () => {
+        const timing = networkScrollPhases(progress, paths.length, reduced.matches);
         const ease = 1 - Math.pow(1 - timing.entry, 3);
-        const current = positions.map((p, i) => ({ x: p.x + (completed && !reduced.matches ? Math.sin(now / 12000 + i) * 2 : 0), y: p.y + (completed && !reduced.matches ? Math.cos(now / 14000 + i) * 2 : 0) }));
+        const current = positions;
         const fly = (x: number, y: number, i: number) => { const edge = i % 4, f = (i * .618033) % 1; const sx = edge === 0 ? -60 : edge === 1 ? width + 60 : f * width, sy = edge === 2 ? -60 : edge === 3 ? height + 60 : f * height; return { x: sx + (x - sx) * ease, y: sy + (y - sy) * ease }; };
         anchors.forEach((a, i) => { const p = current[i]; if (!p) return; const pos = fly(p.x, p.y, i); a.setAttribute('transform', `translate(${pos.x},${pos.y})`); });
         dots.forEach((dot, i) => { const p = current[dot.group]; if (!p) return; const pos = fly(p.x + dot.dx, p.y + dot.dy, i + 11); dot.el.setAttribute('cx', String(pos.x)); dot.el.setAttribute('cy', String(pos.y)); });
         paths.forEach((path, i) => { const pair = GROUP_CONNECTIONS[i]; if (!pair) return; const a = current[pair[0]], b = current[pair[1]]; if (!a || !b) return; const progress = Math.max(0, Math.min(1, timing.connections - i)); path.setAttribute('d', `M${a.x},${a.y}L${a.x + (b.x - a.x) * progress},${a.y + (b.y - a.y) * progress}`); });
-        completed = timing.entry === 1 && timing.connections === paths.length;
-        svg.dataset['phase'] = completed ? 'settled' : timing.entry < 1 ? 'entering' : 'connecting';
-        if (visible && !reduced.matches) frame = requestAnimationFrame(drawFrame ?? (() => {}));
+        anchors.forEach(a => { const label = a.querySelector('text'); if (label) label.style.opacity = String(timing.labels); });
+        svg.dataset['phase'] = timing.labels >= .999 ? 'settled' : timing.entry < 1 ? 'entering' : timing.connections < paths.length ? 'connecting' : 'labelling';
+        svg.dataset['progress'] = String(progress);
       };
-      if (entered || reduced.matches) drawFrame(performance.now()); else svg.dataset['phase'] = 'waiting';
+      drawFrame();
     };
-    const observer = new IntersectionObserver(([entry]) => { visible = entry?.isIntersecting ?? false; cancelAnimationFrame(frame); if (visible) { if (!entered) { entered = true; render(); } else if (drawFrame) frame = requestAnimationFrame(drawFrame); } }, { threshold: .1 });
-    observer.observe(svg);
+    const scrollProgress = (event: Event) => { progress = (event as CustomEvent<number>).detail; drawFrame?.(); };
+    svg.addEventListener('northbeat:network-progress', scrollProgress);
     const resize = new ResizeObserver(render); resize.observe(svg);
     reduced.addEventListener('change', render); render();
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); resize.disconnect(); reduced.removeEventListener('change', render); };
+    return () => { svg.removeEventListener('northbeat:network-progress', scrollProgress); resize.disconnect(); reduced.removeEventListener('change', render); };
   }, [data]);
   return <section className="nb-network-section" aria-labelledby="ecosystem-heading"><div className="nb-container"><h2 id="ecosystem-heading" className="nb-network-heading">The ecosystem</h2></div><svg ref={svgRef} className="nb-network-figure" role="group" aria-label="Nordic health ecosystem groups" /></section>;
 }
