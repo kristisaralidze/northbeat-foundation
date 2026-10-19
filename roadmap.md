@@ -1,8 +1,8 @@
 # Home and site-shell refinements
-- [ ] Redesign header actions and mobile menu placement; remove footer pulse and newsletter eyebrow.
-- [ ] Reveal the large intro immediately at docking and reduce home gaps.
-- [ ] Improve network label readability, globe caption and city glow dots.
-- [ ] Verify desktop, tablet, phone, reversible scrolling and reduced motion.
+- [x] Redesign header actions and mobile menu placement; remove footer pulse and newsletter eyebrow.
+- [x] Reveal the large intro immediately at docking and reduce home gaps.
+- [x] Improve network label readability, globe caption and city glow dots.
+- [x] Verify desktop, tablet, phone, reversible scrolling and reduced motion.
 
 # Home scroll story
 - [x] Pin the network for two screen-heights with reversible 0-40% dots, 40-80% connections and 80-100% labels.

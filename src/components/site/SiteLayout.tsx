@@ -1,7 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { Menu, X } from "lucide-react";
-import { PulseLine, Wordmark } from "./PulseLine";
+import { Wordmark } from "./PulseLine";
 import { NewsletterSignup } from "./NewsletterSignup";
 import { Button } from "@/components/ui/button";
 
