@@ -39,11 +39,11 @@ function Guide() {
       <nav aria-label="Breadcrumb" className="nb-small mb-6"><Link to="/learn" className="nb-link">Learn</Link></nav>
       <h1 className="nb-h1">{guide.title}</h1>
       <p className="nb-small mt-4 text-muted-foreground">{meta.join(' · ')}</p>
-      {guide.one_sentence && <div className="mt-8 border-l-2 border-primary pl-5">
+      {guide.one_sentence && <div data-one-sentence className="mt-8 border-l-2 border-primary pl-5">
         <p className="nb-eyebrow mb-2">In one sentence</p>
         <p className="nb-lead text-ink">{guide.one_sentence}</p>
       </div>}
-      {body.length > 0 && <div className="nb-body mt-10 space-y-5 text-ink">{body.map((p, i) => <p key={i} className="whitespace-pre-line">{p}</p>)}</div>}
+      {body.length > 0 && <div data-guide-body className="nb-body mt-10 space-y-5 text-ink">{body.map((p, i) => <p key={i} className="whitespace-pre-line">{p}</p>)}</div>}
       {guide.next_step && <aside className="nb-card-frost mt-12">
         <p className="nb-eyebrow mb-2">Your next step</p>
         <p className="nb-body text-ink whitespace-pre-line">{guide.next_step}</p>

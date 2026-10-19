@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { humanize, type EntityKey } from '@/lib/admin/entities';
 import { EMPTY_SEARCH } from '@/lib/explore';
 import { safeWebUrl, text, type PublicProfile, type RelatedEntry } from '@/lib/profiles';
+import { RelationshipMap } from './RelationshipMap';
 
 export function EntryLink({ kind, entry, children, className }: { kind: EntityKey; entry: { slug: string }; children: ReactNode; className?: string }) {
   const props = { params: { slug: entry.slug }, className, children };
@@ -21,8 +22,8 @@ export function EntryLink({ kind, entry, children, className }: { kind: EntityKe
 function ProfileImage({ image, name, kind, small = false }: { image: string | null; name: string; kind: EntityKey; small?: boolean }) {
   const [failed, setFailed] = useState(false);
   const Icon = kind === 'people' ? UserRound : kind === 'episodes' ? Radio : Building2;
-  return <div className={small ? 'nb-org-logo shrink-0' : 'nb-profile-image'}>
-    {image && !failed ? <img src={image} alt={kind === 'people' ? name : `${name} ${kind === 'episodes' ? 'cover' : 'logo'}`} onError={() => setFailed(true)} className={kind === 'people' ? 'h-full w-full object-cover' : 'h-full w-full object-contain'} /> : <Icon className="h-8 w-8 text-muted-foreground" aria-hidden />}
+  return <div className={small || kind === 'organisations' && (!image || failed) ? 'nb-org-logo shrink-0' : 'nb-profile-image'}>
+    {image && !failed ? <img src={image} alt={kind === 'people' ? name : `${name} ${kind === 'episodes' ? 'cover' : 'logo'}`} onError={() => setFailed(true)} className={kind === 'people' ? 'h-full w-full object-cover' : 'h-full w-full object-contain'} /> : kind === 'organisations' ? <span className="nb-monogram" aria-hidden>{name.charAt(0)}</span> : <Icon className="h-8 w-8 text-muted-foreground" aria-hidden />}
   </div>;
 }
 function RelatedCard({ kind, entry }: { kind: EntityKey; entry: RelatedEntry }) {
@@ -56,13 +57,14 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
   const label = isPerson ? 'Person' : kind === 'episodes' ? 'Podcast' : humanize(text(row, kind === 'events' ? 'event_type' : 'type') ?? kind);
   return <article className="nb-container nb-section">
     <div className="mb-8"><Link to="/explore" search={EMPTY_SEARCH} className="nb-link inline-flex items-center gap-2"><ArrowLeft className="h-4 w-4" aria-hidden />Explore</Link></div>
-    <header className="border-b border-hairline pb-10">
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+    <header data-profile-identity data-profile-detail={isOrg ? [label, text(row, 'city')].filter(Boolean).join(', ') : undefined} className="pb-10">
+      <div className={isOrg ? 'flex items-start gap-4' : 'flex flex-col gap-6 sm:flex-row sm:items-start'}>
         {(isOrg || isPerson || (profile.image && kind !== 'episodes')) && <ProfileImage image={profile.image} name={profile.title} kind={kind} />}
-        <div className="min-w-0 flex-1"><p className="nb-eyebrow mb-3">{label}</p><h1 className="nb-h1 break-words">{profile.title}</h1>{profile.summary && kind !== 'episodes' && <p className="nb-lead mt-4 break-words">{profile.summary}</p>}</div>
+        <div className="min-w-0 flex-1"><p className="nb-eyebrow mb-3">{label}</p><h1 className="nb-h1 break-words">{profile.title}</h1>{isOrg && text(row, 'city') && <p className="nb-small mt-3 text-muted-foreground">{text(row, 'city')}</p>}{profile.summary && kind !== 'episodes' && <p className="nb-lead mt-4 break-words">{profile.summary}</p>}</div>
       </div>
       {profile.terms.length > 0 && <div className="mt-6 flex flex-wrap gap-2" aria-label="Tags">{profile.terms.map((term) => <span key={term.id} className="nb-chip max-w-full"><span className="truncate">{term.name}</span></span>)}</div>}
     </header>
+    {isOrg && <RelationshipMap profile={profile} link={(relatedKind, entry) => <EntryLink kind={relatedKind} entry={entry} className="nb-link">{entry.title}</EntryLink>} />}
     {kind === 'episodes' && safeWebUrl(text(row, 'embed_url')) && <div className="mt-10 aspect-video w-full overflow-hidden rounded-[var(--radius)] border border-hairline"><iframe src={safeWebUrl(text(row, 'embed_url')) ?? undefined} title={`Watch ${profile.title}`} className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen loading="lazy" /></div>}
     <div className={isOrg && !description ? 'max-w-2xl py-10' : 'nb-profile-layout py-10'}>
       {!(isOrg && !description) && <section className="min-w-0" aria-label={isPerson ? 'Biography' : 'Description'}>

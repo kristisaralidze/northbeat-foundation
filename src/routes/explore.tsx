@@ -8,6 +8,8 @@ import { DirectoryFilters } from "@/components/site/DirectoryFilters";
 import { getDirectory } from "@/lib/explore.functions";
 import { EMPTY_SEARCH, FACETS, cleanExploreSearch, filterOrganisations, parseExploreSearch, type ExploreSearch, type Facet } from "@/lib/explore";
 import { humanize } from "@/lib/admin/entities";
+import { LayoutResults } from '@/components/site/LayoutResults';
+import { FilterSheet } from '@/components/site/FilterSheet';
 
 const directoryQuery = queryOptions({ queryKey: ["public-organisations"], queryFn: () => getDirectory(), staleTime: 60_000 });
 
@@ -46,27 +48,27 @@ function Explore() {
   const toggle = (facet: Facet, value: string) => { void navigate({ search: (prev) => ({ ...prev, [facet]: prev[facet].includes(value) ? prev[facet].filter((v) => v !== value) : [...prev[facet], value] }), resetScroll: false }); };
   const clear = () => { void navigate({ search: EMPTY_SEARCH, resetScroll: false }); };
   return <div className="nb-container py-12 md:py-16">
-    <div className="mb-10 border-b border-hairline pb-8">
-      <p className="nb-eyebrow mb-3">The Nordic health innovation directory</p>
-      <h1 className="nb-h1">Explore</h1>
-    </div>
-    <div className="nb-directory-layout">
-      <div className="relative min-w-0 lg:col-start-2 lg:row-start-1">
+    <div data-explore-bar className="nb-explore-bar">
+      <div><h1 className="nb-h1">Explore</h1></div>
+      <div className="relative min-w-0 flex-1">
         <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
         <input type="search" aria-label="Search organisations" placeholder="Search organisations…" value={search.q} onChange={(event) => { void navigate({ search: (prev) => ({ ...prev, q: event.target.value }), replace: true, resetScroll: false }); }} className="nb-input pl-12" />
       </div>
-      <aside aria-label="Organisation filters" className="lg:col-start-1 lg:row-start-1 lg:row-span-2">
+      <p className="nb-small text-muted-foreground" aria-live="polite">{results.length} {results.length === 1 ? 'organisation' : 'organisations'}</p>
+      <Button variant="ghost" title="Filters" aria-label="Filters" className="lg:hidden" onClick={() => setFiltersOpen(true)}><SlidersHorizontal />Filters</Button>
+    </div>
+    <div className="nb-directory-layout">
+      <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen}><DirectoryFilters data={data} search={search} onToggle={toggle} /></FilterSheet>
+      <aside aria-label="Organisation filters" data-native-scroll className="nb-sticky-filters hidden lg:block lg:col-start-1">
         <div className="mb-6 hidden items-center justify-between gap-3 lg:flex">
           <h2 className="nb-h3">Filters</h2>
           {(selected.length > 0 || search.q) && <Button variant="ghost" size="sm" onClick={clear} className="text-primary">Clear all</Button>}
         </div>
-        <Button variant="ghost" className="nb-btn nb-btn-quiet nb-btn-block lg:hidden" aria-expanded={filtersOpen} aria-controls="directory-filters" onClick={() => setFiltersOpen((open) => !open)}><SlidersHorizontal aria-hidden />{filtersOpen ? "Hide filters" : `Show filters${selected.length ? ` (${selected.length})` : ""}`}</Button>
-        <div id="directory-filters" className={filtersOpen ? "mt-6 block lg:mt-0" : "hidden lg:block"}><DirectoryFilters data={data} search={search} onToggle={toggle} /></div>
+        <div id="directory-filters" className="block"><DirectoryFilters data={data} search={search} onToggle={toggle} /></div>
       </aside>
       <section aria-label="Organisations" className="min-w-0 lg:col-start-2">
         {selected.length > 0 && <div className="flex flex-wrap gap-2">{selected.map(({ facet, value, label }) => <Button key={`${facet}-${value}`} variant="ghost" size="sm" className="nb-chip" data-active="true" onClick={() => toggle(facet, value)} aria-label={`Remove ${label} filter`}>{label}<X className="h-3 w-3" aria-hidden /></Button>)}</div>}
-        <p className="nb-small my-6 text-muted-foreground" aria-live="polite">{results.length} {results.length === 1 ? "organisation" : "organisations"}</p>
-        {results.length ? <div className="grid grid-cols-1 gap-6 md:grid-cols-2">{results.map((org) => <OrganisationCard key={org.id} organisation={org} terms={data.terms} />)}</div> : <div className="border-y border-hairline py-16">
+        {results.length ? <LayoutResults signature={results.map(org => org.id).join(',')}>{results.map((org) => <OrganisationCard key={org.id} organisation={org} terms={data.terms} />)}</LayoutResults> : <div className="py-16">
           <h2 className="nb-h2">{data.organisations.length ? "No matching organisations" : "No organisations yet"}</h2>
           <p className="nb-body mt-4 text-muted-foreground">{data.organisations.length ? "Try a different search or fewer filters." : "We’re adding organisations to the directory."}</p>
           {(selected.length > 0 || search.q) && <Button variant="ghost" onClick={clear} className="nb-btn nb-btn-secondary mt-6">Clear search and filters</Button>}

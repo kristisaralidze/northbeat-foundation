@@ -8,6 +8,8 @@ import { opportunitiesQuery } from '@/lib/opportunities.query';
 import { compactSearch } from '@/lib/search-params';
 import { amountLabel, deadlineLabel, filterOpportunities } from '@/lib/opportunities';
 import { publicTitle } from '@/lib/profiles';
+import { DateTimeline } from '@/components/site/DateTimeline';
+import { closingDays } from '@/lib/timeline';
 
 const searchSchema = z.object({
   type: fallback(z.string(), '').default(''),
@@ -49,7 +51,7 @@ function Opportunities() {
 
   return <div className="nb-container nb-section">
     <header className="mb-8 flex flex-wrap items-end justify-between gap-6">
-      <div><p className="nb-eyebrow mb-3">Nordic health innovation</p><h1 className="nb-h1">Opportunities</h1></div>
+      <div><h1 className="nb-h1">Opportunities</h1></div>
       <div className="flex gap-2" aria-label="Opportunity period">
         <Button variant="ghost" className={`nb-btn ${!search.archive ? 'nb-btn-primary' : 'nb-btn-quiet'}`} aria-pressed={!search.archive} onClick={() => update({ archive: false })}>Open</Button>
         <Button variant="ghost" className={`nb-btn ${search.archive ? 'nb-btn-primary' : 'nb-btn-quiet'}`} aria-pressed={search.archive} onClick={() => update({ archive: true })}>Closed</Button>
@@ -77,14 +79,14 @@ function Opportunities() {
       {hasFilters && <Button variant="ghost" className="nb-btn nb-btn-quiet" onClick={() => update({ type: '', field: '', stage: '' })}>Clear filters</Button>}
     </div>
     <p className="nb-small my-6 text-muted-foreground" role="status">{opportunities.length} {search.archive ? 'closed' : 'open'} {opportunities.length === 1 ? 'opportunity' : 'opportunities'}{!search.archive && opportunities.length > 0 ? ' · nearest deadline first' : ''}</p>
-    {opportunities.length > 0 && <ul className="space-y-4">
-      {opportunities.map((opportunity) => {
+    {opportunities.length > 0 && <DateTimeline items={opportunities} date={opportunity => opportunity.deadline_at} now={data.now} earlier={search.archive}>
+      {(opportunity) => {
         const amount = amountLabel(opportunity);
         const job = opportunity.type === 'job';
-        return <li key={opportunity.id} className="nb-card">
+        return <article key={opportunity.id} className="py-6">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <p className="nb-eyebrow">{humanize(opportunity.type)}</p>
-            <p className="nb-small text-muted-foreground">{deadlineLabel(opportunity, data.now)}</p>
+            <p className={`nb-small ${closingDays(opportunity.deadline_at, data.now) !== null ? 'text-primary' : 'text-muted-foreground'}`}>{closingDays(opportunity.deadline_at, data.now) !== null ? `Closes in ${closingDays(opportunity.deadline_at, data.now)} days` : deadlineLabel(opportunity, data.now)}</p>
           </div>
           <h2 className="nb-h3 mt-2"><Link to="/opportunity/$slug" params={{ slug: opportunity.slug }} className="nb-org-link break-words">{publicTitle(opportunity.title)}</Link></h2>
           {opportunity.summary && <p className="nb-body mt-2 text-muted-foreground">{opportunity.summary}</p>}
@@ -93,9 +95,9 @@ function Opportunities() {
             {job && opportunity.location && <span className="nb-chip">{opportunity.location}{opportunity.remote_ok ? ' · remote OK' : ''}</span>}
             {job && opportunity.employment_type && <span className="nb-chip">{humanize(opportunity.employment_type)}</span>}
           </div>
-        </li>;
-      })}
-    </ul>}
+        </article>;
+      }}
+    </DateTimeline>}
     {opportunities.length === 0 && <div className="py-12">
       <h2 className="nb-h3">{search.archive ? 'No closed opportunities found' : 'No open opportunities found'}</h2>
       <p className="nb-body mt-3 text-muted-foreground">{hasFilters ? 'No opportunities match these filters.' : 'We’re adding opportunities. Check back soon.'}</p>

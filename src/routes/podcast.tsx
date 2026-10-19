@@ -29,7 +29,7 @@ function Podcast() {
   const { data } = useSuspenseQuery(podcastQuery);
   const episodes = sortEpisodes(data.episodes);
   return <div className="nb-container nb-section">
-    <header className="mb-8"><p className="nb-eyebrow mb-3">The Northbeat podcast</p><h1 className="nb-h1">Podcast</h1>
+    <header className="mb-8"><h1 className="nb-h1">Podcast</h1>
       <p className="nb-lead mt-4 max-w-2xl">Conversations with the people building Nordic health startups.</p></header>
     <p className="nb-small mb-6 text-muted-foreground" role="status">{episodes.length} {episodes.length === 1 ? 'episode' : 'episodes'}</p>
     {episodes.length > 0 && <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -31,7 +31,6 @@ function NewsletterPage() {
   return (
     <div className="nb-page">
       <header className="nb-page-header">
-        <p className="nb-eyebrow">Newsletter</p>
         <h1 className="nb-h1">The Northbeat letter</h1>
         <p className="nb-lead">Funding calls, programme intakes and events in Nordic health innovation. We track it so you don't miss it.</p>
       </header>
@@ -40,7 +39,7 @@ function NewsletterPage() {
         <p className="nb-small text-muted-foreground">One email when a new issue is out.</p>
         <NewsletterSignup source="newsletter" />
       </section>
-      <section aria-label="Past issues" className="mt-10">
+      {issues.length > 0 && <section aria-label="Past issues" className="mt-10">
         <h2 className="nb-h2">Past issues</h2>
         {issues.length === 0 ? (
           <p className="nb-body text-muted-foreground">No past issues yet.</p>
@@ -57,7 +56,7 @@ function NewsletterPage() {
             ))}
           </ul>
         )}
-      </section>
+      </section>}
     </div>
   );
 }

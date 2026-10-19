@@ -1,9 +1,10 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { Menu, X } from "lucide-react";
-import { Wordmark } from "./PulseLine";
+import { LaboratoryWordmark } from "./LaboratoryWordmark";
 import { NewsletterSignup } from "./NewsletterSignup";
 import { Button } from "@/components/ui/button";
+import { PublicScrollFrame } from './PublicScrollFrame';
 
 const NAV = [
   { to: "/explore", label: "Explore" },
@@ -26,8 +27,8 @@ function Header({ isHome }: { isHome: boolean }) {
   return (
     <header className="sticky top-0 z-40 border-b border-hairline bg-background">
       <div className="nb-container flex h-16 items-center justify-between gap-6">
-        <Link to="/" aria-label="Northbeat home" className={`shrink-0${isHome ? ' nb-home-header-logo' : ''}`} onClick={() => setOpen(false)}>
-          {isHome ? <span className="nb-wordmark">Northbeat</span> : <Wordmark />}
+        <Link to="/" aria-label="Northbeat home" className={`shrink-0 nb-site-logo${isHome ? ' nb-home-header-logo' : ''}`} onClick={() => setOpen(false)}>
+          <LaboratoryWordmark compact />
         </Link>
         <nav aria-label="Main" className="hidden lg:block">
           <ul className="flex items-center gap-6">
@@ -74,17 +75,17 @@ function Header({ isHome }: { isHome: boolean }) {
   );
 }
 
-function Footer() {
+function Footer({ hideSignup }: { hideSignup: boolean }) {
   return (
     <footer className="mt-auto border-t border-hairline bg-frost-wash">
       <div className="nb-container grid gap-10 py-14 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] md:gap-16">
-        <div className="max-w-md space-y-4">
+        {!hideSignup && <div className="max-w-md space-y-4">
           <h2 className="nb-h3 text-ink">We track it so you don't miss it.</h2>
           <p className="nb-small text-muted-foreground">Funding calls, programme intakes and events in Nordic health innovation, in one email.</p>
           <NewsletterSignup source="footer" />
-        </div>
+        </div>}
         <div className="flex flex-col justify-between gap-8 md:items-end">
-          <span className="nb-wordmark text-ink">Northbeat</span>
+          <span className="nb-site-logo"><LaboratoryWordmark compact /></span>
           <ul className="flex gap-6 nb-small">
             <li><Link to="/about" className="nb-link">About</Link></li>
             <li><Link to="/privacy" className="nb-link">Privacy</Link></li>
@@ -99,15 +100,16 @@ function Footer() {
 }
 
 export function SiteLayout({ children }: { children: ReactNode }) {
-  const isHome = useLocation({ select: location => location.pathname === '/' });
+  const pathname = useLocation({ select: location => location.pathname });
+  const isHome = pathname === '/';
   return (
-    <div className={`theme-site flex min-h-screen flex-col${isHome ? ' nb-home-shell' : ''}`}>
+    <div className={`theme-site flex min-h-screen flex-col${isHome ? ' nb-home-shell' : ' nb-public-shell'}`}>
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 nb-btn nb-btn-primary nb-btn-sm">
         Skip to content
       </a>
       <Header isHome={isHome} />
-      <main id="main" className="flex-1">{children}</main>
-      <Footer />
+      <main id="main" className="flex-1">{isHome ? children : <PublicScrollFrame key={pathname} pathname={pathname}>{children}</PublicScrollFrame>}</main>
+      <Footer hideSignup={pathname === '/newsletter' || pathname === '/newsletter/'} />
     </div>
   );
 }
