@@ -38,7 +38,9 @@ describe('public profiles', () => {
     const entries = Array.from({ length: 3 }, (_, i) => ({ id: String(i), slug: String(i), title: String(i), summary: null, image: null, roles: [] }));
     profile.related = [{ kind: 'organisations', label: 'Partners', entries: entries.slice(0, 2) }];
     expect(showRelationshipMap(profile)).toBe(false);
-    profile.related[0]?.entries.push(entries[2] ?? entries[0]);
+    const third = entries[2];
+    if (!third) throw new Error('Missing third test connection');
+    profile.related[0]?.entries.push(third);
     expect(showRelationshipMap(profile)).toBe(true);
     profile.related = [{ kind: 'organisations', label: 'Partners', entries: [entries[0], entries[0], entries[1]].filter((e): e is NonNullable<typeof e> => Boolean(e)) }];
     expect(showRelationshipMap(profile)).toBe(false);
