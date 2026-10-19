@@ -16,7 +16,7 @@ export function EntityList({ entity, filters }: { entity: EntityKey; filters: Li
   const [q, setQ] = useState(filters.q ?? "");
 
   const setFilter = (patch: Partial<ListFilters>) =>
-    navigate({ to: ".", search: (prev: ListFilters) => ({ ...prev, ...patch }) as never, replace: true });
+    navigate({ to: ".", search: (prev) => ({ ...prev, ...patch }), replace: true });
 
   useEffect(() => {
     const t = setTimeout(() => {
