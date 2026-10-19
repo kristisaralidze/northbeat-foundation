@@ -66,7 +66,7 @@ async function loadOrgRelations(client: SupabaseClient, orgId: string): Promise<
     for (let offset = 0; ; offset += 1000) {
       const { data, error } = await client.from('organisation_relations').select('from_org_id,to_org_id,relation').eq(column, orgId).order('id').range(offset, offset + 999);
       if (error) throw new Error('Related organisations could not be loaded.');
-      relations.push(...(data ?? []));
+      for (const rel of data ?? []) if (!relations.some((seen) => seen.from_org_id === rel.from_org_id && seen.to_org_id === rel.to_org_id && seen.relation === rel.relation)) relations.push(rel);
       if (!data || data.length < 1000) break;
     }
   }
