@@ -1,6 +1,20 @@
 import { describe, it, expect } from 'vitest';
-import { clampGlobeDistance, isNordic, NORDIC_CITIES } from './globe';
+import { clampGlobeDistance, globeScrollDistance, recoverGlobeRotation, GLOBE_ROTATION_SPEED, isNordic, NORDIC_CITIES } from './globe';
 describe('Nordic globe', () => {
+  it('scrolls closer and reverses to the whole globe with bounded endpoints', () => {
+    expect(globeScrollDistance(0)).toBe(3.3);
+    expect(globeScrollDistance(1)).toBeCloseTo(2.35);
+    expect(globeScrollDistance(.5)).toBeCloseTo(2.825);
+    expect(globeScrollDistance(-1)).toBe(3.3);
+    expect(globeScrollDistance(2)).toBeCloseTo(2.35);
+  });
+  it('stops while dragging and gradually resumes slow rotation after release', () => {
+    expect(recoverGlobeRotation(GLOBE_ROTATION_SPEED, 1, true)).toBe(0);
+    const first = recoverGlobeRotation(0, .1, false);
+    expect(first).toBeGreaterThan(0);
+    expect(first).toBeLessThan(GLOBE_ROTATION_SPEED);
+    expect(recoverGlobeRotation(first, 10, false)).toBeCloseTo(GLOBE_ROTATION_SPEED);
+  });
   it('highlights only the five Nordic countries', () => {
     expect(['FIN','SWE','NOR','DNK','ISL','DEU','RUS','USA'].filter(isNordic)).toEqual(['FIN','SWE','NOR','DNK','ISL']);
   });

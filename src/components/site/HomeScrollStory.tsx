@@ -41,7 +41,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
             duration: 1.05,
             syncTouch: false,
             anchors: true,
-            prevent: node => node.id === 'mobile-nav' || node.dataset['wheelActive'] === 'true',
+            prevent: node => node.id === 'mobile-nav',
             virtualScroll: () => document.body.style.overflow !== 'hidden',
           });
           lenis.on('scroll', ScrollTrigger.update);
@@ -105,16 +105,17 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
               gsap.set([network, globeWrapper], { position: 'absolute', inset: 0, height: '100%' });
               gsap.set(globeWrapper, { autoAlpha: 0, yPercent: 65, scale: .18 });
               gsap.set(stage, { pointerEvents: 'none' });
-              gsap.set('.nb-globe-controls', { autoAlpha: 0 });
               gsap.set('.nb-home-globe-line', { autoAlpha: 0 });
               notify(svg, 'northbeat:network-progress', 0);
               notify(stage, 'northbeat:globe-progress', 0);
-              const progress = { network: 0, globe: 0 };
+              notify(stage, 'northbeat:globe-zoom', 0);
+              const progress = { network: 0, globe: 0, zoom: 0 };
               const settleWorld = (self: ScrollTriggerInstance, final: boolean) => {
                 self.getTween()?.progress(1);
                 self.animation?.progress(final ? 1 : 0);
                 notify(svg, 'northbeat:network-progress', final ? 1 : 0);
                 notify(stage, 'northbeat:globe-progress', final ? 1 : 0);
+                notify(stage, 'northbeat:globe-zoom', final ? 1 : 0);
                 if (final) {
                   gsap.set(globeWrapper, { autoAlpha: 1, x: 0, y: 0, xPercent: 0, yPercent: 0, scale: 1 });
                   gsap.set(stage, { pointerEvents: 'auto' });
@@ -136,9 +137,8 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
                 .to(globeWrapper, { autoAlpha: 1, yPercent: 0, scale: 1, duration: .9, ease: 'none' }, 2)
                 .to(progress, { globe: 1, duration: .9, ease: 'none', onUpdate: () => notify(stage, 'northbeat:globe-progress', progress.globe) }, 2)
                 .to('.nb-home-globe-line', { autoAlpha: 1, duration: .15, ease: 'none' }, 2.75)
-                .to('.nb-globe-controls', { autoAlpha: 1, duration: .2, ease: 'none' }, 2.9)
                 .set(stage, { pointerEvents: 'auto' }, 2.9)
-                .to({}, { duration: .3 }, 3.1);
+                .to(progress, { zoom: 1, duration: .5, ease: 'none', onUpdate: () => notify(stage, 'northbeat:globe-zoom', progress.zoom) }, 2.9);
             }
             const happening = story.querySelector<HTMLElement>('.nb-home-happening');
             const track = happening?.querySelector<HTMLElement>('.nb-home-happening-track');
@@ -180,6 +180,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
             restoreWordmark();
             notify(story.querySelector('.nb-network-figure'), 'northbeat:network-progress', 1);
             notify(story.querySelector('.nb-globe-stage'), 'northbeat:globe-progress', 1);
+            notify(story.querySelector('.nb-globe-stage'), 'northbeat:globe-zoom', 0);
           };
         });
         cleanup = () => media.revert();
