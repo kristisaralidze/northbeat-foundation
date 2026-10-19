@@ -571,21 +571,21 @@
   padding: 28px 48px 64px;
 }
 .direction-stained {
-  --direction-paper: oklch(0.9857 0.0027 286.3); /* #FAFAFC */
-  --direction-rule: oklch(0.8989 0.0125 281.7); /* #DCDDE6 */
-  --direction-accent: oklch(0.3543 0.1037 290.6); /* #3D3270 */
-  --direction-signal: oklch(0.7881 0.0909 350.4); /* #E9A3C0 */
-  --direction-ink: oklch(0.1919 0.0251 295); /* #14121F */
+  --direction-paper: oklch(0.985664 0.002640 286.351); /* #FAFAFC */
+  --direction-rule: oklch(0.899408 0.012259 281.065); /* #DCDDE6 */
+  --direction-accent: oklch(0.363109 0.103054 288.328); /* #3D3270 */
+  --direction-signal: oklch(0.790936 0.090242 352.818); /* #E9A3C0 */
+  --direction-ink: oklch(0.191359 0.026132 290.764); /* #14121F */
   --direction-font: "Schibsted Grotesk", sans-serif;
   --direction-glass: color-mix(in oklab, var(--direction-paper) 55%, transparent);
   --direction-frost: color-mix(in oklab, var(--direction-rule) 52%, transparent);
 }
 .direction-chart {
-  --direction-paper: oklch(0.9723 0.0034 247.9); /* #F4F6F8 */
-  --direction-rule: oklch(0.8592 0.0149 242.6); /* #C9D2DA */
-  --direction-accent: oklch(0.3289 0.04 171.9); /* #1E3B34 */
-  --direction-signal: oklch(0.7254 0.147 61.7); /* #E8913A */
-  --direction-ink: oklch(0.2108 0.015 187.5); /* #111B1A */
+  --direction-paper: oklch(0.972191 0.003423 247.858); /* #F4F6F8 */
+  --direction-rule: oklch(0.859244 0.014825 244.743); /* #C9D2DA */
+  --direction-accent: oklch(0.327029 0.037481 176.498); /* #1E3B34 */
+  --direction-signal: oklch(0.732110 0.144101 61.663); /* #E8913A */
+  --direction-ink: oklch(0.212026 0.014620 188.434); /* #111B1A */
   --direction-font: "Familjen Grotesk", sans-serif;
   --direction-grid: color-mix(in oklab, var(--direction-rule) 46%, transparent);
   background-image: linear-gradient(var(--direction-grid) 1px, transparent 1px), linear-gradient(90deg, var(--direction-grid) 1px, transparent 1px);
@@ -593,9 +593,9 @@
   font-variant-numeric: tabular-nums;
 }
 .direction-archive {
-  --direction-paper: oklch(0.9496 0.003 264.5); /* #EDEEF0 */
+  --direction-paper: oklch(0.948921 0.002888 264.542); /* #EDEEF0 */
   --direction-white: oklch(1 0 0);
-  --direction-ink: oklch(0.289 0.007 275); /* #2A2B2F */
+  --direction-ink: oklch(0.289650 0.007384 274.709); /* #2A2B2F */
   --direction-rule: color-mix(in oklab, var(--direction-ink) 22%, var(--direction-paper));
   --direction-accent: var(--direction-ink);
   --direction-font: "Schibsted Grotesk", sans-serif;

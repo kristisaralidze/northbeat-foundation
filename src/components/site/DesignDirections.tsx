@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import histology from "@/assets/directions-histology.jpg";
+import { EMPTY_SEARCH } from "@/lib/explore";
 
 const INTRO = "Every founder, investor, programme and deadline in Nordic health, in one place. We track it so you don't miss it.";
 const DEADLINES = [
@@ -63,7 +64,7 @@ export function DesignDirections() {
         <div className="stained-hero">
           <p className="direction-wordmark">NORTHBEAT</p>
           <div className="stained-field"><img src={histology} alt="Generated pink and violet stained tissue micrograph" width={1024} height={1024} /></div>
-          <div className="direction-intro"><p>{INTRO}</p><Link to="/explore" className="direction-action">Explore the hub</Link></div>
+          <div className="direction-intro"><p>{INTRO}</p><Link to="/explore" search={EMPTY_SEARCH} className="direction-action">Explore the hub</Link></div>
         </div>
         <div className="stained-content">
           <div className="direction-deadline-block"><h2 className="direction-heading">Upcoming deadlines</h2><DeadlineRows /></div>
@@ -76,7 +77,7 @@ export function DesignDirections() {
         <h2 className="direction-label" id="chart-title">Nordic field chart</h2>
         <div className="chart-hero">
           <p className="direction-wordmark">NORTHBEAT</p>
-          <div className="direction-intro"><p>{INTRO}</p><Link to="/explore" className="direction-action">Explore the hub</Link></div>
+          <div className="direction-intro"><p>{INTRO}</p><Link to="/explore" search={EMPTY_SEARCH} className="direction-action">Explore the hub</Link></div>
           <div className="chart-field" aria-hidden="true"><span className="chart-axis axis-horizontal" /><span className="chart-axis axis-vertical" /><span className="chart-orbit" /><span className="chart-signal" /></div>
         </div>
         <div className="chart-content">
@@ -91,7 +92,7 @@ export function DesignDirections() {
         <div className="archive-hero">
           <Exhibit shape="slide" />
           <p className="direction-wordmark">NORTHBEAT</p>
-          <div className="direction-intro"><p>{INTRO}</p><Link to="/explore" className="direction-action">Explore the hub</Link></div>
+          <div className="direction-intro"><p>{INTRO}</p><Link to="/explore" search={EMPTY_SEARCH} className="direction-action">Explore the hub</Link></div>
         </div>
         <div className="archive-content">
           <div className="direction-deadline-block"><Exhibit shape="ring" /><h2 className="direction-heading">Upcoming deadlines</h2><DeadlineRows /></div>
