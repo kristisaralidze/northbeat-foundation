@@ -36,7 +36,7 @@ const LINK: Record<Kind, { table: 'organisation_terms' | 'opportunity_terms' | '
   events: { table: 'event_terms', fk: 'event_id', cols: 'id,slug,title,summary,starts_at,ends_at', title: 'title', summary: 'summary' },
 };
 /** Published entries of one kind tagged with any of the given terms, with each entry's full tag list. */
-async function tagged(c: Client, kind: Kind, termIds: string[]) {
+async function tagged(c: Client, kind: Kind, termIds: string[], includePastEvents = false) {
   if (!termIds.length) return [];
   const cfg = LINK[kind];
   const hits = await all<Record<string, string>>((a, b) => c.from(cfg.table).select(`${cfg.fk},term_id`).in('term_id', termIds).order(cfg.fk).order('term_id').range(a, b) as never);
@@ -48,8 +48,10 @@ async function tagged(c: Client, kind: Kind, termIds: string[]) {
     const rows = await all<Record<string, string | null>>((a, b) => c.from(kind).select(cfg.cols).eq('status', 'published').in('id', chunk).order('id').range(a, b) as never);
     const links = await all<Record<string, string>>((a, b) => c.from(cfg.table).select(`${cfg.fk},term_id`).in(cfg.fk, chunk).order(cfg.fk).order('term_id').range(a, b) as never);
     for (const r of rows) {
-      if (kind === 'events') { const end = r['ends_at'] ?? r['starts_at']; if (end && new Date(end).getTime() < now) continue; }
-      out.push({ id: r['id']!, slug: r['slug']!, title: publicTitle(r[cfg.title] ?? ''), summary: r[cfg.summary] ?? null, termIds: links.filter((l) => l[cfg.fk] === r['id']).map((l) => l['term_id']).filter((id): id is string => Boolean(id)) });
+      if (kind === 'events' && !includePastEvents) { const end = r['ends_at'] ?? r['starts_at']; if (end && new Date(end).getTime() < now) continue; }
+      const id = r['id']; const slug = r['slug'];
+      if (!id || !slug) continue;
+      out.push({ id, slug, title: publicTitle(r[cfg.title] ?? ''), summary: r[cfg.summary] ?? null, termIds: links.filter((l) => l[cfg.fk] === id).map((l) => l['term_id']).filter((id): id is string => Boolean(id)) });
     }
   }
   return out.sort((a, b) => a.title.localeCompare(b.title));
@@ -77,18 +79,17 @@ export const getGuide = createServerFn({ method: 'GET' }).inputValidator(z.objec
   const { data: row, error } = await c.from('guides').select(`${GUIDE_CARD},summary,body,next_step,reviewed_by,last_checked,sources`).eq('status', 'published').eq('slug', data.slug).maybeSingle();
   if (error) throw new Error('This guide could not be loaded. Please try again.');
   if (!row) return null;
-  const [list, guideRows, tagRows] = await Promise.all([terms(c, ['area', 'journey_step', 'field']), guides(c), c.from('guide_terms').select('term_id').eq('guide_id', row.id)]);
-  if (tagRows.error) throw new Error('This guide could not be loaded. Please try again.');
-  const fieldIds = (tagRows.data ?? []).map((t) => t.term_id).filter((id) => list.some((t) => t.id === id && t.kind === 'field'));
+  const [list, guideRows] = await Promise.all([terms(c, ['area', 'journey_step']), guides(c)]);
   const steps = list.filter((t) => t.kind === 'journey_step');
   const stepOrder = new Map(steps.map((t, i) => [t.id, i]));
-  const [orgs, opps] = row.journey_step_id ? await Promise.all([tagged(c, 'organisations', [row.journey_step_id]), tagged(c, 'opportunities', [row.journey_step_id])]) : [[], []];
+  const [orgs, opps, events] = row.journey_step_id ? await Promise.all([tagged(c, 'organisations', [row.journey_step_id]), tagged(c, 'opportunities', [row.journey_step_id]), tagged(c, 'events', [row.journey_step_id], true)]) : [[], [], []];
   const term = (id: string | null) => { const t = list.find((x) => x.id === id); return t ? { id: t.id, name: t.name, slug: t.slug, sort_order: t.sort_order } : null; };
   const { sources, ...guide } = row;
   return {
     guide: cleanGuide(guide), area: term(row.area_id), step: term(row.journey_step_id), sources: parseSources(sources),
-    organisations: orgs.filter((o) => sharesHub(o.termIds, row.journey_step_id, fieldIds)).map(strip),
-    opportunities: opps.filter((o) => sharesHub(o.termIds, row.journey_step_id, fieldIds)).map(strip),
+    organisations: orgs.filter((o) => sharesHub(o.termIds, row.journey_step_id)).map(strip),
+    opportunities: opps.filter((o) => sharesHub(o.termIds, row.journey_step_id)).map(strip),
+    events: events.filter((o) => sharesHub(o.termIds, row.journey_step_id)).map(strip),
     ...areaNeighbours(guideRows, row.id, stepOrder),
   };
 });
