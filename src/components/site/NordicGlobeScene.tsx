@@ -11,7 +11,7 @@ function World({ palette }: Pick<Props, 'palette'>) {
     const geometry = (rows: number[][]) => { const g = new BufferGeometry(); g.setAttribute('position', new Float32BufferAttribute(rows.flatMap(p => globePosition(p[0] ?? 0, p[1] ?? 0, 1.002)), 3)); return g; };
     const canvas = document.createElement('canvas'); canvas.width = canvas.height = 64;
     const ctx = canvas.getContext('2d');
-    if (ctx) { const gradient = ctx.createRadialGradient(32,32,0,32,32,32); gradient.addColorStop(0,palette.berry); gradient.addColorStop(.15,palette.berry); gradient.addColorStop(1,'transparent'); ctx.fillStyle = gradient; ctx.fillRect(0,0,64,64); }
+    if (ctx) { const gradient = ctx.createRadialGradient(32,32,0,32,32,32); gradient.addColorStop(0,palette.berry); gradient.addColorStop(.08,palette.berry); gradient.addColorStop(.45, `${palette.berry.replace('rgb(', 'rgba(').replace(')', ',0.25)')}`); gradient.addColorStop(1,'transparent'); ctx.fillStyle = gradient; ctx.fillRect(0,0,64,64); }
     const texture = new CanvasTexture(canvas); texture.colorSpace = SRGBColorSpace;
     const diskCanvas = document.createElement('canvas'); diskCanvas.width = diskCanvas.height = 32;
     const disk = diskCanvas.getContext('2d');
@@ -24,7 +24,7 @@ function World({ palette }: Pick<Props, 'palette'>) {
     <mesh><sphereGeometry args={[1,48,32]} /><meshBasicMaterial colorWrite={false} /></mesh>
     <points geometry={resources.land}><pointsMaterial color={palette.land} alphaMap={resources.diskTexture} alphaTest={.5} size={.009} sizeAttenuation /></points>
     <points geometry={resources.nordic}><pointsMaterial color={palette.berry} alphaMap={resources.diskTexture} alphaTest={.5} size={.015} sizeAttenuation /></points>
-    {NORDIC_CITIES.map(city => <sprite key={city.name} position={globePosition(city.lat,city.lng,1.01)} scale={[.035,.035,1]}><spriteMaterial map={resources.texture} transparent depthWrite={false} /></sprite>)}
+    {NORDIC_CITIES.map(city => <sprite key={city.name} position={globePosition(city.lat,city.lng,1.01)} scale={[.022,.022,1]}><spriteMaterial map={resources.texture} transparent opacity={.8} depthWrite={false} /></sprite>)}
   </>;
 }
 function Interaction({ visible, reduced, touched, wheel, zoom, reset, storyProgress, onFailure }: Props) {

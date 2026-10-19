@@ -72,6 +72,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
               shell.append(wordmark);
               restoreWordmark = () => slot.append(wordmark);
               gsap.set(wordmark, { position: 'fixed', zIndex: 45, pointerEvents: 'none', margin: 0 });
+              gsap.set(intro, { autoAlpha: 0 });
               const docking = gsap.timeline({
                 scrollTrigger: {
                   trigger: opening, start: 'top 64px', end: () => `+=${window.innerHeight * 0.85}`,
@@ -81,13 +82,10 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
               docking.fromTo(wordmark,
                 { left: () => startBounds().left, top: () => startBounds().top, width: () => startBounds().width },
                 { left: () => dockBounds().left, top: () => dockBounds().top, width: () => dockBounds().width, duration: 1, ease: 'none' }, 0)
-                .to('.nb-home-tagline', { autoAlpha: 0, duration: 0.5, ease: 'none' }, 0.25);
-
-              const reveal = gsap.timeline({
-                scrollTrigger: { trigger: intro, start: 'top 64px', end: () => `+=${window.innerHeight * 0.75}`, pin: true, scrub: true, invalidateOnRefresh: true },
-              });
-              reveal.fromTo('.nb-home-intro-word', { opacity: 0 }, { opacity: 1, duration: 0.12, stagger: 0.07, ease: 'none' })
-                .fromTo('.nb-home-actions', { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.3, ease: 'none' });
+                .to('.nb-home-tagline', { autoAlpha: 0, duration: 0.5, ease: 'none' }, 0.25)
+                .set(intro, { autoAlpha: 1 }, 1)
+                .fromTo('.nb-home-intro-word', { opacity: 0 }, { opacity: 1, duration: 0.06, stagger: 0.008, ease: 'none' }, 1)
+                .fromTo('.nb-home-actions', { autoAlpha: 0, y: 8 }, { autoAlpha: 1, y: 0, duration: 0.08, ease: 'none' }, 1.22);
             }
             const world = story.querySelector<HTMLElement>('.nb-home-world-scene');
             const network = story.querySelector<HTMLElement>('.nb-network-section');
@@ -95,7 +93,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
             const globe = story.querySelector<HTMLElement>('.nb-globe-section');
             const stage = globe?.querySelector('.nb-globe-stage') ?? null;
             if (world && network && svg && globe && stage) {
-              gsap.set(world, { height: 'calc(100svh - 4rem)', position: 'relative' });
+              gsap.set(world, { height: 'min(calc(100svh - 4rem), 900px)', position: 'relative' });
               gsap.set([network, globe], { position: 'absolute', inset: 0, height: '100%' });
               gsap.set(globe, { autoAlpha: 0, yPercent: 65, scale: .18 });
               gsap.set(stage, { pointerEvents: 'none' });
@@ -111,7 +109,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
                 .to(network, { scale: .015, autoAlpha: 0, duration: .9, ease: 'none' }, 2)
                 .to(globe, { autoAlpha: 1, yPercent: 0, scale: 1, duration: .9, ease: 'none' }, 2)
                 .to(progress, { globe: 1, duration: .9, ease: 'none', onUpdate: () => notify(stage, 'northbeat:globe-progress', progress.globe) }, 2)
-                .to('.nb-home-globe-line', { autoAlpha: 1, duration: .2, ease: 'none' }, 2.9)
+                .to('.nb-home-globe-line', { autoAlpha: 1, duration: .15, ease: 'none' }, 2.75)
                 .to('.nb-globe-controls', { autoAlpha: 1, duration: .2, ease: 'none' }, 2.9)
                 .set(stage, { pointerEvents: 'auto' }, 2.9)
                 .to({}, { duration: .3 }, 3.1);

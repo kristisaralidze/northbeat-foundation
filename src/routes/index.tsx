@@ -37,7 +37,6 @@ function Index() {
         <div className="nb-home-wordmark-slot"><LaboratoryWordmark /></div>
         <p className="nb-home-tagline">The heartbeat of Nordic health innovation.</p>
       </div>
-    </section>
     <section className="nb-home-intro-section">
       <div className="nb-home-intro nb-container">
         <p className="nb-home-intro-line" aria-label="The map of the Nordic health ecosystem: the companies, the capital, the science and the people behind them.">
@@ -48,6 +47,7 @@ function Index() {
           <Link to="/newsletter" className="nb-link">Get the newsletter</Link>
         </div>
       </div>
+    </section>
     </section>
     <div className="nb-home-world-scene">
       <EcosystemNetwork />
