@@ -253,8 +253,18 @@ html.lenis, html.lenis body { height: auto; }
 
 .nb-home-wordmark-section {
   width: 100%;
-  padding: var(--space-16) var(--gutter) var(--space-24);
+  height: calc(100svh - 4rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--gutter);
 }
+.nb-home-opening-content { width: 100%; text-align: center; }
+.nb-home-wordmark-slot { width: 100%; aspect-ratio: 9 / 1; }
+.nb-home-tagline { margin-top: var(--space-8); color: var(--ink-soft); font-size: 1.125rem; }
+.nb-home-header-logo { display: flex; align-items: center; width: 9rem; height: 2.5rem; }
+.nb-home-intro-section { min-height: calc(100svh - 4rem); display: flex; align-items: center; padding-block: var(--space-16); }
+.nb-home-intro-word { display: inline-block; white-space: pre; }
 .nb-laboratory-wordmark {
   width: 100%;
   margin: 0;
@@ -275,14 +285,15 @@ html.lenis, html.lenis body { height: auto; }
   letter-spacing: 0;
 }
 @media (max-width: 40rem) {
-  .nb-home-wordmark-section { padding-block: var(--space-12) var(--space-16); }
+  .nb-home-header-logo { width: 7rem; }
+  .nb-home-tagline { max-width: 18rem; margin-inline: auto; }
 }
 .nb-home-intro {
-  margin-top: var(--space-8);
-  max-width: 44rem;
+  width: 100%;
 }
 .nb-home-intro-line {
   margin: 0;
+  max-width: 44rem;
   color: var(--ink-soft);
   font-family: var(--font-body);
   font-size: 1.125rem;
@@ -296,9 +307,12 @@ html.lenis, html.lenis body { height: auto; }
   margin-top: var(--space-6);
 }
 @media (max-width: 40rem) {
-  .nb-home-intro { margin-top: var(--space-6); }
   .nb-home-intro-line { font-size: 1.0625rem; }
   .nb-home-actions { gap: var(--space-4); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nb-home-wordmark-section { height: auto; min-height: 55svh; }
+  .nb-home-intro-section { min-height: auto; }
 }
 
 .theme-site ::selection {

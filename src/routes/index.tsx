@@ -25,18 +25,23 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <HomeScrollStory>
-    <div className="nb-home-wordmark-section">
-      <LaboratoryWordmark />
-      <div className="nb-home-intro">
-        <p className="nb-home-intro-line">
-          Map of the Nordic health ecosystem: the companies, the capital, the science and the people behind them.
+    <section className="nb-home-wordmark-section">
+      <div className="nb-home-opening-content">
+        <div className="nb-home-wordmark-slot"><LaboratoryWordmark /></div>
+        <p className="nb-home-tagline">The heartbeat of Nordic health innovation.</p>
+      </div>
+    </section>
+    <section className="nb-home-intro-section">
+      <div className="nb-home-intro nb-container">
+        <p className="nb-home-intro-line" aria-label="The map of the Nordic health ecosystem: the companies, the capital, the science and the people behind them.">
+          {'The map of the Nordic health ecosystem: the companies, the capital, the science and the people behind them.'.split(' ').map((word, index) => <span key={index} className="nb-home-intro-word" aria-hidden="true">{word}{' '}</span>)}
         </p>
         <div className="nb-home-actions">
           <Link to="/explore" search={EMPTY_SEARCH} className="nb-btn nb-btn-primary">Explore the hub</Link>
           <Link to="/newsletter" className="nb-link">Get the newsletter</Link>
         </div>
       </div>
-    </div>
+    </section>
     <EcosystemNetwork />
     <NordicGlobe />
     </HomeScrollStory>

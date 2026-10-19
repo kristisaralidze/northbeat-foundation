@@ -48,6 +48,43 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
           gsap.ticker.add(tick);
 
           const context = gsap.context(() => {
+            const opening = story.querySelector<HTMLElement>('.nb-home-wordmark-section');
+            const slot = story.querySelector<HTMLElement>('.nb-home-wordmark-slot');
+            const wordmark = story.querySelector<HTMLElement>('.nb-laboratory-wordmark');
+            const dock = shell.querySelector<HTMLElement>('.nb-home-header-logo');
+            const intro = story.querySelector<HTMLElement>('.nb-home-intro-section');
+            if (opening && slot && wordmark && dock && intro) {
+              const startBounds = () => {
+                const bounds = slot.getBoundingClientRect();
+                const section = opening.getBoundingClientRect();
+                return { left: bounds.left, top: bounds.top - section.top + 64, width: bounds.width };
+              };
+              const dockBounds = () => {
+                const bounds = dock.getBoundingClientRect();
+                const svg = wordmark.querySelector('svg');
+                const box = svg?.viewBox.baseVal;
+                const height = box && box.width > 0 ? bounds.width * box.height / box.width : bounds.height;
+                return { left: bounds.left, top: bounds.top + (bounds.height - height) / 2, width: bounds.width };
+              };
+              gsap.set(dock.children, { autoAlpha: 0 });
+              gsap.set(wordmark, { position: 'fixed', zIndex: 45, pointerEvents: 'none', margin: 0 });
+              const docking = gsap.timeline({
+                scrollTrigger: {
+                  trigger: opening, start: 'top 64px', end: () => `+=${window.innerHeight * 0.85}`,
+                  pin: true, scrub: true, invalidateOnRefresh: true,
+                },
+              });
+              docking.fromTo(wordmark,
+                { left: () => startBounds().left, top: () => startBounds().top, width: () => startBounds().width },
+                { left: () => dockBounds().left, top: () => dockBounds().top, width: () => dockBounds().width, duration: 1, ease: 'none' }, 0)
+                .to('.nb-home-tagline', { autoAlpha: 0, duration: 0.5, ease: 'none' }, 0.25);
+
+              const reveal = gsap.timeline({
+                scrollTrigger: { trigger: intro, start: 'top 64px', end: () => `+=${window.innerHeight * 0.75}`, pin: true, scrub: true, invalidateOnRefresh: true },
+              });
+              reveal.fromTo('.nb-home-intro-word', { opacity: 0 }, { opacity: 1, duration: 0.12, stagger: 0.07, ease: 'none' })
+                .fromTo('.nb-home-actions', { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.3, ease: 'none' });
+            }
             gsap.set(shell, { '--home-surface': surfaces[0] });
             const timeline = gsap.timeline({
               scrollTrigger: { trigger: story, start: 'top top', end: 'bottom top', scrub: 0.7 },
@@ -56,8 +93,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
             timeline.to(shell, { '--home-surface': surfaces[1], duration: 1 })
               .to(shell, { '--home-surface': surfaces[2], duration: 1 })
               .to(shell, { '--home-surface': surfaces[3], duration: 1 });
-            timeline.to('.nb-home-intro', { y: -20, duration: 1 }, 0)
-              .fromTo('.nb-network-section .nb-network-heading', { y: 18 }, { y: 0, duration: 1 }, 0)
+            timeline.fromTo('.nb-network-section .nb-network-heading', { y: 18 }, { y: 0, duration: 1 }, 0)
               .fromTo('.nb-globe-section .nb-network-heading', { y: 18 }, { y: 0, duration: 1 }, 1);
           }, story);
 

@@ -10,7 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
-- Home scrolling is owned by a route-mounted wrapper that dynamically loads Lenis and GSAP, shares their ticker, scopes effects to the home shell, and reverts everything on reduced motion or navigation; the globe uses a transparent depth-only ocean surface. Why: one continuous background stays compatible with globe input and leaves other pages untouched.
+- Home scrolling is owned by a route-mounted wrapper that dynamically loads Lenis and GSAP, shares their ticker, measures one fixed opening wordmark against the header dock, pins the opening and introduction for reversible reveals, and reverts effects on reduced motion or navigation; the globe uses a transparent depth-only ocean surface. Why: one coordinated sequence stays compatible with globe input and leaves other pages untouched.
 - The home ecosystem groups the paginated published reader into fixed group anchors and one cloud dot per entry; group links use Explore's canonical type search and separate conceptual edges. Why: group browsing stays distinct from individual database relationships.
 - The home globe lazy-loads an R3F scene with locally sampled Design Lab country geometry and a matching still; OrbitControls handles rotation while zoom is bounded and wheel-gated. Why: SSR stays safe and scrolling works without external runtime assets.
 - The home object wordmark uses local asset pointers and measured serif lettering; object images replace letters only after loading and failed images revert to letters. Why: the imported composition stays readable even when media is unavailable.

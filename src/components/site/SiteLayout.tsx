@@ -12,7 +12,7 @@ const NAV = [
   { to: "/podcast", label: "Podcast" },
 ] as const;
 
-function Header() {
+function Header({ isHome }: { isHome: boolean }) {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (!open) return;
@@ -25,8 +25,8 @@ function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-hairline bg-background">
       <div className="nb-container flex h-16 items-center justify-between gap-6">
-        <Link to="/" aria-label="Northbeat home" className="shrink-0" onClick={() => setOpen(false)}>
-          <Wordmark />
+        <Link to="/" aria-label="Northbeat home" className={`shrink-0${isHome ? ' nb-home-header-logo' : ''}`} onClick={() => setOpen(false)}>
+          {isHome ? <span className="nb-wordmark">Northbeat</span> : <Wordmark />}
         </Link>
         <nav aria-label="Main" className="hidden md:block">
           <ul className="flex items-center gap-8">
@@ -105,7 +105,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 nb-btn nb-btn-primary nb-btn-sm">
         Skip to content
       </a>
-      <Header />
+      <Header isHome={isHome} />
       <main id="main" className="flex-1">{children}</main>
       <Footer />
     </div>
