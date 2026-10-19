@@ -1,3 +1,7 @@
+# Home wordmark
+- [ ] Transfer the Design Lab wordmark and show it full width at the top of the home page, with serif fallbacks for missing images.
+- [ ] Verify the wordmark and missing-image fallback on desktop and phone screens.
+
 # Design directions
 - [x] Build /directions with three isolated visual treatments and the same supplied content.
 - [x] Verify all three treatments, real entry links, and phone layouts without changing existing pages or data.
