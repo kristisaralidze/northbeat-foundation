@@ -99,34 +99,34 @@ function SubmitForm({ tab }: { tab: SubmitTab }) {
     <form onSubmit={submit} className="mt-4 space-y-4" noValidate>
       {tab === "company" && (
         <>
-          <Field label="Company or organisation name"><input className="nb-input" required value={values.organisation_name ?? ""} onChange={set("organisation_name")} /></Field>
-          <Field label="Website" hint="Optional, but it helps us check it quickly."><input className="nb-input" type="url" placeholder="https://" value={values.website ?? ""} onChange={set("website")} /></Field>
+          <Field label="Company or organisation name"><input className="nb-input" required value={values['organisation_name'] ?? ""} onChange={set("organisation_name")} /></Field>
+          <Field label="Website" hint="Optional, but it helps us check it quickly."><input className="nb-input" type="url" placeholder="https://" value={values['website'] ?? ""} onChange={set("website")} /></Field>
         </>
       )}
       {tab === "event" && (
         <>
-          <Field label="Event name"><input className="nb-input" required value={values.event_title ?? ""} onChange={set("event_title")} /></Field>
-          <Field label="Event link"><input className="nb-input" type="url" placeholder="https://" value={values.event_url ?? ""} onChange={set("event_url")} /></Field>
+          <Field label="Event name"><input className="nb-input" required value={values['event_title'] ?? ""} onChange={set("event_title")} /></Field>
+          <Field label="Event link"><input className="nb-input" type="url" placeholder="https://" value={values['event_url'] ?? ""} onChange={set("event_url")} /></Field>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Date" hint="Optional."><input className="nb-input" placeholder="e.g. 12 March 2027" value={values.event_date ?? ""} onChange={set("event_date")} /></Field>
-            <Field label="City" hint="Optional."><input className="nb-input" value={values.event_city ?? ""} onChange={set("event_city")} /></Field>
+            <Field label="Date" hint="Optional."><input className="nb-input" placeholder="e.g. 12 March 2027" value={values['event_date'] ?? ""} onChange={set("event_date")} /></Field>
+            <Field label="City" hint="Optional."><input className="nb-input" value={values['event_city'] ?? ""} onChange={set("event_city")} /></Field>
           </div>
         </>
       )}
       {tab === "opportunity" && (
         <>
-          <Field label="Opportunity name"><input className="nb-input" required value={values.opportunity_title ?? ""} onChange={set("opportunity_title")} /></Field>
-          <Field label="Link to apply or read more"><input className="nb-input" type="url" placeholder="https://" value={values.opportunity_url ?? ""} onChange={set("opportunity_url")} /></Field>
-          <Field label="Deadline" hint="Optional."><input className="nb-input" placeholder="e.g. 30 April 2027" value={values.deadline ?? ""} onChange={set("deadline")} /></Field>
+          <Field label="Opportunity name"><input className="nb-input" required value={values['opportunity_title'] ?? ""} onChange={set("opportunity_title")} /></Field>
+          <Field label="Link to apply or read more"><input className="nb-input" type="url" placeholder="https://" value={values['opportunity_url'] ?? ""} onChange={set("opportunity_url")} /></Field>
+          <Field label="Deadline" hint="Optional."><input className="nb-input" placeholder="e.g. 30 April 2027" value={values['deadline'] ?? ""} onChange={set("deadline")} /></Field>
         </>
       )}
       {tab === "guest" && (
-        <Field label="What would you talk about?" hint="Optional — a sentence is plenty."><input className="nb-input" value={values.topic ?? ""} onChange={set("topic")} /></Field>
+        <Field label="What would you talk about?" hint="Optional — a sentence is plenty."><input className="nb-input" value={values['topic'] ?? ""} onChange={set("topic")} /></Field>
       )}
-      <Field label="Your name"><input className="nb-input" required autoComplete="name" value={values.name ?? ""} onChange={set("name")} /></Field>
-      <Field label="Your email"><input className="nb-input" type="email" required autoComplete="email" value={values.email ?? ""} onChange={set("email")} /></Field>
+      <Field label="Your name"><input className="nb-input" required autoComplete="name" value={values['name'] ?? ""} onChange={set("name")} /></Field>
+      <Field label="Your email"><input className="nb-input" type="email" required autoComplete="email" value={values['email'] ?? ""} onChange={set("email")} /></Field>
       <Field label="Anything else?" hint="Optional.">
-        <textarea className="nb-input min-h-24" value={values.message ?? ""} onChange={set("message")} />
+        <textarea className="nb-input min-h-24" value={values['message'] ?? ""} onChange={set("message")} />
       </Field>
       <label className="flex items-start gap-2 nb-small text-muted-foreground">
         <input type="checkbox" className="mt-1 accent-primary" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
