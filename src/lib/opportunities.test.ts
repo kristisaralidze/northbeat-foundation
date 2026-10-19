@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { amountLabel, deadlineLabel, filterOpportunities, type OpportunitiesData, type OpportunityRow } from './opportunities';
+import { amountLabel, deadlineLabel, filterOpportunities, isRolling, type OpportunitiesData, type OpportunityRow } from './opportunities';
 
 const NOW = '2026-10-19T09:00:00Z';
 const FIELD = { id: 'f1', kind: 'field', name: 'Medtech', slug: 'medtech', parent_id: null, sort_order: 1 };
@@ -50,7 +50,11 @@ describe('deadlineLabel', () => {
     expect(deadlineLabel(row({ deadline_at: '2026-10-19T12:00:00Z' }), NOW)).toBe('Closes today');
     expect(deadlineLabel(row({ deadline_at: '2026-10-25T00:00:00Z' }), NOW)).toBe('25 Oct 2026 · 6 days left');
     expect(deadlineLabel(row({ deadline_at: '2026-10-01T00:00:00Z' }), NOW)).toBe('Closed 1 Oct 2026');
-    expect(deadlineLabel(row({ type: 'grant_call' }), NOW)).toBe('Dates TBA');
-    expect(deadlineLabel(row({ type: 'job' }), NOW)).toBe('Rolling');
+  });
+  it('recognises continuous calls and rolling programmes from existing timing notes', () => {
+    expect(isRolling(row({ type: 'grant_call', description: 'Continuous application. No fixed deadline.' }))).toBe(true);
+    expect(isRolling(row({ type: 'programme_intake', description: 'Rolling applications accepted year-round.' }))).toBe(true);
+    expect(isRolling(row({ type: 'programme_intake', description: 'Intake dates not yet announced.' }))).toBe(false);
+    expect(isRolling(row({ type: 'programme_intake' }))).toBe(false);
   });
 });

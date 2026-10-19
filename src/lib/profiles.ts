@@ -14,6 +14,7 @@ export function relationshipNodes(profile: PublicProfile) {
   }));
 }
 export const showRelationshipMap = (profile: PublicProfile) => relationshipNodes(profile).length >= 3;
+export const publicProfileTerms = (terms: ProfileTerm[]) => terms.filter(term => term.kind !== 'journey_step');
 /** Presentation only: leave stored entry titles unchanged. */
 export const publicTitle = (value: string): string => value.replace(/\s*[—–]\s*/g, ': ');
 export const text = (row: Record<string, unknown>, key: string): string | null => typeof row[key] === 'string' && row[key] ? String(row[key]) : null;

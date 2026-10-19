@@ -9,7 +9,7 @@ import { safeWebUrl, text, type PublicProfile, type RelatedEntry } from '@/lib/p
 import { RelationshipMap } from './RelationshipMap';
 import { OrganisationLogo } from './OrganisationLogo';
 import { organisationDomain } from '@/lib/organisation-logo';
-import { relationshipNodes } from '@/lib/profiles';
+import { relationshipNodes, publicProfileTerms } from '@/lib/profiles';
 
 export function EntryLink({ kind, entry, children, className }: { kind: EntityKey; entry: { slug: string }; children: ReactNode; className?: string }) {
   const props = { params: { slug: entry.slug }, className, children };
@@ -55,7 +55,7 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
   const email = text(row, 'contact_email');
   const openTo = Array.isArray(row['open_to']) ? row['open_to'].filter((value): value is string => typeof value === 'string') : [];
   const compactDetails = isOrg || kind === 'events' || kind === 'opportunities';
-  const tags = profile.terms.filter(term => term.kind !== 'journey_step');
+  const tags = publicProfileTerms(profile.terms);
   const connectionCount = relationshipNodes(profile).length;
   const facts: [string, string | null][] = isOrg ? [['Location', text(row, 'city')], ['Founded', row['founded_year'] ? String(row['founded_year']) : null]] : kind === 'events' ? [
     ['Starts', date(text(row, 'starts_at'), text(row, 'timezone'))], ['Ends', date(text(row, 'ends_at'), text(row, 'timezone'))], ['Apply by', date(text(row, 'apply_deadline_at'), text(row, 'timezone'))], ['Location', [text(row, 'venue'), text(row, 'city')].filter(Boolean).join(', ') || null], ['Format', text(row, 'format') ? humanize(String(row['format'])) : null], ['Price', text(row, 'price_note')]
