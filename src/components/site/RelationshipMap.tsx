@@ -2,24 +2,17 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import { networkGroup } from '@/lib/ecosystem';
 import type { EntityKey } from '@/lib/admin/entities';
 import type { PublicProfile, RelatedEntry } from '@/lib/profiles';
-import { text } from '@/lib/profiles';
+import { text, relationshipNodes, showRelationshipMap } from '@/lib/profiles';
 import { OrganisationLogo } from './OrganisationLogo';
 export function RelationshipMap({ profile, link }: { profile: PublicProfile; link: (kind: EntityKey, entry: RelatedEntry) => ReactNode }) {
   const host = useRef<HTMLElement>(null);
-  const seen = new Set<string>();
-  const nodes = profile.related.flatMap(group => group.entries.flatMap(entry => {
-    const key = `${group.kind}:${entry.id}`;
-    if (seen.has(key) || !['organisations', 'people', 'events', 'opportunities'].includes(group.kind)) return [];
-    seen.add(key);
-    const colour = group.kind === 'people' ? 8 : networkGroup(group.kind === 'organisations' ? 'organisation' : group.kind === 'events' ? 'event' : 'opportunity', entry.type ?? '');
-    return [{ entry, kind: group.kind, colour }];
-  }));
+  const nodes = relationshipNodes(profile).map(node => ({ ...node, colour: node.kind === 'people' ? 8 : networkGroup(node.kind === 'organisations' ? 'organisation' : node.kind === 'events' ? 'event' : 'opportunity', node.entry.type ?? '') }));
   useEffect(() => {
     const el = host.current; if (!el) return;
     const observer = new IntersectionObserver(([entry]) => { if (entry?.isIntersecting) { el.dataset['drawn'] = 'true'; observer.disconnect(); } }, { threshold: .25 });
     observer.observe(el); return () => observer.disconnect();
   }, []);
-  if (!nodes.length) return null;
+  if (!showRelationshipMap(profile)) return null;
   const rows = Math.ceil(nodes.length / 2), height = Math.max(260, rows * 96);
   return <section ref={host} className="nb-relationship-map" aria-label={`${profile.title} connections`}>
     <svg viewBox={`0 0 700 ${height}`} preserveAspectRatio="none" aria-hidden="true" className="nb-relationship-lines">

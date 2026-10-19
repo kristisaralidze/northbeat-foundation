@@ -57,25 +57,32 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
   const compactDetails = isOrg || kind === 'events' || kind === 'opportunities';
   const tags = profile.terms.filter(term => term.kind !== 'journey_step');
   const connectionCount = relationshipNodes(profile).length;
-  const details = <aside className="min-w-0 space-y-4" aria-label="Details and contact">
-    {factsPlaceholder()}
-  </aside>;
   const facts: [string, string | null][] = isOrg ? [['Location', text(row, 'city')], ['Founded', row['founded_year'] ? String(row['founded_year']) : null]] : kind === 'events' ? [
-    ['Starts', date(text(row, 'starts_at'), text(row, 'timezone'))], ['Ends', date(text(row, 'ends_at'), text(row, 'timezone'))], ['Apply by', date(text(row, 'apply_deadline_at'), text(row, 'timezone'))], ['Timezone', text(row, 'timezone')], ['Location', [text(row, 'venue'), text(row, 'city')].filter(Boolean).join(', ') || null], ['Format', text(row, 'format') ? humanize(String(row['format'])) : null], ['Price', text(row, 'price_note')]
+    ['Starts', date(text(row, 'starts_at'), text(row, 'timezone'))], ['Ends', date(text(row, 'ends_at'), text(row, 'timezone'))], ['Apply by', date(text(row, 'apply_deadline_at'), text(row, 'timezone'))], ['Location', [text(row, 'venue'), text(row, 'city')].filter(Boolean).join(', ') || null], ['Format', text(row, 'format') ? humanize(String(row['format'])) : null], ['Price', text(row, 'price_note')]
   ] : kind === 'opportunities' ? [['Opens', date(text(row, 'opens_at'))], ['Deadline', date(text(row, 'deadline_at'))], ['Location', text(row, 'location')], ['Employment', text(row, 'employment_type')]] : kind === 'episodes' ? [['Episode', row['episode_number'] ? String(row['episode_number']) : null], ['Published', date(text(row, 'published_on'))]] : [];
   const label = isPerson ? 'Person' : kind === 'episodes' ? 'Podcast' : humanize(text(row, kind === 'events' ? 'event_type' : 'type') ?? kind);
+  const details = <aside className="min-w-0 space-y-4" aria-label="Details and contact">
+    {facts.some(([, value]) => value) && <dl className={compactDetails ? 'flex flex-wrap gap-x-8 gap-y-3' : 'space-y-4'}>{facts.filter(([, value]) => value).map(([name, value]) => <div key={name}><dt className="nb-small text-muted-foreground">{name}</dt><dd className="nb-small break-words">{value}</dd></div>)}</dl>}
+    <div className="nb-small flex flex-wrap items-center gap-x-6 gap-y-3">
+      {safeWebUrl(text(row, 'website')) && <span><span className="text-muted-foreground">Website: </span><WebLink url={text(row, 'website')}>{organisationDomain(text(row, 'website')) || 'Website'}</WebLink></span>}
+      <WebLink url={text(row, 'linkedin_url')}>LinkedIn</WebLink><WebLink url={text(row, 'registration_url')}>Register</WebLink><WebLink url={text(row, 'apply_url')}>Apply</WebLink>{kind !== 'episodes' && <WebLink url={text(row, 'embed_url')}>Listen to episode</WebLink>}
+      {email && <a href={`mailto:${encodeURIComponent(email)}`} className="nb-link break-all">{email}</a>}
+    </div>
+    {text(row, 'last_checked') && <p className="nb-small text-muted-foreground">Last checked {date(text(row, 'last_checked'))}</p>}
+  </aside>;
   return <article className="nb-container nb-section">
     <div className="mb-8"><Link to="/explore" search={EMPTY_SEARCH} className="nb-link inline-flex items-center gap-2"><ArrowLeft className="h-4 w-4" aria-hidden />Explore</Link></div>
     <header data-profile-identity data-profile-detail={isOrg ? [label, text(row, 'city')].filter(Boolean).join(', ') : undefined} className="pb-10">
       <div className={isOrg ? 'flex items-start gap-4' : 'flex flex-col gap-6 sm:flex-row sm:items-start'}>
         {isOrg ? <OrganisationLogo name={profile.title} slug={profile.row.slug} uploaded={profile.image} website={text(row, 'website')} eager /> : (isPerson || (profile.image && kind !== 'episodes')) && <ProfileImage image={profile.image} name={profile.title} kind={kind} />}
-        <div className="min-w-0 flex-1"><p className="nb-eyebrow mb-3">{label}</p><h1 className="nb-h1 break-words">{profile.title}</h1>{isOrg && text(row, 'city') && <p className="nb-small mt-3 text-muted-foreground">{text(row, 'city')}</p>}{profile.summary && kind !== 'episodes' && <p className="nb-lead mt-4 break-words">{profile.summary}</p>}</div>
+        <div className="min-w-0 flex-1"><h1 data-page-title className="nb-h1 break-words">{profile.title}</h1><p className="nb-small mt-3 text-muted-foreground">{label}</p>{profile.summary && kind !== 'episodes' && <p className="nb-lead mt-4 break-words">{profile.summary}</p>}</div>
       </div>
-      {profile.terms.length > 0 && <div className="mt-6 flex flex-wrap gap-2" aria-label="Tags">{profile.terms.map((term) => <span key={term.id} className="nb-chip max-w-full"><span className="truncate">{term.name}</span></span>)}</div>}
+      {compactDetails && <div className="mt-6">{details}</div>}
+      {tags.length > 0 && <div className="mt-6 flex flex-wrap gap-2" aria-label="Tags">{tags.map((term) => <span key={term.id} className="nb-chip max-w-full"><span className="truncate">{term.name}</span></span>)}</div>}
     </header>
     {isOrg && <RelationshipMap profile={profile} link={(relatedKind, entry) => <EntryLink kind={relatedKind} entry={entry} className="nb-link">{entry.title}</EntryLink>} />}
     {kind === 'episodes' && safeWebUrl(text(row, 'embed_url')) && <div className="mt-10 aspect-video w-full overflow-hidden rounded-[var(--radius)] border border-hairline"><iframe src={safeWebUrl(text(row, 'embed_url')) ?? undefined} title={`Watch ${profile.title}`} className="h-full w-full" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen loading="lazy" /></div>}
-    <div className={isOrg && !description ? 'max-w-2xl py-10' : 'nb-profile-layout py-10'}>
+    <div className={compactDetails ? 'max-w-3xl pb-8' : 'nb-profile-layout py-10'}>
       {!(isOrg && !description) && <section className="min-w-0" aria-label={isPerson ? 'Biography' : 'Description'}>
         {kind === 'episodes' && profile.summary && <section className="mb-8"><h2 className="nb-h3 mb-3">Key takeaways</h2><p className="nb-body whitespace-pre-wrap break-words">{profile.summary}</p></section>}
         {description && <>{kind === 'episodes' && <h2 className="nb-h3 mb-3">Show notes</h2>}<p className="nb-body whitespace-pre-wrap break-words">{description}</p></>}
@@ -84,17 +91,9 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
         {kind === 'episodes' && safeWebUrl(text(row, 'audio_url')) && <audio controls preload="none" src={safeWebUrl(text(row, 'audio_url')) ?? undefined} className="mt-6 w-full" aria-label={`Listen to ${profile.title}`} />}
         {kind === 'episodes' && text(row, 'transcript') && <details className="mt-8 border-t border-hairline pt-6"><summary className="nb-h3 cursor-pointer">Transcript</summary><p className="nb-body mt-4 whitespace-pre-wrap break-words">{text(row, 'transcript')}</p></details>}
       </section>}
-      <aside className="min-w-0 space-y-6" aria-label="Details and contact">
-        {facts.some(([, value]) => value) && <dl className="space-y-4">{facts.filter(([, value]) => value).map(([name, value]) => <div key={name}><dt className="nb-eyebrow mb-1">{name}</dt><dd className="nb-body break-words">{value}</dd></div>)}</dl>}
-        <div className="nb-body flex flex-col items-start gap-4">
-          <WebLink url={text(row, 'website')}>Website</WebLink><WebLink url={text(row, 'linkedin_url')}>LinkedIn</WebLink>
-          <WebLink url={text(row, 'registration_url')}>Register</WebLink><WebLink url={text(row, 'apply_url')}>Apply</WebLink>{kind !== 'episodes' && <WebLink url={text(row, 'embed_url')}>Listen to episode</WebLink>}
-          {email && <a href={`mailto:${encodeURIComponent(email)}`} className="nb-link break-all">{email}</a>}
-        </div>
-        {text(row, 'last_checked') && <p className="nb-small text-muted-foreground">Last checked {date(text(row, 'last_checked'))}</p>}
-      </aside>
+      {!compactDetails && details}
     </div>
-    {profile.related.map((group) => <section key={`${group.kind}-${group.label}`} className="border-t border-hairline py-10"><h2 className="nb-h2 mb-6">{group.label}</h2><div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">{group.entries.map((entry) => <RelatedCard kind={group.kind} entry={entry} key={entry.id} />)}</div></section>)}
+    {profile.related.map((group) => <section key={`${group.kind}-${group.label}`} className="py-8"><h2 className="nb-h2 mb-6">{group.label}</h2>{isOrg && connectionCount < 3 ? <ul className="space-y-3">{group.entries.map(entry => <li key={entry.id} className="flex items-center gap-3">{group.kind === 'organisations' && <OrganisationLogo name={entry.title} slug={entry.slug} />}<EntryLink kind={group.kind} entry={entry} className="nb-link">{entry.title}</EntryLink></li>)}</ul> : <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">{group.entries.map((entry) => <RelatedCard kind={group.kind} entry={entry} key={entry.id} />)}</div>}</section>)}
   </article>;
 }
 export function ProfileNotFound() { return <div className="nb-container nb-section"><h1 className="nb-h2">Profile not found</h1><p className="nb-body mt-4">This entry is unavailable or has not been published.</p><Link to="/explore" search={EMPTY_SEARCH} className="nb-link mt-6 inline-block">Back to Explore</Link></div>; }

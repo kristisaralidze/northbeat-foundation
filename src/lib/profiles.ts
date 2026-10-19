@@ -4,6 +4,16 @@ export type ProfileTerm = { id: string; name: string; kind: string; slug: string
 export type RelatedEntry = { id: string; slug: string; title: string; summary: string | null; image: string | null; roles: string[]; type?: string | undefined };
 export type RelatedGroup = { kind: EntityKey; label: string; entries: RelatedEntry[] };
 export type PublicProfile = { kind: EntityKey; row: ProfileRow; title: string; summary: string | null; image: string | null; terms: ProfileTerm[]; related: RelatedGroup[] };
+export function relationshipNodes(profile: PublicProfile) {
+  const seen = new Set<string>();
+  return profile.related.flatMap(group => group.entries.flatMap(entry => {
+    const key = `${group.kind}:${entry.id}`;
+    if (seen.has(key) || !['organisations', 'people', 'events', 'opportunities'].includes(group.kind)) return [];
+    seen.add(key);
+    return [{ kind: group.kind, entry }];
+  }));
+}
+export const showRelationshipMap = (profile: PublicProfile) => relationshipNodes(profile).length >= 3;
 /** Presentation only: leave stored entry titles unchanged. */
 export const publicTitle = (value: string): string => value.replace(/\s*[—–]\s*/g, ': ');
 export const text = (row: Record<string, unknown>, key: string): string | null => typeof row[key] === 'string' && row[key] ? String(row[key]) : null;
