@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import type { ScrollTrigger as ScrollTriggerInstance } from 'gsap/ScrollTrigger';
 
 /** Owns scroll effects only while the home route is mounted. */
 export function HomeScrollStory({ children }: { children: ReactNode }) {
@@ -109,7 +110,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
               notify(svg, 'northbeat:network-progress', 0);
               notify(stage, 'northbeat:globe-progress', 0);
               const progress = { network: 0, globe: 0 };
-              const settleWorld = (self: ScrollTrigger, final: boolean) => {
+              const settleWorld = (self: ScrollTriggerInstance, final: boolean) => {
                 self.getTween()?.progress(1);
                 self.animation?.progress(final ? 1 : 0);
                 notify(svg, 'northbeat:network-progress', final ? 1 : 0);
