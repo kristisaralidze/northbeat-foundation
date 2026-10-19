@@ -7,6 +7,7 @@ import { OPP_TYPES, humanize } from '@/lib/admin/entities';
 import { opportunitiesQuery } from '@/lib/opportunities.query';
 import { compactSearch } from '@/lib/search-params';
 import { amountLabel, deadlineLabel, filterOpportunities } from '@/lib/opportunities';
+import { publicTitle } from '@/lib/profiles';
 
 const searchSchema = z.object({
   type: fallback(z.string(), '').default(''),
@@ -85,7 +86,7 @@ function Opportunities() {
             <p className="nb-eyebrow">{humanize(opportunity.type)}</p>
             <p className="nb-small text-muted-foreground">{deadlineLabel(opportunity, data.now)}</p>
           </div>
-          <h2 className="nb-h3 mt-2"><Link to="/opportunity/$slug" params={{ slug: opportunity.slug }} className="nb-org-link break-words">{opportunity.title}</Link></h2>
+          <h2 className="nb-h3 mt-2"><Link to="/opportunity/$slug" params={{ slug: opportunity.slug }} className="nb-org-link break-words">{publicTitle(opportunity.title)}</Link></h2>
           {opportunity.summary && <p className="nb-body mt-2 text-muted-foreground">{opportunity.summary}</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             {amount && <span className="nb-chip">{amount}</span>}
