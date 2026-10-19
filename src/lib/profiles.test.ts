@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { loadPublicProfile } from './profiles.server';
-import { safeWebUrl } from './profiles';
+import { orgRelationLabel, safeWebUrl } from './profiles';
 function fixture() {
   const tables: Record<string, Record<string, unknown>[]> = {
     organisations: [{ id: 'org-1', slug: 'public-org', name: 'Public org', status: 'published', contact_email: 'private@example.org', contact_email_public: false }],
