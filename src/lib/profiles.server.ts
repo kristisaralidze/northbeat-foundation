@@ -62,11 +62,13 @@ export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey,
 /** Organisation relationships in both directions, grouped into plain-language sections. */
 async function loadOrgRelations(client: SupabaseClient, orgId: string): Promise<RelatedGroup[]> {
   const relations: { from_org_id: string; to_org_id: string; relation: string }[] = [];
-  for (let offset = 0; ; offset += 1000) {
-    const { data, error } = await client.from('organisation_relations').select('from_org_id,to_org_id,relation').or(`from_org_id.eq.${orgId},to_org_id.eq.${orgId}`).order('id').range(offset, offset + 999);
-    if (error) throw new Error('Related organisations could not be loaded.');
-    relations.push(...(data ?? []));
-    if (!data || data.length < 1000) break;
+  for (const column of ['from_org_id', 'to_org_id'] as const) {
+    for (let offset = 0; ; offset += 1000) {
+      const { data, error } = await client.from('organisation_relations').select('from_org_id,to_org_id,relation').eq(column, orgId).order('id').range(offset, offset + 999);
+      if (error) throw new Error('Related organisations could not be loaded.');
+      relations.push(...(data ?? []));
+      if (!data || data.length < 1000) break;
+    }
   }
   if (!relations.length) return [];
   const otherIds = [...new Set(relations.map((rel) => (rel.from_org_id === orgId ? rel.to_org_id : rel.from_org_id)))];
