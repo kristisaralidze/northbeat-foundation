@@ -1,4 +1,5 @@
 # Explore directory
+- [ ] Update guide hub lists to match journey steps alone, include published events, and verify with real entries.
 - [x] Review public copy against the voice rules, remove dash punctuation, and verify page titles and text without changing layout or data.
 - [x] Load all published organisations and shared tags from the database.
 - [x] Build searchable cards and counted, URL-backed filters.
