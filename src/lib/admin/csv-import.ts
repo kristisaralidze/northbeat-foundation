@@ -54,7 +54,7 @@ export function prepareRow(entity: ImportEntity, row: CsvRow, snapshot: Snapshot
   const warnings: string[] = [];
   const name = row[cfg.titleField]?.trim() ?? '';
   const duplicate = snapshot.entries.some(e => normalize(e.name) === normalize(name) || (entity === 'organisations' && websiteDomain(row['website'] ?? '') !== '' && websiteDomain(e.website ?? '') === websiteDomain(row['website'] ?? '')));
-  const values: Record<string, unknown> = { status: 'draft', last_checked: today, slug: slugify(name), [cfg.titleField]: name };
+  const values: Record<string, string | number | boolean | null> = { status: 'draft', last_checked: today, slug: slugify(name), [cfg.titleField]: name };
   if (!name) errors.push(`${cfg.titleField} is required`);
   const tags: { kind: string; name: string; create: boolean }[] = [];
   for (const column of CSV_COLUMNS[entity]) {

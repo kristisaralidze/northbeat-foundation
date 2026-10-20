@@ -46,13 +46,14 @@ export const importCsvRows = createServerFn({ method: 'POST' })
       if (prepared.duplicate) { summary.skipped++; continue; }
       if (prepared.errors.length) { summary.errors.push({ row: row.number, message: prepared.errors.join('; ') }); continue; }
       const { data: result, error } = await context.supabase.rpc('admin_import_csv_row', {
-        _entity: data.entity, _values: prepared.values, _tags: prepared.tags, _organisation_id: prepared.organisationId,
+        _entity: data.entity, _values: prepared.values, _tags: prepared.tags, ...(prepared.organisationId ? { _organisation_id: prepared.organisationId } : {}),
       });
       if (error) { summary.errors.push({ row: row.number, message: 'Could not save this row. Check its values and try again.' }); continue; }
-      if (result?.status === 'skipped') summary.skipped++;
+      const saved = result && typeof result === 'object' && !Array.isArray(result) ? result : null;
+      if (saved?.['status'] === 'skipped') summary.skipped++;
       else {
         summary.added++;
-        matches.entries.push({ id: String(result?.id), name: prepared.name, website: String(prepared.values['website'] ?? '') });
+        matches.entries.push({ id: String(saved?.['id']), name: prepared.name, website: String(prepared.values['website'] ?? '') });
       }
     }
     return summary;
