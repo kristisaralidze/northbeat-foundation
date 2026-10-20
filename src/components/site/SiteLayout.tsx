@@ -5,7 +5,7 @@ import { LaboratoryWordmark } from "./LaboratoryWordmark";
 import { NewsletterSignup } from "./NewsletterSignup";
 import { Button } from "@/components/ui/button";
 import { PublicScrollFrame } from './PublicScrollFrame';
-import { LivingFabric } from './LivingFabric';
+import { AtmosphericImage } from './AtmosphericImage';
 
 const NAV = [
   { to: "/explore", label: "Explore" },
@@ -80,7 +80,7 @@ function Footer({ hideSignup }: { hideSignup: boolean }) {
   return (
     <footer className="nb-site-footer mt-auto">
       {!hideSignup && <section className="nb-footer-signup" aria-labelledby="footer-newsletter-heading">
-        <LivingFabric />
+        <AtmosphericImage />
         <div className="nb-footer-signup-content">
           <h2 id="footer-newsletter-heading" className="nb-h2">We track it so you don't miss it.</h2>
           <p className="nb-body">Funding calls, programme intakes and events in Nordic health innovation, in one email.</p>

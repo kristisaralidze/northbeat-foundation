@@ -4,7 +4,7 @@ import { HubList, LearnError, LearnNotFound } from '@/components/site/LearnParts
 import { learnHubQuery } from '@/lib/learn.query';
 import { levelLabel, readingLabel, type JourneyStep } from '@/lib/learn';
 import { useEffect, useRef, useState } from 'react';
-import { LivingFabric } from '@/components/site/LivingFabric';
+import { AtmosphericImage } from '@/components/site/AtmosphericImage';
 
 const TITLE = 'Learn: Northbeat';
 const DESC = 'Plain guides for building a health venture in the Nordics, step by step, from first idea to growth.';
@@ -53,7 +53,7 @@ function Learn() {
         <p>These guides walk you through it in order, and point to the people and programmes in the Nordics who can help.</p>
       </div>
     </header>
-    <LivingFabric className="nb-learn-atmosphere-circle" />
+    <div className="nb-learn-atmosphere-circle" aria-hidden="true"><AtmosphericImage /></div>
     </div>
 
     {data.steps.length > 0 && <section ref={journeyRef} data-journey className="mt-16" aria-labelledby="journey">
