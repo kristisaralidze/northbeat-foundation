@@ -137,3 +137,4 @@
 - [ ] ClinicalTrials.gov trials: admin pick, weekly refresh, public Clinical trials section
 - [ ] PRH YTJ business ID: admin match, monthly refresh, facts strip line
 - [ ] Nominatim geocoded maps on event and organisation pages, admin-correctable lat/lng
+- [ ] News feed: news_feed_url, daily latest 3 headlines, "Latest from them" section
