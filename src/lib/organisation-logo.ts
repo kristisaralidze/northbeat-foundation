@@ -13,5 +13,5 @@ export function organisationDomain(website?: string | null): string | null {
 export function organisationLogoUrl(uploaded?: string | null, website?: string | null, clientId = BRANDFETCH_CLIENT_ID): string | null {
   if (uploaded?.trim()) return uploaded.trim();
   const domain = organisationDomain(website);
-  return domain && clientId.trim() ? `https://cdn.brandfetch.io/domain/${domain}/w/128/h/128/type/icon?c=${encodeURIComponent(clientId.trim())}` : null;
+  return domain && clientId.trim() ? `https://cdn.brandfetch.io/domain/${domain}/w/128/h/128/fallback/404/type/icon?c=${encodeURIComponent(clientId.trim())}` : null;
 }

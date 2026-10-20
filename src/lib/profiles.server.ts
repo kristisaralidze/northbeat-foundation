@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ENTITIES, type EntityKey } from './admin/entities';
 import { ORG_RELATION_ORDER, orgRelationLabel, publicEntry, publishedOnly, type ProfileRow, type ProfileTerm, type PublicProfile, type RelatedGroup } from './profiles';
+import { approvedCover } from './organisation-cover';
 const COLUMNS: Record<EntityKey, string> = {
   organisations: '', people: '',
   events: 'id,slug,status,title,event_type,summary,description,starts_at,ends_at,apply_deadline_at,timezone,format,venue,city,registration_url,price_note,source_url,last_checked',
@@ -27,10 +28,11 @@ async function readEntries(client: SupabaseClient, kind: EntityKey, filter: { sl
 export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey, slug: string): Promise<PublicProfile | null> {
   const [row] = await readEntries(client, kind, { slug });
   if (!row) return null;
-  if (kind === 'organisations') {
-    const cover = await client.from('organisations').select('cover_image_url').eq('id', row.id).eq('status', 'published').maybeSingle();
+  if (kind === 'organisations' || kind === 'events') {
+    const cover = await client.from(kind).select('cover_image_url,cover_image_status').eq('id', row.id).eq('status', 'published').maybeSingle();
     if (cover.error) throw new Error('This profile could not be loaded. Please try again.');
-    row['cover_image_url'] = cover.data?.cover_image_url ?? null;
+    row['cover_image_url'] = approvedCover(cover.data?.cover_image_url, cover.data?.cover_image_status);
+    row['cover_image_status'] = cover.data?.cover_image_status ?? 'pending';
   }
   const cfg = ENTITIES[kind];
   const { data: tagLinks, error: tagError } = await client.from(cfg.termTable).select('term_id').eq(cfg.termFk, row.id);

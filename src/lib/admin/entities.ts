@@ -137,6 +137,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
     fields: [
       { name: "title", label: "Title", kind: "text", required: true },
       { name: "event_type", label: "Event type", kind: "select", options: EVENT_TYPES, required: true },
+      { name: "cover_image_url", label: "Cover image", kind: "image" },
       { name: "summary", label: "Summary", kind: "textarea" },
       { name: "description", label: "Description", kind: "textarea" },
       { name: "starts_at", label: "Starts", kind: "datetime" },
