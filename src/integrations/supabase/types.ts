@@ -1435,6 +1435,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_import_csv_row: {
+        Args: {
+          _entity: string
+          _organisation_id?: string
+          _tags: Json
+          _values: Json
+        }
+        Returns: Json
+      }
       entry_is_published: {
         Args: { _id: string; _kind: Database["public"]["Enums"]["entry_kind"] }
         Returns: boolean

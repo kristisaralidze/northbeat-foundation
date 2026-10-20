@@ -50,6 +50,13 @@
       "when": 1792412314654,
       "tag": "0006_learn_guides_glossary",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792473537555,
+      "tag": "0007_admin_csv_import_row",
+      "breakpoints": true
     }
   ]
 }
