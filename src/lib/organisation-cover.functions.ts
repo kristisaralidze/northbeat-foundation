@@ -12,7 +12,7 @@ export const fetchOrganisationCover = createServerFn({ method: 'POST' })
     const { data: row, error } = await context.supabase.from('organisations').select('name,website,cover_image_url,cover_image_pending_url,cover_image_status').eq('id', data.id).single();
     if (error || !row || row.website !== data.website || row.cover_image_url || row.cover_image_pending_url || row.cover_image_status === 'rejected') return { image: null };
     const checked = await inspectWebsiteCover(data.website, row.name);
-    const saved = await context.supabase.from('organisations').update({ cover_image_pending_url: checked.image, cover_image_status: checked.reason ? 'rejected' : 'pending', cover_page_title: checked.title, cover_image_flag: checked.reason }).eq('id', data.id).eq('website', data.website).is('cover_image_url', null).is('cover_image_pending_url', null);
+    const saved = await context.supabase.from('organisations').update({ cover_image_pending_url: checked.image, cover_image_status: checked.reason ? 'rejected' : 'pending', cover_page_title: checked.title, cover_image_flag: checked.reason }).eq('id', data.id).eq('website', data.website).eq('cover_image_status', row.cover_image_status).is('cover_image_url', null).is('cover_image_pending_url', null);
     if (saved.error) throw new Error('Could not save the cover candidate.');
     return { image: checked.image };
   });
@@ -29,7 +29,7 @@ export const backfillOrganisationCovers = createServerFn({ method: 'POST' })
       const current = await context.supabase.from('organisations').select('name,cover_image_url,cover_image_pending_url,cover_image_status').eq('id', row.id).single();
       if (!row.website || !current.data || current.data.cover_image_url || current.data.cover_image_pending_url || current.data.cover_image_status === 'rejected') return { id: row.id, saved: false };
       const checked = await inspectWebsiteCover(row.website, current.data.name);
-      const saved = await context.supabase.from('organisations').update({ cover_image_pending_url: checked.image, cover_image_status: checked.reason ? 'rejected' : 'pending', cover_page_title: checked.title, cover_image_flag: checked.reason }).eq('id', row.id).eq('website', row.website).is('cover_image_url', null).is('cover_image_pending_url', null);
+      const saved = await context.supabase.from('organisations').update({ cover_image_pending_url: checked.image, cover_image_status: checked.reason ? 'rejected' : 'pending', cover_page_title: checked.title, cover_image_flag: checked.reason }).eq('id', row.id).eq('website', row.website).eq('cover_image_status', current.data.cover_image_status).is('cover_image_url', null).is('cover_image_pending_url', null);
       if (saved.error) throw new Error('Could not save a cover image.');
       return { id: row.id, saved: Boolean(checked.image) };
     }));

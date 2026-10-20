@@ -65,4 +65,4 @@ export function coverSafetyReason(input: { title: string; name: string; website:
   if (input.width < MIN_COVER_WIDTH) return `Image is ${input.width}px wide; minimum is 800px`;
   return null;
 }
-export function approvedCover(image: unknown, status: unknown): string | null { return status === 'approved' && typeof image === 'string' ? image : null; }
+export function approvedCover(image: unknown, status: unknown): string | null { return status === 'approved' && typeof image === 'string' && publicWebsite(image) ? image : null; }

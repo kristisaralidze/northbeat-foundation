@@ -53,9 +53,10 @@ export const refillCoverBatch = createServerFn({ method: 'POST' }).middleware([r
     const checked = website ? await inspectWebsiteCover(website, String(row['name'] ?? row['title'])) : { image: null, title: '', reason: 'No website stored' };
     let update = context.supabase.from(data.kind).update({ cover_image_pending_url: checked.image, cover_image_status: checked.reason ? 'rejected' : 'pending', cover_page_title: checked.title, cover_image_flag: checked.reason }).eq('id', String(row['id'])).eq('cover_image_status', 'pending').is('cover_image_url', null);
     update = row['cover_image_pending_url'] ? update.eq('cover_image_pending_url', String(row['cover_image_pending_url'])) : update.is('cover_image_pending_url', null);
-    const saved = await update;
+    update = row['cover_page_title'] ? update.eq('cover_page_title', String(row['cover_page_title'])) : update.is('cover_page_title', null);
+    const saved = await update.select('id');
     if (saved.error) throw new Error('Could not save candidate.');
-    return { id: String(row['id']), status: checked.reason ? 'rejected' : 'pending', reason: checked.reason };
+    return { id: String(row['id']), status: !saved.data?.length ? 'skipped' : checked.reason ? 'rejected' : 'pending', reason: checked.reason };
   }));
   return { checked: outcomes.length, outcomes };
 });
