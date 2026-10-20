@@ -10,7 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
-- Home owns one Lenis/GSAP story; other public pages use keyed PublicScrollFrame. Both clean up on navigation and reduced motion. Why: avoid duplicate tickers.
+- Home owns one Lenis/GSAP story; public pages use keyed PublicScrollFrame. Home overlays activate only after hiding the intro. Both clean up. Why: no duplicate tickers or pre-load text overlap.
 - Fabric is the static still image in every placement (arrival, Learn circle, footer band); no shader or animation. Why: the WebGL silk was explicitly removed.
 - Official covers require provenance and approval; failed logos hide. Brand imports are admin-only and quota-bounded; forms use uncached browser search copying only confirmed name/website. Why: authentic assets and search retention compliance.
 - Relationship maps use published links, network tokens and measured node lines; timelines use tested date helpers and URL filters. Why: preserve real connections across screen sizes.

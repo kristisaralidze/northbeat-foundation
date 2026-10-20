@@ -75,6 +75,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
               restoreWordmark = () => slot.append(wordmark);
               gsap.set(wordmark, { position: 'fixed', zIndex: 45, pointerEvents: 'none', margin: 0 });
               gsap.set(intro, { autoAlpha: 0 });
+              story.classList.add('nb-home-motion');
               const docking = gsap.timeline({
                 scrollTrigger: {
                   id: 'home-opening',
@@ -194,6 +195,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
             lenis.destroy();
             context.revert();
             restoreWordmark();
+            story.classList.remove('nb-home-motion');
             notify(story.querySelector('.nb-network-figure'), 'northbeat:network-progress', 1);
             notify(story.querySelector('.nb-globe-stage'), 'northbeat:globe-progress', 1);
             notify(story.querySelector('.nb-globe-stage'), 'northbeat:globe-zoom', 0);
