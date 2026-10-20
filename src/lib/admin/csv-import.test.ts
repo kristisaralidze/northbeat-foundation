@@ -40,6 +40,17 @@ describe('CSV import rules', () => {
     expect(prepareRow('events', { title: 'Meetup', event_type: 'meetup', organiser: 'partner' }, snapshot, {}, '2026-10-20').organisationId).toBe('2');
     expect(prepareRow('opportunities', { title: 'Call', type: 'grant_call', provider: 'Partner' }, snapshot, {}, '2026-10-20').organisationId).toBe('2');
   });
+  it('requires a real parent field when creating a sub-area', () => {
+    const row = { name: 'New', type: 'startup', sub_areas: 'New sub-area' };
+    const choices = { 'sub_area:new sub-area': 'create' as const };
+    expect(prepareRow('organisations', row, snapshot, choices, '2026-10-20').errors).toContain('Choose a parent field for New sub-area');
+    const result = prepareRow('organisations', row, snapshot, choices, '2026-10-20', { 'sub_area:new sub-area': '3' });
+    expect(result.tags).toContainEqual({ kind: 'sub_area', name: 'New sub-area', create: true, parent_id: '3' });
+    expect(result.errors).toEqual([]);
+  });
+  it('rejects impossible calendar dates rather than rolling into the next month', () => {
+    expect(prepareRow('events', { title: 'Meetup', event_type: 'meetup', starts_at: '2026-02-30' }, snapshot, {}, '2026-10-20').errors).toContain('Invalid starts_at: use an ISO date');
+  });
   it('rejects unknown or ambiguous organisation matches', () => {
     expect(prepareRow('events', { title: 'Meetup', event_type: 'meetup', organiser: 'Missing' }, snapshot, {}, '2026-10-20').errors).toContain('Unknown organisation: Missing');
   });
