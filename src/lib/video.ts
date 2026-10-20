@@ -18,7 +18,7 @@ export function parseVideo(value: string | null | undefined): OfficialVideo | nu
   if (id && /^[A-Za-z0-9_-]{11}$/.test(id)) return { platform: 'youtube', id, embedUrl: `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`, thumbnail: `https://i.ytimg.com/vi/${id}/hqdefault.jpg` };
   if (h === 'vimeo.com' || h === 'player.vimeo.com') {
     const m = url.pathname.match(/(?:^|\/)(\d{6,12})(?:\/|$)/);
-    if (m) return { platform: 'vimeo', id: m[1], embedUrl: `https://player.vimeo.com/video/${m[1]}?autoplay=1&dnt=1`, thumbnail: null };
+    if (m?.[1]) return { platform: 'vimeo', id: m[1], embedUrl: `https://player.vimeo.com/video/${m[1]}?autoplay=1&dnt=1`, thumbnail: null };
   }
   return null;
 }
