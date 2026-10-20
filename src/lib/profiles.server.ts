@@ -34,7 +34,7 @@ export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey,
     const cover = await client.from(kind).select(columns).eq('id', row.id).eq('status', 'published').maybeSingle();
     if (cover.error) throw new Error('This profile could not be loaded. Please try again.');
     const assets = cover.data as unknown as Record<string, unknown> | null;
-    if (assets) for (const column of columns.split(',')) row[column] = assets[column] ?? null;
+    if (assets) for (const column of columns.split(',')) row[column] = typeof assets[column] === 'string' ? assets[column] : null;
     row['cover_image_url'] = approvedCover(typeof assets?.['cover_image_url'] === 'string' ? assets['cover_image_url'] : null, typeof assets?.['cover_image_status'] === 'string' ? assets['cover_image_status'] : null);
   }
   const cfg = ENTITIES[kind];
