@@ -40,7 +40,9 @@ export async function inspectWebsiteCover(website: string, name: string) {
   let reason = 'No candidate image found'; let best: { image: string; width: number; reason: string | null } | null = null;
   for (const image of candidates) {
     try {
-      const fetched = await safeFetch(image, true); const width = imageSize(fetched.bytes).width ?? 0;
+      const fetched = await safeFetch(image, true); const dimensions = imageSize(fetched.bytes);
+      if (dimensions.type === 'svg') { reason = 'Vector image has no verified 800px raster width'; continue; }
+      const width = dimensions.width ?? 0;
       const checked = coverSafetyReason({ title: page.title, name, website, finalUrl: page.finalUrl, pageText: page.pageText, alt: page.images.find(i => i.url === image)?.alt ?? '', image: fetched.url, width });
       if (checked) { reason = checked; if (checked.startsWith('Unsafe content') || checked.startsWith('Known advertising')) return { image: null, title: page.title, reason: checked }; continue; }
       if (image === page.preferred || image === page.twitterImage) return { image: fetched.url, title: page.title, reason: null };
