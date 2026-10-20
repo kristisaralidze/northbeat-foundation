@@ -12,7 +12,7 @@ export function OrganisationLogo({ name, slug, uploaded, website, eager = false,
   const org = data?.organisations.find(org => org.slug === slug);
   const domainWebsite = website ?? org?.website;
   const verified = officialLogo(uploaded ?? org?.logo_url, domainWebsite, source ?? org?.logo_image_source, sourceUrl ?? org?.logo_image_source_url);
-  const src = verified ?? (automatic ? organisationLogoUrl(null, domainWebsite) : null);
+  const src = verified ?? (automatic ? brandfetchLogoUrl(domainWebsite, 'icon') : null);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
   if (!src || src === failedSrc) return null;
