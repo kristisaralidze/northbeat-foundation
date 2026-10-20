@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
 const MAX_BYTES = 10 * 1024 * 1024;
 
-async function uploadImage(file: File, folder: string): Promise<string> {
+export async function uploadImage(file: File, folder: string): Promise<string> {
   if (!file.type.startsWith("image/")) throw new Error("Please choose an image file.");
   if (file.size > MAX_BYTES) throw new Error("Image must be under 10 MB.");
   const ext = (file.name.split(".").pop() || "img").toLowerCase().replace(/[^a-z0-9]/g, "");
