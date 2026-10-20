@@ -1,3 +1,4 @@
+import { officialVideo } from '@/lib/video';
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
@@ -75,6 +76,8 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
     mutationFn: async () => {
       const payload = normalise(cfg.fields, values);
       if (['organisations', 'events'].includes(entity)) {
+        if (payload['video_url'] && !officialVideo(payload['video_url'] as string, payload['video_source_url'] as string)) throw new Error('Use a YouTube or Vimeo video and the official channel URL on the same platform, like youtube.com/@name or vimeo.com/name.');
+        if (!payload['video_url']) payload['video_source_url'] = null;
         if (!coverEdited) delete payload['cover_image_url'];
         else {
           const image = payload['cover_image_url'] as string | null;

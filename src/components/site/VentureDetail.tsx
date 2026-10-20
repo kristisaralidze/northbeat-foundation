@@ -9,6 +9,8 @@ import { safeWebUrl, text, type DetailItem, type PublicProfile, type RelatedEntr
 import { OrganisationCover } from './OrganisationCover';
 import { OrganisationLogo } from './OrganisationLogo';
 import { brandColour } from '@/lib/brand';
+import { officialVideo } from '@/lib/video';
+import { VideoEmbed } from './VideoEmbed';
 import { RelationshipMap } from './RelationshipMap';
 const MapView = lazy(() => import('./VenueMap').then(module => ({ default: module.VenueMap })));
 
@@ -53,6 +55,7 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
   const otherGroups = profile.related.filter(group => !['organisations', 'events', 'opportunities'].includes(group.kind));
   const venue = text(row, 'venue'); const city = text(row, 'city'); const coordinates = row['format'] === 'online' ? null : venueCoordinates(venue, city);
   const website = safeWebUrl(text(row, 'website')); const description = text(row, 'description');
+  const video = officialVideo(text(row, 'video_url'), text(row, 'video_source_url'));
   const accent = isOrg ? brandColour(row['brand_accent']) : null;
   return <article className="nb-container nb-section nb-venture-detail" style={accent ? { '--official-brand-accent': accent } as React.CSSProperties : undefined}>
     <OrganisationCover image={text(row, 'cover_image_url')} website={text(row, 'image_source_url') ?? text(row, isOrg ? 'website' : 'registration_url') ?? text(row, 'source_url')} name={profile.title} />
@@ -62,6 +65,7 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
       <div className="min-w-0 flex-1"><h1 data-page-title className="nb-h1 break-words">{profile.title}</h1>{!isOrg && days !== null && <p className="nb-countdown mt-4">{days > 0 ? `In ${days} ${days === 1 ? 'day' : 'days'}` : days === 0 ? 'Today' : text(row, 'ends_at') && Date.parse(String(row['ends_at'])) >= Date.parse(now) ? 'Happening now' : 'Past event'}</p>}{profile.summary && <p className="nb-lead mt-5">{profile.summary}</p>}<dl className="nb-facts-strip">{facts.filter(([,value])=>value).map(([name,value])=><div key={name}><dt>{name}</dt><dd className={name === 'Fields' ? 'nb-official-field' : undefined}>{value}</dd></div>)}</dl></div>
     </header>
     {!isOrg && <CalendarActions profile={profile} />}
+    {video && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">Watch</h2><VideoEmbed video={video} title={profile.title} channel={text(row, 'video_source_url')} /></section>}
     {description && description !== profile.summary && <p className="nb-body nb-detail-description">{description}</p>}
     {steps.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">{isOrg ? 'Useful if you are…' : 'Go if you are…'}</h2><ul className="nb-journey-sentences">{steps.map(step => <li key={step.id}>{journeySentence(step.name)}</li>)}</ul></section>}
     {isOrg && connections.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2">Connections</h2><RelationshipMap profile={connectionProfile} link={(kind, entry) => <DetailLink item={{ ...entry, kind }}>{entry.title}</DetailLink>} /><div className="nb-connection-lists">{connections.map(group => <div key={group.label}><h3 className="nb-h3 mb-4">{group.label}</h3><ul className="space-y-3">{group.entries.map(entry => <li key={entry.id}><DetailLink item={{ ...entry, kind: group.kind }}>{entry.title}</DetailLink></li>)}</ul></div>)}</div></section>}

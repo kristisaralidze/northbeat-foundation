@@ -230,6 +230,8 @@ export type Database = {
           title: string
           updated_at: string
           venue: string | null
+          video_source_url: string | null
+          video_url: string | null
         }
         Insert: {
           apply_deadline_at?: string | null
@@ -266,6 +268,8 @@ export type Database = {
           title: string
           updated_at?: string
           venue?: string | null
+          video_source_url?: string | null
+          video_url?: string | null
         }
         Update: {
           apply_deadline_at?: string | null
@@ -302,6 +306,8 @@ export type Database = {
           title?: string
           updated_at?: string
           venue?: string | null
+          video_source_url?: string | null
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -1118,6 +1124,8 @@ export type Database = {
           ticket_min_eur: number | null
           type: Database["public"]["Enums"]["organisation_type"]
           updated_at: string
+          video_source_url: string | null
+          video_url: string | null
           website: string | null
           website_health_checked_at: string | null
           website_health_reason: string | null
@@ -1167,6 +1175,8 @@ export type Database = {
           ticket_min_eur?: number | null
           type: Database["public"]["Enums"]["organisation_type"]
           updated_at?: string
+          video_source_url?: string | null
+          video_url?: string | null
           website?: string | null
           website_health_checked_at?: string | null
           website_health_reason?: string | null
@@ -1216,6 +1226,8 @@ export type Database = {
           ticket_min_eur?: number | null
           type?: Database["public"]["Enums"]["organisation_type"]
           updated_at?: string
+          video_source_url?: string | null
+          video_url?: string | null
           website?: string | null
           website_health_checked_at?: string | null
           website_health_reason?: string | null
