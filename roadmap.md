@@ -14,7 +14,8 @@
 # Organisation logos
 - [x] Add shared uploaded-first domain logos and error fallbacks across public organisation listings; test and verify.
 - [x] Configure the supplied Brandfetch public client ID and verify light monogram fallbacks on Explore and profiles, including image failures before hydration.
-- [ ] Verify automatic logos with the corrected Brandfetch ID including its trailing hyphen.
+- [x] Update Brandfetch client ID including its trailing hyphen and check Explore and organisation profiles.
+- [ ] Load automatic logos (blocked: Brandfetch redirects image requests to its documentation instead of returning images; monogram tiles verified).
 
 # Atmospheric image
 - [x] Transfer Concept B fabric waves as desktop/phone WebP assets under 300 KB (24 KB and 7 KB).
