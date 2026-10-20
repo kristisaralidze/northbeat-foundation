@@ -268,8 +268,17 @@ html.lenis, html.lenis body { height: auto; }
 .nb-arrival-atmosphere .nb-atmospheric-image { position: absolute; inset: -5% 0; opacity: .55; }
 .nb-home-opening-content { position: relative; }
 .nb-home-wordmark-section .nb-home-tagline { color: var(--ink); }
-.nb-home-newsletter-atmosphere { position: relative; isolation: isolate; --muted-foreground: var(--ink); }
-.nb-home-newsletter-atmosphere > .nb-atmospheric-image { position: absolute; inset: -1.5rem; z-index: -1; opacity: .35; overflow: hidden; }
+.nb-site-footer { background: var(--background); }
+.nb-footer-signup { position: relative; isolation: isolate; overflow: hidden; padding: var(--space-24) var(--gutter); color: var(--ink); --muted-foreground: var(--ink); }
+.nb-footer-signup > .nb-atmospheric-image { position: absolute; inset: 0; z-index: -1; opacity: .45; }
+.nb-footer-signup-content { max-width: 40rem; margin-inline: auto; }
+.nb-footer-signup-content h2 { text-align: center; }
+.nb-footer-signup-content > p { margin-block: var(--space-6) var(--space-8); text-align: center; }
+.nb-footer-bottom { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); padding-block: var(--space-8); background: var(--background); }
+@media (max-width: 767px) {
+  .nb-footer-signup { padding-block: var(--space-16); }
+  .nb-footer-bottom { flex-direction: column; text-align: center; }
+}
 .nb-learn-arrival { display: grid; grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr); align-items: center; gap: var(--space-12); }
 .nb-learn-atmosphere-circle { width: 100%; max-width: 22rem; aspect-ratio: 1; border-radius: 50%; overflow: hidden; justify-self: end; }
 @media (max-width: 767px) {

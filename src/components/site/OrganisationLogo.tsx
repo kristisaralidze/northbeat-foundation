@@ -13,7 +13,7 @@ export function OrganisationLogo({ name, slug, uploaded, website, eager = false 
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   return <span className="nb-org-logo" data-organisation-logo={slug}>
     {src && src !== failedSrc
-      ? <img src={src} alt={`${name} logo`} width={128} height={128} loading={eager ? 'eager' : 'lazy'} decoding="async" onError={() => setFailedSrc(src)} />
+      ? <img ref={image => { if (image?.complete && image.naturalWidth === 0) setFailedSrc(src); }} src={src} alt={`${name} logo`} width={128} height={128} loading={eager ? 'eager' : 'lazy'} decoding="async" onError={() => setFailedSrc(src)} />
       : <span className="nb-monogram" aria-hidden="true">{name.trim().charAt(0).toLocaleUpperCase()}</span>}
   </span>;
 }

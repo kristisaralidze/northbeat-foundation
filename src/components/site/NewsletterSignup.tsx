@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { subscribeToNewsletter } from "@/lib/newsletter.functions";
+import { Button } from '@/components/ui/button';
 
 export function NewsletterSignup({ source = "footer" }: { source?: string }) {
   const subscribe = useServerFn(subscribeToNewsletter);
@@ -39,9 +40,9 @@ export function NewsletterSignup({ source = "footer" }: { source?: string }) {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <button type="submit" className="nb-btn nb-btn-primary" disabled={state === "busy"}>
+        <Button type="submit" className="nb-btn nb-btn-primary" disabled={state === "busy"}>
           {state === "busy" ? "Signing up…" : "Subscribe"}
-        </button>
+        </Button>
       </div>
       <label className="flex items-start gap-2 nb-small text-muted-foreground">
         <input type="checkbox" className="mt-1 accent-primary" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
