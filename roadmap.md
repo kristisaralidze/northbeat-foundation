@@ -135,3 +135,5 @@
 - [x] Test labels and ordering; verify grid, embed, guest links and reciprocal person link in preview with temporary entries and remove them.
 - [ ] OpenAlex research profiles: admin match, weekly refresh, public Research section
 - [ ] ClinicalTrials.gov trials: admin pick, weekly refresh, public Clinical trials section
+- [ ] PRH YTJ business ID: admin match, monthly refresh, facts strip line
+- [ ] Nominatim geocoded maps on event and organisation pages, admin-correctable lat/lng
