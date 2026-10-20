@@ -1,4 +1,5 @@
 # Official brand assets
+- [ ] Apply revised point 3: Brandfetch Logo/Brand API, own-domain files or actual admin uploads only; store provenance for every image.
 - [ ] Add secret-backed, admin-only Brandfetch imports, stored light/dark logos, covers, colours and timestamps; prioritise published investors/universities then startups; stop/report 429. Blocker: API key required.
 - [ ] Put Brandfetch covers in pending review and apply brand accents only to thin logo border and field tags; report import counts and empty results.
 - [ ] Remove organisation/event header placeholders and show official logos, approved credited covers and compact facts only.

@@ -30,10 +30,12 @@ export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey,
   const [row] = await readEntries(client, kind, { slug });
   if (!row) return null;
   if (kind === 'organisations' || kind === 'events') {
-    const cover = await client.from(kind).select('cover_image_url,cover_image_status').eq('id', row.id).eq('status', 'published').maybeSingle();
+    const columns = kind === 'organisations' ? 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url,brand_accent' : 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url';
+    const cover = await client.from(kind).select(columns).eq('id', row.id).eq('status', 'published').maybeSingle();
     if (cover.error) throw new Error('This profile could not be loaded. Please try again.');
-    row['cover_image_url'] = approvedCover(cover.data?.cover_image_url, cover.data?.cover_image_status);
-    row['cover_image_status'] = cover.data?.cover_image_status ?? 'pending';
+    const assets = cover.data as unknown as Record<string, unknown> | null;
+    if (assets) for (const column of columns.split(',')) row[column] = assets[column] ?? null;
+    row['cover_image_url'] = approvedCover(typeof assets?.['cover_image_url'] === 'string' ? assets['cover_image_url'] : null, typeof assets?.['cover_image_status'] === 'string' ? assets['cover_image_status'] : null);
   }
   const cfg = ENTITIES[kind];
   const { data: tagLinks, error: tagError } = await client.from(cfg.termTable).select('term_id').eq(cfg.termFk, row.id);

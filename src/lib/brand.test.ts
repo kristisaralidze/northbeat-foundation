@@ -1,0 +1,9 @@
+import { describe, expect, it } from 'vitest';
+import { ownDomain, officialLogo, brandPriority, parseBrand } from './brand';
+describe('official brand assets', () => {
+  it('allows own-domain assets but not lookalike domains', () => { expect(ownDomain('https://media.company.fi/logo.png', 'https://company.fi')).toBe(true); expect(ownDomain('https://company.fi.evil.com/logo.png', 'https://company.fi')).toBe(false); });
+  it('allows stored Brandfetch logos, not arbitrary external logos', () => { expect(officialLogo('https://cdn.brandfetch.io/logo.png', 'https://company.fi', 'brandfetch', 'https://api.brandfetch.io/v2/brands/domain/company.fi')).toBe('https://cdn.brandfetch.io/logo.png'); expect(officialLogo('https://random.com/logo.png', 'https://company.fi')).toBeNull(); });
+  it('prioritises investors and universities before startups', () => { expect(brandPriority('investor')).toBeLessThan(brandPriority('university')); expect(brandPriority('university')).toBeLessThan(brandPriority('startup')); });
+  it('keeps missing brand imagery empty', () => { expect(parseBrand({ logos: [], images: [], colors: [] })).toEqual({ light: null, dark: null, covers: [], accent: null, darkColour: null, lightColour: null }); });
+  it('extracts light and dark official logos, covers and colours', () => { expect(parseBrand({ logos: [{ type: 'logo', theme: 'light', formats: [{ src: 'https://cdn.brandfetch.io/light.svg', format: 'svg' }] }, { type: 'logo', theme: 'dark', formats: [{ src: 'https://cdn.brandfetch.io/dark.png' }] }], images: [{ formats: [{ src: 'https://cdn.brandfetch.io/banner.jpg' }] }], colors: [{ type: 'accent', hex: '#123456' }] })).toMatchObject({ light: 'https://cdn.brandfetch.io/light.svg', dark: 'https://cdn.brandfetch.io/dark.png', covers: ['https://cdn.brandfetch.io/banner.jpg'], accent: '#123456' }); });
+});

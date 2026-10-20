@@ -12,7 +12,7 @@
 ## Architecture rules
 - Home owns one Lenis/GSAP story; other public pages use keyed PublicScrollFrame. Both clean up on navigation and reduced motion. Why: avoid duplicate tickers.
 - Fabric is the static still image in every placement (arrival, Learn circle, footer band); no shader or animation. Why: the WebGL silk was explicitly removed.
-- Logos request Brandfetch fallback/404. Cover candidates use bounded safety fetches, admin-only columns and approval-gated public reads; preserve removals. Why: unsafe assets cannot bypass review.
+- Asset provenance gates covers to own-domain, admin media uploads or Brandfetch; logos hide on failure. Admin-only Brand API imports run once, store assets/colours and stop on quota. Why: official identity without per-view API calls.
 - Relationship maps use published links, network tokens and measured node lines; timelines use tested date helpers and URL filters. Why: preserve real connections across screen sizes.
 - The home ecosystem groups the paginated published reader into fixed group anchors and one cloud dot per entry; group links use Explore's canonical type search and separate conceptual edges. Why: group browsing stays distinct from individual database relationships.
 - The home globe uses local R3F geometry, a still, fixed canvas measurement and wrapper transforms; scroll events drive framing/zoom with endpoint snaps, touch pointers pinch, and OrbitControls recovers rotation after dragging. Why: scroll stays uncaptured and fast jumps settle correctly.

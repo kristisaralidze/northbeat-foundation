@@ -37,6 +37,8 @@ export const Route = createFileRoute("/admin")({
 });
 
 const items = [
+  { title: "Missing official assets", to: "/admin/missing-assets" },
+  { title: "Fetch brand data", to: "/admin/brand-data" },
   { title: "Cover images", to: "/admin/cover-images" },
   { title: "Website health", to: "/admin/website-health" },
   { title: "Organisations", to: "/admin/organisations" },

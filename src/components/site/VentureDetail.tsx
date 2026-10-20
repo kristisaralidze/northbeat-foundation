@@ -8,7 +8,7 @@ import { EMPTY_SEARCH } from '@/lib/explore';
 import { safeWebUrl, text, type DetailItem, type PublicProfile, type RelatedEntry } from '@/lib/profiles';
 import { OrganisationCover } from './OrganisationCover';
 import { OrganisationLogo } from './OrganisationLogo';
-import { SpecimenCard } from './SpecimenCard';
+import { brandColour } from '@/lib/brand';
 import { RelationshipMap } from './RelationshipMap';
 const MapView = lazy(() => import('./VenueMap').then(module => ({ default: module.VenueMap })));
 
@@ -53,19 +53,17 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
   const otherGroups = profile.related.filter(group => !['organisations', 'events', 'opportunities'].includes(group.kind));
   const venue = text(row, 'venue'); const city = text(row, 'city'); const coordinates = row['format'] === 'online' ? null : venueCoordinates(venue, city);
   const website = safeWebUrl(text(row, 'website')); const description = text(row, 'description');
-  const dateKey = start ? dayKey(start, text(row, 'timezone') ?? undefined) : '';
-  return <article className="nb-container nb-section nb-venture-detail">
-    <OrganisationCover image={text(row, 'cover_image_url')} website={text(row, isOrg ? 'website' : 'registration_url') ?? text(row, 'source_url')} fallback={<SpecimenCard name={profile.title} terms={terms} />} />
+  const accent = isOrg ? brandColour(row['brand_accent']) : null;
+  return <article className="nb-container nb-section nb-venture-detail" style={accent ? { '--official-brand-accent': accent } as React.CSSProperties : undefined}>
+    <OrganisationCover image={text(row, 'cover_image_url')} website={text(row, 'image_source_url') ?? text(row, isOrg ? 'website' : 'registration_url') ?? text(row, 'source_url')} name={profile.title} />
     <div className="mb-8">{isOrg ? <Link to="/explore" search={EMPTY_SEARCH} className="nb-link">Explore</Link> : <Link to="/events" search={{ type: '', city: '', month: '', archive: false, view: 'list' }} className="nb-link">Events</Link>}</div>
     <header data-profile-identity data-profile-detail={isOrg ? [label, city].filter(Boolean).join(', ') : label} className="nb-detail-identity">
-      {!isOrg && dateKey && <div className="nb-calendar-tile" aria-label={dateLabel(start ?? '')}><span>{Number(dateKey.slice(8))}</span><p>{new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${dateKey}T12:00:00Z`))}</p></div>}
-      <div className="min-w-0"><h1 data-page-title className="nb-h1 break-words">{profile.title}</h1>{!isOrg && days !== null && <p className="nb-countdown mt-4">{days > 0 ? `In ${days} ${days === 1 ? 'day' : 'days'}` : days === 0 ? 'Today' : text(row, 'ends_at') && Date.parse(String(row['ends_at'])) >= Date.parse(now) ? 'Happening now' : 'Past event'}</p>}{profile.summary && <p className="nb-lead mt-5">{profile.summary}</p>}</div>
+      <OrganisationLogo name={profile.title} uploaded={text(row,'logo_url')} website={text(row,isOrg ? 'website' : 'registration_url') ?? text(row,'source_url')} source={text(row,'logo_image_source')} sourceUrl={text(row,'logo_image_source_url')} large eager automatic={isOrg} />
+      <div className="min-w-0 flex-1"><h1 data-page-title className="nb-h1 break-words">{profile.title}</h1>{!isOrg && days !== null && <p className="nb-countdown mt-4">{days > 0 ? `In ${days} ${days === 1 ? 'day' : 'days'}` : days === 0 ? 'Today' : text(row, 'ends_at') && Date.parse(String(row['ends_at'])) >= Date.parse(now) ? 'Happening now' : 'Past event'}</p>}{profile.summary && <p className="nb-lead mt-5">{profile.summary}</p>}<dl className="nb-facts-strip">{facts.filter(([,value])=>value).map(([name,value])=><div key={name}><dt>{name}</dt><dd className={name === 'Fields' ? 'nb-official-field' : undefined}>{value}</dd></div>)}</dl></div>
     </header>
     {!isOrg && <CalendarActions profile={profile} />}
-    {isOrg && <dl className="nb-facts-strip">{facts.filter(([, value]) => value).map(([name, value]) => <div key={name}><dt>{name}</dt><dd>{value}</dd></div>)}</dl>}
     {description && description !== profile.summary && <p className="nb-body nb-detail-description">{description}</p>}
     {steps.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">{isOrg ? 'Useful if you are…' : 'Go if you are…'}</h2><ul className="nb-journey-sentences">{steps.map(step => <li key={step.id}>{journeySentence(step.name)}</li>)}</ul></section>}
-    {!isOrg && <dl className="nb-facts-strip">{facts.filter(([, value]) => value).map(([name, value]) => <div key={name}><dt>{name}</dt><dd>{value}</dd></div>)}</dl>}
     {isOrg && connections.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2">Connections</h2><RelationshipMap profile={connectionProfile} link={(kind, entry) => <DetailLink item={{ ...entry, kind }}>{entry.title}</DetailLink>} /><div className="nb-connection-lists">{connections.map(group => <div key={group.label}><h3 className="nb-h3 mb-4">{group.label}</h3><ul className="space-y-3">{group.entries.map(entry => <li key={entry.id}><DetailLink item={{ ...entry, kind: group.kind }}>{entry.title}</DetailLink></li>)}</ul></div>)}</div></section>}
     {isOrg && detail && <Recommendations title="Coming up with them" items={detail.coming} now={now} />}
     {!isOrg && coordinates && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">Venue</h2><ClientOnly fallback={null}><Suspense fallback={null}><MapView latitude={coordinates[0]} longitude={coordinates[1]} name={venue ?? city ?? ''} /></Suspense></ClientOnly><a className="nb-link nb-small mt-3 inline-block" href={`https://www.openstreetmap.org/?mlat=${coordinates[0]}&mlon=${coordinates[1]}#map=16/${coordinates[0]}/${coordinates[1]}`} target="_blank" rel="noopener noreferrer">Open venue map</a></section>}

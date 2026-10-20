@@ -11,9 +11,9 @@ export function OrganisationCard({ organisation: org, terms }: { organisation: D
   const { shown, extra } = cardTags(org, terms);
   return (
     <article data-result-id={org.id} className="nb-card flex h-full min-w-0 flex-col gap-6">
-      <OrganisationCover image={org.cover_image_url} website={org.website} strip />
+      <OrganisationCover image={org.cover_image_url} website={org.image_source_url ?? org.website} name={org.name} strip />
       <div className="flex items-start justify-between gap-4">
-        <OrganisationLogo name={org.name} slug={org.slug} uploaded={org.logo_url} website={org.website} />
+        <OrganisationLogo name={org.name} slug={org.slug} uploaded={org.logo_url} website={org.website} source={org.logo_image_source ?? null} sourceUrl={org.logo_image_source_url ?? null} />
         <span className="nb-small text-muted-foreground text-right"><span className={`nb-group-dot nb-network-group-${networkGroup('organisation', org.type)}`} aria-hidden />{humanize(org.type)}</span>
       </div>
       <div className="min-w-0">

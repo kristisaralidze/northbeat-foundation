@@ -210,7 +210,14 @@ export type Database = {
           event_type: Database["public"]["Enums"]["event_type"]
           format: Database["public"]["Enums"]["event_format"] | null
           id: string
+          image_source: string | null
+          image_source_url: string | null
+          image_uploaded_by: string | null
           last_checked: string | null
+          logo_image_source: string | null
+          logo_image_source_url: string | null
+          logo_uploaded_by: string | null
+          logo_url: string | null
           price_note: string | null
           published_at: string | null
           registration_url: string | null
@@ -239,7 +246,14 @@ export type Database = {
           event_type: Database["public"]["Enums"]["event_type"]
           format?: Database["public"]["Enums"]["event_format"] | null
           id?: string
+          image_source?: string | null
+          image_source_url?: string | null
+          image_uploaded_by?: string | null
           last_checked?: string | null
+          logo_image_source?: string | null
+          logo_image_source_url?: string | null
+          logo_uploaded_by?: string | null
+          logo_url?: string | null
           price_note?: string | null
           published_at?: string | null
           registration_url?: string | null
@@ -268,7 +282,14 @@ export type Database = {
           event_type?: Database["public"]["Enums"]["event_type"]
           format?: Database["public"]["Enums"]["event_format"] | null
           id?: string
+          image_source?: string | null
+          image_source_url?: string | null
+          image_uploaded_by?: string | null
           last_checked?: string | null
+          logo_image_source?: string | null
+          logo_image_source_url?: string | null
+          logo_uploaded_by?: string | null
+          logo_url?: string | null
           price_note?: string | null
           published_at?: string | null
           registration_url?: string | null
@@ -1055,6 +1076,15 @@ export type Database = {
       }
       organisations: {
         Row: {
+          brand_accent: string | null
+          brand_cover_urls: Json
+          brand_dark: string | null
+          brand_fetch_reason: string | null
+          brand_fetch_status: string | null
+          brand_fetched_at: string | null
+          brand_light: string | null
+          brand_logo_dark_url: string | null
+          brand_logo_light_url: string | null
           city: string | null
           contact_email: string | null
           contact_email_public: boolean
@@ -1068,8 +1098,15 @@ export type Database = {
           description: string | null
           founded_year: number | null
           id: string
+          image_source: string | null
+          image_source_url: string | null
+          image_uploaded_by: string | null
           last_checked: string | null
           linkedin_url: string | null
+          logo_api_image_source_url: string | null
+          logo_image_source: string | null
+          logo_image_source_url: string | null
+          logo_uploaded_by: string | null
           logo_url: string | null
           name: string
           published_at: string | null
@@ -1088,6 +1125,15 @@ export type Database = {
           website_health_title: string | null
         }
         Insert: {
+          brand_accent?: string | null
+          brand_cover_urls?: Json
+          brand_dark?: string | null
+          brand_fetch_reason?: string | null
+          brand_fetch_status?: string | null
+          brand_fetched_at?: string | null
+          brand_light?: string | null
+          brand_logo_dark_url?: string | null
+          brand_logo_light_url?: string | null
           city?: string | null
           contact_email?: string | null
           contact_email_public?: boolean
@@ -1101,8 +1147,15 @@ export type Database = {
           description?: string | null
           founded_year?: number | null
           id?: string
+          image_source?: string | null
+          image_source_url?: string | null
+          image_uploaded_by?: string | null
           last_checked?: string | null
           linkedin_url?: string | null
+          logo_api_image_source_url?: string | null
+          logo_image_source?: string | null
+          logo_image_source_url?: string | null
+          logo_uploaded_by?: string | null
           logo_url?: string | null
           name: string
           published_at?: string | null
@@ -1121,6 +1174,15 @@ export type Database = {
           website_health_title?: string | null
         }
         Update: {
+          brand_accent?: string | null
+          brand_cover_urls?: Json
+          brand_dark?: string | null
+          brand_fetch_reason?: string | null
+          brand_fetch_status?: string | null
+          brand_fetched_at?: string | null
+          brand_light?: string | null
+          brand_logo_dark_url?: string | null
+          brand_logo_light_url?: string | null
           city?: string | null
           contact_email?: string | null
           contact_email_public?: boolean
@@ -1134,8 +1196,15 @@ export type Database = {
           description?: string | null
           founded_year?: number | null
           id?: string
+          image_source?: string | null
+          image_source_url?: string | null
+          image_uploaded_by?: string | null
           last_checked?: string | null
           linkedin_url?: string | null
+          logo_api_image_source_url?: string | null
+          logo_image_source?: string | null
+          logo_image_source_url?: string | null
+          logo_uploaded_by?: string | null
           logo_url?: string | null
           name?: string
           published_at?: string | null
@@ -1486,6 +1555,11 @@ export type Database = {
         }
         Returns: Json
       }
+      asset_domain: { Args: { _url: string }; Returns: string }
+      asset_on_domain: {
+        Args: { _url: string; _website: string }
+        Returns: boolean
+      }
       entry_is_published: {
         Args: { _id: string; _kind: Database["public"]["Enums"]["entry_kind"] }
         Returns: boolean
@@ -1497,6 +1571,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin_media_asset: { Args: { _url: string }; Returns: boolean }
       public_organisations: {
         Args: never
         Returns: {
