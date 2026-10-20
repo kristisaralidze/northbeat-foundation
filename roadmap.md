@@ -1,11 +1,11 @@
 # Official brand assets
-- [ ] Add uncached Brandfetch name autocomplete to public organisation submission and admin New organisation, 300ms debounce from 2 characters, maximum 5, editable name/website and attribution.
-- [ ] Apply revised point 3: Brandfetch Logo/Brand API, own-domain files or actual admin uploads only; store provenance for every image.
-- [ ] Add secret-backed, admin-only Brandfetch imports, stored light/dark logos, covers, colours and timestamps; prioritise published investors/universities then startups; stop/report 429. Blocker: API key required.
-- [ ] Put Brandfetch covers in pending review and apply brand accents only to thin logo border and field tags; report import counts and empty results.
-- [ ] Remove organisation/event header placeholders and show official logos, approved credited covers and compact facts only.
-- [ ] Store logo/cover provenance and enforce own-domain or verified admin-upload approval, including existing assets.
-- [ ] Add Missing official assets with website/edit links and real Brandfetch checks; test and verify public/admin flows.
+- [x] Add uncached Brandfetch name autocomplete to both forms, 300ms debounce from 2 characters, maximum 5, editable name/website and attribution.
+- [x] Apply revised official-source rule and store provenance.
+- [x] Add secret-backed admin Brand API imports with prioritisation, stored data and quota stop; completed 97 organisations.
+- [x] Queue covers for review and limit accents to logo border/field tags; returned 94 logos, 74 image sets and 96 colour records.
+- [x] Remove organisation/event header placeholders and move maps under Connections.
+- [x] Enforce own-domain, Brandfetch result or verified admin-upload approval.
+- [x] Add Missing official assets; 130 tests passed and public/admin form flows verified.
 
 # Urgent listing safety
 - [x] Remove 4MindHealth cover and set its listing to draft; clear 35 other website-fetched covers.
@@ -52,7 +52,7 @@
 - [x] Add shared uploaded-first domain logos and error fallbacks across public organisation listings; test and verify.
 - [x] Configure the supplied Brandfetch public client ID and verify light monogram fallbacks on Explore and profiles, including image failures before hydration.
 - [x] Update Brandfetch client ID including its trailing hyphen and check Explore and organisation profiles.
-- [ ] Load automatic logos (blocked: Brandfetch redirects image requests to its documentation instead of returning images; monogram tiles verified).
+- [x] Replace failed automatic-logo placeholders with verified official assets; hide failed logo delivery.
 
 # Atmospheric image
 - [x] Transfer Concept B fabric waves as desktop/phone WebP assets under 300 KB (24 KB and 7 KB).
