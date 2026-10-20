@@ -1,4 +1,5 @@
 # Official brand assets
+- [ ] Add uncached Brandfetch name autocomplete to public organisation submission and admin New organisation, 300ms debounce from 2 characters, maximum 5, editable name/website and attribution.
 - [ ] Apply revised point 3: Brandfetch Logo/Brand API, own-domain files or actual admin uploads only; store provenance for every image.
 - [ ] Add secret-backed, admin-only Brandfetch imports, stored light/dark logos, covers, colours and timestamps; prioritise published investors/universities then startups; stop/report 429. Blocker: API key required.
 - [ ] Put Brandfetch covers in pending review and apply brand accents only to thin logo border and field tags; report import counts and empty results.
