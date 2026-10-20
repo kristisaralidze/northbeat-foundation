@@ -156,7 +156,7 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
               gsap.to(track, {
                 x: () => -distance(), ease: 'none',
                 scrollTrigger: {
-                  id: 'home-happening', trigger: happening, start: 'clamp(top 64px)', end: () => `clamp(+=${Math.max(1, distance())})`,
+                  id: 'home-happening', trigger: happening, start: 'clamp(bottom bottom)', end: () => `+=${Math.max(1, distance())}`,
                   pin: true, scrub: 0.5, invalidateOnRefresh: true, fastScrollEnd: true,
                   onLeave: self => settleHappening(self, true),
                   onEnterBack: self => settleHappening(self, true),
