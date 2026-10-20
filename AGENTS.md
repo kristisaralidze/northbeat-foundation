@@ -11,7 +11,7 @@
 
 ## Architecture rules
 - Home owns one Lenis/GSAP story; other public pages use keyed PublicScrollFrame. Both clean up on navigation and reduced motion. Why: avoid duplicate tickers.
-- Fabric uses responsive stills; Learn/footer dynamically load a layered-fold shader with palette tokens and a visibility-aware loop. Why: no SSR browser access or new scroll controller.
+- Fabric is the static still image in every placement (arrival, Learn circle, footer band); no shader or animation. Why: the WebGL silk was explicitly removed.
 - OrganisationLogo reuses the published directory query. Why: consistent logos without editorial mutations.
 - Relationship maps use published links, network tokens and measured node lines; timelines use tested date helpers and URL filters. Why: preserve real connections across screen sizes.
 - The home ecosystem groups the paginated published reader into fixed group anchors and one cloud dot per entry; group links use Explore's canonical type search and separate conceptual edges. Why: group browsing stays distinct from individual database relationships.
