@@ -8,6 +8,7 @@ import { selectClass } from "@/components/admin/EntityList";
 type Search = { type?: string; status?: string };
 
 export const Route = createFileRoute("/admin/submissions/")({
+  head: () => ({ meta: [{'title': 'Submissions | Northbeat admin'}, {'name': 'description', 'content': 'Submissions for Northbeat.'}, {'property': 'og:title', 'content': 'Submissions | Northbeat admin'}, {'property': 'og:description', 'content': 'Submissions for Northbeat.'}, {'property': 'og:type', 'content': 'website'}, {'name': 'twitter:card', 'content': 'summary'}] }),
   validateSearch: (s: Record<string, unknown>): Search => ({
     ...(typeof s["type"] === "string" && s["type"] ? { type: s["type"] } : {}),
     ...(typeof s["status"] === "string" && s["status"] ? { status: s["status"] } : {}),

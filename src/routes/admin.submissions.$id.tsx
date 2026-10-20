@@ -12,6 +12,7 @@ import { approvableEntity, buildDraft, ENTITY_TO_KIND, submissionLabel, KIND_TO_
 import { selectClass } from "@/components/admin/EntityList";
 
 export const Route = createFileRoute("/admin/submissions/$id")({
+  head: () => ({ meta: [{'title': 'Edit submissions | Northbeat admin'}, {'name': 'description', 'content': 'Edit submissions for Northbeat.'}, {'property': 'og:title', 'content': 'Edit submissions | Northbeat admin'}, {'property': 'og:description', 'content': 'Edit submissions for Northbeat.'}, {'property': 'og:type', 'content': 'website'}, {'name': 'twitter:card', 'content': 'summary'}] }),
   component: Detail,
 });
 
