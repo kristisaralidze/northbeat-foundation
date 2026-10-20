@@ -147,9 +147,22 @@ export function HomeScrollStory({ children }: { children: ReactNode }) {
             const track = happening?.querySelector<HTMLElement>('.nb-home-happening-track');
             const viewport = happening?.querySelector<HTMLElement>('.nb-home-happening-window');
             if (happening && track && viewport) {
+              const distance = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
+              const settleHappening = (self: ScrollTriggerInstance, final: boolean) => {
+                self.getTween()?.progress(1);
+                self.animation?.progress(final ? 1 : 0);
+                gsap.set(track, { x: final ? -distance() : 0 });
+              };
               gsap.to(track, {
-                x: () => -Math.max(0, track.scrollWidth - viewport.clientWidth), ease: 'none',
-                scrollTrigger: { id: 'home-happening', trigger: happening, start: 'top 64px', end: () => `+=${Math.max(window.innerHeight, track.scrollWidth - viewport.clientWidth)}`, pin: true, scrub: 0.5, invalidateOnRefresh: true, fastScrollEnd: true },
+                x: () => -distance(), ease: 'none',
+                scrollTrigger: {
+                  id: 'home-happening', trigger: happening, start: 'top 64px', end: () => `+=${Math.max(1, distance())}`,
+                  pin: true, scrub: 0.5, invalidateOnRefresh: true, fastScrollEnd: true,
+                  onLeave: self => settleHappening(self, true),
+                  onEnterBack: self => settleHappening(self, true),
+                  onLeaveBack: self => settleHappening(self, false),
+                  onRefresh: self => { if (self.progress === 1) settleHappening(self, true); else if (self.progress === 0) settleHappening(self, false); },
+                },
               });
             }
             gsap.set(shell, { '--home-surface': surfaces[0] });
