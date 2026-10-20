@@ -276,7 +276,7 @@ html.lenis, html.lenis body { height: auto; }
 .nb-site-footer { background: var(--background); }
 .nb-footer-signup { position: relative; isolation: isolate; overflow: hidden; padding: var(--space-24) var(--gutter); color: var(--ink); --muted-foreground: var(--ink); }
 .nb-footer-signup > .nb-living-fabric { position: absolute; inset: 0; z-index: -1; opacity: 1; }
-.nb-footer-signup-content { position: relative; isolation: isolate; background: var(--fabric-glass); backdrop-filter: blur(20px); border-radius: 16px; padding: var(--space-10); }
+.nb-footer-signup-content { position: relative; isolation: isolate; background: var(--fabric-glass); backdrop-filter: blur(20px); border-radius: 16px; padding: var(--space-12); }
 .nb-footer-signup { --fabric-glass: rgb(255 255 255 / .72); --fabric-edge-fade: linear-gradient(to bottom, var(--background), transparent); }
 .nb-footer-signup::before { content: ''; position: absolute; inset: 0 0 auto; height: 48px; background: var(--fabric-edge-fade); pointer-events: none; }
 .nb-footer-signup-content { max-width: 40rem; margin-inline: auto; }
