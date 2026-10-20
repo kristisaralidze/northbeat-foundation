@@ -800,6 +800,7 @@ html.lenis, html.lenis body { height: auto; }
   padding: var(--space-2);
   background: var(--snow);
   border-radius: var(--radius);
+  &:has(.nb-monogram) { background: var(--frost); }
 }
 @utility nb-org-link {
   display: inline-flex;

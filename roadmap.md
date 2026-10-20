@@ -9,7 +9,7 @@
 
 # Organisation logos
 - [x] Add shared uploaded-first domain logos and error fallbacks across public organisation listings; test and verify.
-- [ ] Activate Brandfetch with the actual public client ID (blocked: placeholder supplied, question skipped).
+- [ ] Activate the supplied Brandfetch public client ID, restore light fallback tiles and verify Explore and profiles.
 
 # Atmospheric image
 - [x] Transfer Concept B fabric waves as desktop/phone WebP assets under 300 KB (24 KB and 7 KB).
