@@ -133,3 +133,8 @@
 # Podcast
 - [x] Build /podcast episode grid with covers, guests, topics and duration; add video embed, key takeaways and show notes to episode pages.
 - [x] Test labels and ordering; verify grid, embed, guest links and reciprocal person link in preview with temporary entries and remove them.
+- [x] OpenAlex research profiles: admin match, weekly refresh, public Research section
+- [x] ClinicalTrials.gov trials: admin pick, weekly refresh, public Clinical trials section
+- [x] PRH YTJ business ID: admin match, monthly refresh, facts strip line
+- [x] Nominatim geocoded maps on event and organisation pages, admin-correctable lat/lng
+- [x] News feed: news_feed_url, daily latest 3 headlines, "Latest from them" section

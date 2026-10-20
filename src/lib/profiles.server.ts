@@ -30,12 +30,17 @@ export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey,
   const [row] = await readEntries(client, kind, { slug });
   if (!row) return null;
   if (kind === 'organisations' || kind === 'events') {
-    const columns = kind === 'organisations' ? 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url,brand_accent,video_url,video_source_url' : 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url,video_url,video_source_url';
+    const columns = kind === 'organisations' ? 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url,brand_accent,video_url,video_source_url,openalex_id,research,business_id,registration_date,company_form,main_business_line,latitude,longitude,news_items' : 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url,video_url,video_source_url,latitude,longitude';
     const cover = await client.from(kind).select(columns).eq('id', row.id).eq('status', 'published').maybeSingle();
     if (cover.error) throw new Error('This profile could not be loaded. Please try again.');
     const assets = cover.data as unknown as Record<string, unknown> | null;
-    if (assets) for (const column of columns.split(',')) row[column] = typeof assets[column] === 'string' ? assets[column] : null;
+    if (assets) for (const column of columns.split(',')) row[column] = ['string', 'number'].includes(typeof assets[column]) || (assets[column] && typeof assets[column] === 'object') ? assets[column] as never : null;
     row['cover_image_url'] = approvedCover(typeof assets?.['cover_image_url'] === 'string' ? assets['cover_image_url'] : null, typeof assets?.['cover_image_status'] === 'string' ? assets['cover_image_status'] : null);
+  }
+  if (kind === 'organisations') {
+    const trials = await client.from('organisation_trials').select('nct_id,title,status,phase,start_date').eq('organisation_id', row.id).order('start_date', { ascending: false, nullsFirst: false }).range(0, 49);
+    if (trials.error) throw new Error('This profile could not be loaded. Please try again.');
+    row['trials'] = (trials.data ?? []) as never;
   }
   const cfg = ENTITIES[kind];
   const { data: tagLinks, error: tagError } = await client.from(cfg.termTable).select('term_id').eq(cfg.termFk, row.id);

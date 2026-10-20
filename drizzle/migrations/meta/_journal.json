@@ -99,6 +99,13 @@
       "when": 1792489426460,
       "tag": "0013_official_videos",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792489554161,
+      "tag": "0014_public_enrichment_data",
+      "breakpoints": true
     }
   ]
 }
