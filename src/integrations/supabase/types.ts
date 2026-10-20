@@ -209,15 +209,18 @@ export type Database = {
           ends_at: string | null
           event_type: Database["public"]["Enums"]["event_type"]
           format: Database["public"]["Enums"]["event_format"] | null
+          geocoded_at: string | null
           id: string
           image_source: string | null
           image_source_url: string | null
           image_uploaded_by: string | null
           last_checked: string | null
+          latitude: number | null
           logo_image_source: string | null
           logo_image_source_url: string | null
           logo_uploaded_by: string | null
           logo_url: string | null
+          longitude: number | null
           price_note: string | null
           published_at: string | null
           registration_url: string | null
@@ -247,15 +250,18 @@ export type Database = {
           ends_at?: string | null
           event_type: Database["public"]["Enums"]["event_type"]
           format?: Database["public"]["Enums"]["event_format"] | null
+          geocoded_at?: string | null
           id?: string
           image_source?: string | null
           image_source_url?: string | null
           image_uploaded_by?: string | null
           last_checked?: string | null
+          latitude?: number | null
           logo_image_source?: string | null
           logo_image_source_url?: string | null
           logo_uploaded_by?: string | null
           logo_url?: string | null
+          longitude?: number | null
           price_note?: string | null
           published_at?: string | null
           registration_url?: string | null
@@ -285,15 +291,18 @@ export type Database = {
           ends_at?: string | null
           event_type?: Database["public"]["Enums"]["event_type"]
           format?: Database["public"]["Enums"]["event_format"] | null
+          geocoded_at?: string | null
           id?: string
           image_source?: string | null
           image_source_url?: string | null
           image_uploaded_by?: string | null
           last_checked?: string | null
+          latitude?: number | null
           logo_image_source?: string | null
           logo_image_source_url?: string | null
           logo_uploaded_by?: string | null
           logo_url?: string | null
+          longitude?: number | null
           price_note?: string | null
           published_at?: string | null
           registration_url?: string | null
@@ -1080,6 +1089,53 @@ export type Database = {
           },
         ]
       }
+      organisation_trials: {
+        Row: {
+          created_at: string
+          id: string
+          nct_id: string
+          organisation_id: string
+          phase: string | null
+          refreshed_at: string
+          sponsor: string | null
+          start_date: string | null
+          status: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nct_id: string
+          organisation_id: string
+          phase?: string | null
+          refreshed_at?: string
+          sponsor?: string | null
+          start_date?: string | null
+          status?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nct_id?: string
+          organisation_id?: string
+          phase?: string | null
+          refreshed_at?: string
+          sponsor?: string | null
+          start_date?: string | null
+          status?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organisation_trials_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organisations: {
         Row: {
           brand_accent: string | null
@@ -1091,7 +1147,9 @@ export type Database = {
           brand_light: string | null
           brand_logo_dark_url: string | null
           brand_logo_light_url: string | null
+          business_id: string | null
           city: string | null
+          company_form: string | null
           contact_email: string | null
           contact_email_public: boolean
           cover_image_flag: string | null
@@ -1103,25 +1161,39 @@ export type Database = {
           created_by: string | null
           description: string | null
           founded_year: number | null
+          geocoded_at: string | null
           id: string
           image_source: string | null
           image_source_url: string | null
           image_uploaded_by: string | null
           last_checked: string | null
+          latitude: number | null
           linkedin_url: string | null
           logo_api_image_source_url: string | null
           logo_image_source: string | null
           logo_image_source_url: string | null
           logo_uploaded_by: string | null
           logo_url: string | null
+          longitude: number | null
+          main_business_line: string | null
           name: string
+          news_feed_url: string | null
+          news_fetched_at: string | null
+          news_items: Json | null
+          openalex_id: string | null
+          openalex_name: string | null
           published_at: string | null
+          registration_date: string | null
+          registry_fetched_at: string | null
+          research: Json | null
+          research_fetched_at: string | null
           short_description: string | null
           slug: string
           source_url: string | null
           status: Database["public"]["Enums"]["entry_status"]
           ticket_max_eur: number | null
           ticket_min_eur: number | null
+          trials_fetched_at: string | null
           type: Database["public"]["Enums"]["organisation_type"]
           updated_at: string
           video_source_url: string | null
@@ -1142,7 +1214,9 @@ export type Database = {
           brand_light?: string | null
           brand_logo_dark_url?: string | null
           brand_logo_light_url?: string | null
+          business_id?: string | null
           city?: string | null
+          company_form?: string | null
           contact_email?: string | null
           contact_email_public?: boolean
           cover_image_flag?: string | null
@@ -1154,25 +1228,39 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           founded_year?: number | null
+          geocoded_at?: string | null
           id?: string
           image_source?: string | null
           image_source_url?: string | null
           image_uploaded_by?: string | null
           last_checked?: string | null
+          latitude?: number | null
           linkedin_url?: string | null
           logo_api_image_source_url?: string | null
           logo_image_source?: string | null
           logo_image_source_url?: string | null
           logo_uploaded_by?: string | null
           logo_url?: string | null
+          longitude?: number | null
+          main_business_line?: string | null
           name: string
+          news_feed_url?: string | null
+          news_fetched_at?: string | null
+          news_items?: Json | null
+          openalex_id?: string | null
+          openalex_name?: string | null
           published_at?: string | null
+          registration_date?: string | null
+          registry_fetched_at?: string | null
+          research?: Json | null
+          research_fetched_at?: string | null
           short_description?: string | null
           slug: string
           source_url?: string | null
           status?: Database["public"]["Enums"]["entry_status"]
           ticket_max_eur?: number | null
           ticket_min_eur?: number | null
+          trials_fetched_at?: string | null
           type: Database["public"]["Enums"]["organisation_type"]
           updated_at?: string
           video_source_url?: string | null
@@ -1193,7 +1281,9 @@ export type Database = {
           brand_light?: string | null
           brand_logo_dark_url?: string | null
           brand_logo_light_url?: string | null
+          business_id?: string | null
           city?: string | null
+          company_form?: string | null
           contact_email?: string | null
           contact_email_public?: boolean
           cover_image_flag?: string | null
@@ -1205,25 +1295,39 @@ export type Database = {
           created_by?: string | null
           description?: string | null
           founded_year?: number | null
+          geocoded_at?: string | null
           id?: string
           image_source?: string | null
           image_source_url?: string | null
           image_uploaded_by?: string | null
           last_checked?: string | null
+          latitude?: number | null
           linkedin_url?: string | null
           logo_api_image_source_url?: string | null
           logo_image_source?: string | null
           logo_image_source_url?: string | null
           logo_uploaded_by?: string | null
           logo_url?: string | null
+          longitude?: number | null
+          main_business_line?: string | null
           name?: string
+          news_feed_url?: string | null
+          news_fetched_at?: string | null
+          news_items?: Json | null
+          openalex_id?: string | null
+          openalex_name?: string | null
           published_at?: string | null
+          registration_date?: string | null
+          registry_fetched_at?: string | null
+          research?: Json | null
+          research_fetched_at?: string | null
           short_description?: string | null
           slug?: string
           source_url?: string | null
           status?: Database["public"]["Enums"]["entry_status"]
           ticket_max_eur?: number | null
           ticket_min_eur?: number | null
+          trials_fetched_at?: string | null
           type?: Database["public"]["Enums"]["organisation_type"]
           updated_at?: string
           video_source_url?: string | null
