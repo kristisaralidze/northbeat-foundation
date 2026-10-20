@@ -24,6 +24,7 @@ import { Route as SubmitRouteImport } from './routes/submit'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminBrandDataRouteImport } from './routes/admin.brand-data'
 import { Route as AdminCoverImagesRouteImport } from './routes/admin.cover-images'
+import { Route as AdminLogoCheckRouteImport } from './routes/admin.logo-check'
 import { Route as AdminMissingAssetsRouteImport } from './routes/admin.missing-assets'
 import { Route as AdminNewsletterRouteImport } from './routes/admin.newsletter'
 import { Route as AdminTagsRouteImport } from './routes/admin.tags'
@@ -130,6 +131,11 @@ const AdminBrandDataRoute = AdminBrandDataRouteImport.update({
 const AdminCoverImagesRoute = AdminCoverImagesRouteImport.update({
   id: '/cover-images',
   path: '/cover-images',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLogoCheckRoute = AdminLogoCheckRouteImport.update({
+  id: '/logo-check',
+  path: '/logo-check',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminMissingAssetsRoute = AdminMissingAssetsRouteImport.update({
@@ -308,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/submit': typeof SubmitRoute
   '/admin/brand-data': typeof AdminBrandDataRoute
   '/admin/cover-images': typeof AdminCoverImagesRoute
+  '/admin/logo-check': typeof AdminLogoCheckRoute
   '/admin/missing-assets': typeof AdminMissingAssetsRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/tags': typeof AdminTagsRoute
@@ -355,6 +362,7 @@ export interface FileRoutesByTo {
   '/submit': typeof SubmitRoute
   '/admin/brand-data': typeof AdminBrandDataRoute
   '/admin/cover-images': typeof AdminCoverImagesRoute
+  '/admin/logo-check': typeof AdminLogoCheckRoute
   '/admin/missing-assets': typeof AdminMissingAssetsRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/tags': typeof AdminTagsRoute
@@ -405,6 +413,7 @@ export interface FileRoutesById {
   '/submit': typeof SubmitRoute
   '/admin/brand-data': typeof AdminBrandDataRoute
   '/admin/cover-images': typeof AdminCoverImagesRoute
+  '/admin/logo-check': typeof AdminLogoCheckRoute
   '/admin/missing-assets': typeof AdminMissingAssetsRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/tags': typeof AdminTagsRoute
@@ -456,6 +465,7 @@ export interface FileRouteTypes {
     | '/submit'
     | '/admin/brand-data'
     | '/admin/cover-images'
+    | '/admin/logo-check'
     | '/admin/missing-assets'
     | '/admin/newsletter'
     | '/admin/tags'
@@ -503,6 +513,7 @@ export interface FileRouteTypes {
     | '/submit'
     | '/admin/brand-data'
     | '/admin/cover-images'
+    | '/admin/logo-check'
     | '/admin/missing-assets'
     | '/admin/newsletter'
     | '/admin/tags'
@@ -552,6 +563,7 @@ export interface FileRouteTypes {
     | '/submit'
     | '/admin/brand-data'
     | '/admin/cover-images'
+    | '/admin/logo-check'
     | '/admin/missing-assets'
     | '/admin/newsletter'
     | '/admin/tags'
@@ -717,6 +729,13 @@ declare module '@tanstack/react-router' {
       path: '/cover-images'
       fullPath: '/admin/cover-images'
       preLoaderRoute: typeof AdminCoverImagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/logo-check': {
+      id: '/admin/logo-check'
+      path: '/logo-check'
+      fullPath: '/admin/logo-check'
+      preLoaderRoute: typeof AdminLogoCheckRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/missing-assets': {
@@ -949,6 +968,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminBrandDataRoute: typeof AdminBrandDataRoute
   AdminCoverImagesRoute: typeof AdminCoverImagesRoute
+  AdminLogoCheckRoute: typeof AdminLogoCheckRoute
   AdminMissingAssetsRoute: typeof AdminMissingAssetsRoute
   AdminNewsletterRoute: typeof AdminNewsletterRoute
   AdminTagsRoute: typeof AdminTagsRoute
@@ -975,6 +995,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminBrandDataRoute: AdminBrandDataRoute,
   AdminCoverImagesRoute: AdminCoverImagesRoute,
+  AdminLogoCheckRoute: AdminLogoCheckRoute,
   AdminMissingAssetsRoute: AdminMissingAssetsRoute,
   AdminNewsletterRoute: AdminNewsletterRoute,
   AdminTagsRoute: AdminTagsRoute,
