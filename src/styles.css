@@ -268,8 +268,17 @@ html.lenis, html.lenis body { height: auto; }
 .nb-arrival-atmosphere .nb-atmospheric-image { position: absolute; inset: -5% 0; opacity: .55; }
 .nb-home-opening-content { position: relative; }
 .nb-home-wordmark-section .nb-home-tagline { color: var(--ink); }
-.nb-home-newsletter-atmosphere { position: relative; isolation: isolate; --muted-foreground: var(--ink); }
-.nb-home-newsletter-atmosphere > .nb-atmospheric-image { position: absolute; inset: -1.5rem; z-index: -1; opacity: .35; overflow: hidden; }
+.nb-site-footer { background: var(--background); }
+.nb-footer-signup { position: relative; isolation: isolate; overflow: hidden; padding: var(--space-24) var(--gutter); color: var(--ink); --muted-foreground: var(--ink); }
+.nb-footer-signup > .nb-atmospheric-image { position: absolute; inset: 0; z-index: -1; opacity: .45; }
+.nb-footer-signup-content { max-width: 40rem; margin-inline: auto; }
+.nb-footer-signup-content h2 { text-align: center; }
+.nb-footer-signup-content > p { margin-block: var(--space-6) var(--space-8); text-align: center; }
+.nb-footer-bottom { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); padding-block: var(--space-8); background: var(--background); }
+@media (max-width: 767px) {
+  .nb-footer-signup { padding-block: var(--space-16); }
+  .nb-footer-bottom { flex-direction: column; text-align: center; }
+}
 .nb-learn-arrival { display: grid; grid-template-columns: minmax(0, 2fr) minmax(12rem, 1fr); align-items: center; gap: var(--space-12); }
 .nb-learn-atmosphere-circle { width: 100%; max-width: 22rem; aspect-ratio: 1; border-radius: 50%; overflow: hidden; justify-self: end; }
 @media (max-width: 767px) {
@@ -291,9 +300,9 @@ html.lenis, html.lenis body { height: auto; }
 .nb-home-world-scene .nb-globe-stage { flex: 0 0 auto; height: min(660px, max(180px, calc(min(100svh - 4rem, 900px) - 200px))); margin-block: var(--space-4); }
 .nb-home-globe-line { flex-shrink: 0; margin: var(--space-3) var(--gutter); text-align: center; font-size: 1.125rem; color: var(--ink); }
 .nb-home-world-scene .nb-globe-controls { flex-shrink: 0; }
-.nb-home-happening { min-height: min(55svh, 36rem); display: flex; flex-direction: column; justify-content: center; gap: var(--space-8); padding-block: var(--space-8); }
-.nb-home-happening-window { overflow: hidden; width: 100%; }
-.nb-home-happening-track { display: flex; width: max-content; gap: var(--space-16); padding-inline: var(--gutter); }
+.nb-home-happening { display: flex; flex-direction: column; gap: var(--space-8); padding-block: var(--space-8); }
+.nb-home-happening-window { overflow-x: clip; overflow-y: visible; width: 100%; }
+.nb-home-happening-track { display: flex; align-items: flex-start; width: max-content; gap: var(--space-16); padding: var(--space-2) var(--gutter); }
 .nb-home-happening-item { flex: 0 0 auto; width: min(22rem, 78vw); }
 .nb-home-happening-item time { color: var(--berry); font-variant-numeric: tabular-nums; }
 .nb-home-happening-item h3 { font-family: 'Schibsted Grotesk', var(--font-body); font-weight: 400; font-size: 1.75rem; line-height: 1.25; margin-block: var(--space-4); }
@@ -800,6 +809,7 @@ html.lenis, html.lenis body { height: auto; }
   padding: var(--space-2);
   background: var(--snow);
   border-radius: var(--radius);
+  &:has(.nb-monogram) { background: var(--frost); }
 }
 @utility nb-org-link {
   display: inline-flex;

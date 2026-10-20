@@ -1,3 +1,7 @@
+# Footer and Happening now
+- [x] Redesign footer as a full-width fabric signup band and plain copyright/link bar, without a wordmark; keep signup hidden on Newsletter.
+- [x] Show full Happening now cards, remove excess bottom space and verify a clean fast-scroll transition into Learn on desktop and phone.
+
 # Public detail and copy fixes
 - [x] Correct detail sticky titles, decorative wordmark alt text, solid covering mobile menu and mobile T fallback.
 - [x] Hide journey tags outside Learn; use compact facts and one main detail column without timezone; website domain link text.
@@ -9,7 +13,8 @@
 
 # Organisation logos
 - [x] Add shared uploaded-first domain logos and error fallbacks across public organisation listings; test and verify.
-- [ ] Activate Brandfetch with the actual public client ID (blocked: placeholder supplied, question skipped).
+- [x] Configure the supplied Brandfetch public client ID and verify light monogram fallbacks on Explore and profiles, including image failures before hydration.
+- [ ] Load automatic logos (blocked: Brandfetch rejects the supplied ID with client_id_invalid_signature; awaiting a corrected ID).
 
 # Atmospheric image
 - [x] Transfer Concept B fabric waves as desktop/phone WebP assets under 300 KB (24 KB and 7 KB).
