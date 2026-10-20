@@ -14,6 +14,8 @@ import { ImageField } from "./ImageField";
 import { useServerFn } from '@tanstack/react-start';
 import { fetchOrganisationCover } from '@/lib/organisation-cover.functions';
 import { shouldDiscoverCover } from '@/lib/organisation-cover';
+import { ownDomain, isMediaUpload } from '@/lib/brand';
+import { BrandSearch } from '@/components/BrandSearch';
 
 type Values = Record<string, unknown>;
 
@@ -74,7 +76,18 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
       const payload = normalise(cfg.fields, values);
       if (['organisations', 'events'].includes(entity)) {
         if (!coverEdited) delete payload['cover_image_url'];
-        else { payload['cover_image_pending_url'] = payload['cover_image_url']; payload['cover_image_status'] = payload['cover_image_url'] ? 'pending' : 'rejected'; payload['cover_image_url'] = null; payload['cover_image_flag'] = null; payload['cover_page_title'] = 'Uploaded by admin'; }
+        else {
+          const image = payload['cover_image_url'] as string | null;
+          const website = (entity === 'organisations' ? values['website'] : values['registration_url'] ?? values['source_url']) as string | null;
+          if (image && !isMediaUpload(image) && !ownDomain(image, website)) throw new Error('Upload a file or use an image from the official website.');
+          payload['cover_image_pending_url'] = image; payload['cover_image_status'] = image ? 'pending' : 'rejected'; payload['cover_image_url'] = null; payload['cover_image_flag'] = null; payload['image_source'] = isMediaUpload(image) ? 'admin_upload' : 'website'; payload['image_source_url'] = isMediaUpload(image) ? image : website; payload['cover_page_title'] = isMediaUpload(image) ? 'Uploaded by admin' : 'Official website image';
+        }
+        const logo = payload['logo_url'] as string | null;
+        if (logo && logo !== bundle.data?.row?.['logo_url']) {
+          const website = (entity === 'organisations' ? values['website'] : values['registration_url'] ?? values['source_url']) as string | null;
+          if (!isMediaUpload(logo) && !ownDomain(logo,website)) throw new Error('Upload a logo file or use the official website domain.');
+          payload['logo_image_source'] = isMediaUpload(logo) ? 'admin_upload' : 'website'; payload['logo_image_source_url'] = logo;
+        }
       }
       const newId = await saveEntry(cfg, id, payload, termIds, links);
       if (entity === 'organisations' && shouldDiscoverCover(bundle.data?.row?.['website'], values['website'], values['cover_image_url'], coverEdited)) {
@@ -156,7 +169,7 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2">
-        {cfg.fields.map((f) => <FieldInput key={f.name} field={f} terms={terms.data ?? []} value={values[f.name]} onChange={(v) => set(f.name, v)} />)}
+        {cfg.fields.map((f) => entity === 'organisations' && id === 'new' && f.name === 'name' ? <div key={f.name} className="space-y-1"><Label htmlFor="name">Name *</Label><BrandSearch id="name" value={String(values['name'] ?? '')} onChange={name=>set('name',name)} onSelect={(name,website)=>setValues(prev=>({...prev,name,website}))} /></div> : <FieldInput key={f.name} field={f} terms={terms.data ?? []} value={values[f.name]} onChange={(v) => set(f.name, v)} />)}
       </section>
       {['organisations', 'events'].includes(entity) && <p className="text-sm text-muted-foreground">Cover review: {String(bundle.data?.row?.['cover_image_status'] ?? 'pending')}. <Link to="/admin/cover-images" className="underline">Cover images</Link>{bundle.data?.row?.['cover_image_flag'] ? `: ${String(bundle.data.row['cover_image_flag'])}` : ''}</p>}
 

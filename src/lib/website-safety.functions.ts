@@ -3,13 +3,14 @@ import { z } from 'zod';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
 import { inspectWebsite, inspectWebsiteCover, validateUploadedCover } from './organisation-cover.server';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { ownDomain, isMediaUpload } from './brand';
 
 const kind = z.enum(['organisations', 'events']);
 async function admin(client: SupabaseClient, userId: string) {
   const role = await client.rpc('has_role', { _user_id: userId, _role: 'admin' });
   if (role.error || role.data !== true) throw new Error('Admin access required.');
 }
-export type CoverReviewRow = { id: string; kind: 'organisations' | 'events'; name: string; website: string | null; image: string | null; title: string | null; status: string; reason: string | null };
+export type CoverReviewRow = { id: string; kind: 'organisations' | 'events'; name: string; website: string | null; image: string | null; title: string | null; status: string; reason: string | null; source: string | null; sourceUrl: string | null; eligible: boolean };
 export const getCoverReview = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth]).inputValidator(z.object({ status: z.enum(['pending', 'rejected', 'approved']), page: z.number().int().min(0) })).handler(async ({ data, context }) => {
   await admin(context.supabase, context.userId);
   const rows: CoverReviewRow[] = [];
@@ -20,7 +21,11 @@ export const getCoverReview = createServerFn({ method: 'POST' }).middleware([req
       for (const entry of result.data ?? []) {
         const row = entry as unknown as Record<string, unknown>;
         if (!row['cover_image_pending_url'] && !row['cover_image_flag']) continue;
-        rows.push({ id: String(row['id']), kind: table, name: String(row['name'] ?? row['title']), website: (table === 'organisations' ? row['website'] : row['registration_url'] ?? row['source_url']) as string | null, image: row['cover_image_pending_url'] as string | null, title: row['cover_page_title'] as string | null, status: String(row['cover_image_status']), reason: row['cover_image_flag'] as string | null });
+        const website = (table === 'organisations' ? row['website'] : row['registration_url'] ?? row['source_url']) as string | null;
+        const image = row['cover_image_pending_url'] as string | null;
+        const source = row['image_source'] as string | null; const sourceUrl = row['image_source_url'] as string | null;
+        const eligible = source === 'brandfetch' ? Boolean(sourceUrl?.startsWith('https://api.brandfetch.io/v2/brands/domain/')) : source === 'admin_upload' ? isMediaUpload(image) : ownDomain(image, website) && ownDomain(sourceUrl, website);
+        rows.push({ id: String(row['id']), kind: table, name: String(row['name'] ?? row['title']), website, image, source, sourceUrl, eligible, title: row['cover_page_title'] as string | null, status: String(row['cover_image_status']), reason: row['cover_image_flag'] as string | null });
       }
       if ((result.data?.length ?? 0) < 1000) break;
     }
@@ -32,7 +37,17 @@ export const reviewCovers = createServerFn({ method: 'POST' }).middleware([requi
   await admin(context.supabase, context.userId);
   let changed = 0;
   for (const entry of data.entries) {
-    if (data.decision === 'approved') await validateUploadedCover(entry.image);
+    const current = await context.supabase.from(entry.kind).select('*').eq('id',entry.id).single();
+    if (current.error) throw new Error('Could not read image source.');
+    const row = current.data as unknown as Record<string,unknown>;
+    const website = (entry.kind === 'organisations' ? row['website'] : row['registration_url'] ?? row['source_url']) as string | null;
+    if (data.decision === 'approved') {
+      const source = row['image_source']; const sourceUrl = row['image_source_url'] as string | null;
+      const eligible = source === 'brandfetch' ? Boolean(sourceUrl?.startsWith('https://api.brandfetch.io/v2/brands/domain/')) : source === 'admin_upload' ? isMediaUpload(entry.image) : ownDomain(entry.image,website) && ownDomain(sourceUrl,website);
+      if (!eligible) throw new Error('This image is not from Brandfetch, the official website or an admin upload.');
+      const finalImage = await validateUploadedCover(entry.image, source === 'brandfetch');
+      if (source === 'website' && !ownDomain(finalImage,website)) throw new Error('Image redirects outside the official website.');
+    }
     const result = await context.supabase.from(entry.kind).update({ cover_image_status: data.decision, cover_image_flag: data.decision === 'rejected' ? 'Rejected by admin' : null }).eq('id', entry.id).eq('cover_image_status', 'pending').eq('cover_image_pending_url', entry.image).is('cover_image_flag', null).select('id');
     if (result.error) throw new Error('Could not save the review.'); changed += result.data?.length ?? 0;
   }
@@ -40,8 +55,15 @@ export const reviewCovers = createServerFn({ method: 'POST' }).middleware([requi
 });
 export const uploadCoverCandidate = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth]).inputValidator(z.object({ id: z.string().uuid(), kind, image: z.string().url().max(4096) })).handler(async ({ data, context }) => {
   await admin(context.supabase, context.userId);
+  const current = await context.supabase.from(data.kind).select('*').eq('id', data.id).single();
+  if (current.error) throw new Error('Could not read entry.');
+  const row = current.data as unknown as Record<string,unknown>;
+  const website = (data.kind === 'organisations' ? row['website'] : row['registration_url'] ?? row['source_url']) as string | null;
+  const uploaded = isMediaUpload(data.image);
+  if (!uploaded && !ownDomain(data.image, website)) throw new Error('Upload a file or use an image on the official website.');
   const image = await validateUploadedCover(data.image);
-  const result = await context.supabase.from(data.kind).update({ cover_image_pending_url: image, cover_image_status: 'pending', cover_image_url: null, cover_image_flag: null, cover_page_title: 'Uploaded by admin' }).eq('id', data.id);
+  if (!uploaded && !ownDomain(image,website)) throw new Error('Image redirects outside the official website.');
+  const result = await context.supabase.from(data.kind).update({ cover_image_pending_url: image, cover_image_status: 'pending', cover_image_url: null, cover_image_flag: null, cover_page_title: uploaded ? 'Uploaded by admin' : 'Official website image', image_source: uploaded ? 'admin_upload' : 'website', image_source_url: uploaded ? image : website, image_uploaded_by: uploaded ? context.userId : null }).eq('id', data.id);
   if (result.error) throw new Error('Could not save the uploaded candidate.'); return { ok: true };
 });
 export const refillCoverBatch = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth]).inputValidator(z.object({ kind, offset: z.number().int().min(0) })).handler(async ({ data, context }) => {
@@ -53,7 +75,7 @@ export const refillCoverBatch = createServerFn({ method: 'POST' }).middleware([r
     if (row['cover_image_url'] || row['cover_image_status'] === 'rejected' || row['cover_page_title'] === 'Uploaded by admin') return { id: String(row['id']), status: 'skipped' };
     const website = (data.kind === 'organisations' ? row['website'] : row['registration_url'] ?? row['source_url']) as string | null;
     const checked = website ? await inspectWebsiteCover(website, String(row['name'] ?? row['title'])) : { image: null, title: '', reason: 'No website stored' };
-    let update = context.supabase.from(data.kind).update({ cover_image_pending_url: checked.image, cover_image_status: checked.reason ? 'rejected' : 'pending', cover_page_title: checked.title, cover_image_flag: checked.reason }).eq('id', String(row['id'])).eq('cover_image_status', 'pending').is('cover_image_url', null);
+    let update = context.supabase.from(data.kind).update({ cover_image_pending_url: checked.image, cover_image_status: checked.reason ? 'rejected' : 'pending', cover_page_title: checked.title, cover_image_flag: checked.reason, image_source: 'website', image_source_url: website, image_uploaded_by: null }).eq('id', String(row['id'])).eq('cover_image_status', 'pending').is('cover_image_url', null);
     update = row['cover_image_pending_url'] ? update.eq('cover_image_pending_url', String(row['cover_image_pending_url'])) : update.is('cover_image_pending_url', null);
     update = row['cover_page_title'] ? update.eq('cover_page_title', String(row['cover_page_title'])) : update.is('cover_page_title', null);
     const saved = await update.select('id');

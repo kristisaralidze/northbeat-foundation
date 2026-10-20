@@ -22,7 +22,9 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SubmitRouteImport } from './routes/submit'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminBrandDataRouteImport } from './routes/admin.brand-data'
 import { Route as AdminCoverImagesRouteImport } from './routes/admin.cover-images'
+import { Route as AdminMissingAssetsRouteImport } from './routes/admin.missing-assets'
 import { Route as AdminNewsletterRouteImport } from './routes/admin.newsletter'
 import { Route as AdminTagsRouteImport } from './routes/admin.tags'
 import { Route as AdminWebsiteHealthRouteImport } from './routes/admin.website-health'
@@ -119,9 +121,19 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminBrandDataRoute = AdminBrandDataRouteImport.update({
+  id: '/brand-data',
+  path: '/brand-data',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCoverImagesRoute = AdminCoverImagesRouteImport.update({
   id: '/cover-images',
   path: '/cover-images',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMissingAssetsRoute = AdminMissingAssetsRouteImport.update({
+  id: '/missing-assets',
+  path: '/missing-assets',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminNewsletterRoute = AdminNewsletterRouteImport.update({
@@ -288,7 +300,9 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/submit': typeof SubmitRoute
+  '/admin/brand-data': typeof AdminBrandDataRoute
   '/admin/cover-images': typeof AdminCoverImagesRoute
+  '/admin/missing-assets': typeof AdminMissingAssetsRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/website-health': typeof AdminWebsiteHealthRoute
@@ -332,7 +346,9 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/submit': typeof SubmitRoute
+  '/admin/brand-data': typeof AdminBrandDataRoute
   '/admin/cover-images': typeof AdminCoverImagesRoute
+  '/admin/missing-assets': typeof AdminMissingAssetsRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/website-health': typeof AdminWebsiteHealthRoute
@@ -379,7 +395,9 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/submit': typeof SubmitRoute
+  '/admin/brand-data': typeof AdminBrandDataRoute
   '/admin/cover-images': typeof AdminCoverImagesRoute
+  '/admin/missing-assets': typeof AdminMissingAssetsRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/website-health': typeof AdminWebsiteHealthRoute
@@ -427,7 +445,9 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/submit'
+    | '/admin/brand-data'
     | '/admin/cover-images'
+    | '/admin/missing-assets'
     | '/admin/newsletter'
     | '/admin/tags'
     | '/admin/website-health'
@@ -471,7 +491,9 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/submit'
+    | '/admin/brand-data'
     | '/admin/cover-images'
+    | '/admin/missing-assets'
     | '/admin/newsletter'
     | '/admin/tags'
     | '/admin/website-health'
@@ -517,7 +539,9 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/submit'
+    | '/admin/brand-data'
     | '/admin/cover-images'
+    | '/admin/missing-assets'
     | '/admin/newsletter'
     | '/admin/tags'
     | '/admin/website-health'
@@ -668,11 +692,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/brand-data': {
+      id: '/admin/brand-data'
+      path: '/brand-data'
+      fullPath: '/admin/brand-data'
+      preLoaderRoute: typeof AdminBrandDataRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/cover-images': {
       id: '/admin/cover-images'
       path: '/cover-images'
       fullPath: '/admin/cover-images'
       preLoaderRoute: typeof AdminCoverImagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/missing-assets': {
+      id: '/admin/missing-assets'
+      path: '/missing-assets'
+      fullPath: '/admin/missing-assets'
+      preLoaderRoute: typeof AdminMissingAssetsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/newsletter': {
@@ -889,7 +927,9 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminBrandDataRoute: typeof AdminBrandDataRoute
   AdminCoverImagesRoute: typeof AdminCoverImagesRoute
+  AdminMissingAssetsRoute: typeof AdminMissingAssetsRoute
   AdminNewsletterRoute: typeof AdminNewsletterRoute
   AdminTagsRoute: typeof AdminTagsRoute
   AdminWebsiteHealthRoute: typeof AdminWebsiteHealthRoute
@@ -913,7 +953,9 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminBrandDataRoute: AdminBrandDataRoute,
   AdminCoverImagesRoute: AdminCoverImagesRoute,
+  AdminMissingAssetsRoute: AdminMissingAssetsRoute,
   AdminNewsletterRoute: AdminNewsletterRoute,
   AdminTagsRoute: AdminTagsRoute,
   AdminWebsiteHealthRoute: AdminWebsiteHealthRoute,
