@@ -106,6 +106,13 @@
       "when": 1792489554161,
       "tag": "0014_public_enrichment_data",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1792490097439,
+      "tag": "0015_organisation_logo_choice",
+      "breakpoints": true
     }
   ]
 }
