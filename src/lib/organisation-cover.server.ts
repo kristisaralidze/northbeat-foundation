@@ -20,7 +20,7 @@ async function safeFetch(value: string, image = false) {
     const reader = response.body?.getReader(); if (!reader) throw new Error('Empty response');
     const limit = image ? 5 * 1024 * 1024 : 1024 * 1024;
     const chunks: Uint8Array[] = []; let size = 0;
-    try { while (true) { const chunk = await reader.read(); if (chunk.done) break; size += chunk.value.length; if (size > limit) { if (image) throw new Error('Image exceeds 5 MB safety limit'); break; } chunks.push(chunk.value); } } finally { await reader.cancel(); }
+    try { while (true) { const chunk = await reader.read(); if (chunk.done) break; size += chunk.value.length; if (size > limit) throw new Error(image ? 'Image exceeds 5 MB safety limit' : 'Page exceeds 1 MB safety limit'); chunks.push(chunk.value); } } finally { await reader.cancel(); }
     const bytes = new Uint8Array(chunks.reduce((n, c) => n + c.length, 0)); let offset = 0; for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.length; }
     return { bytes, url: url.href };
   }
@@ -30,20 +30,20 @@ export async function inspectWebsite(website: string, name: string) {
   try {
     const page = await safeFetch(website); const details = coverPageDetails(new TextDecoder().decode(page.bytes), page.url);
     return { ...details, finalUrl: page.url, reason: titleMatchesName(details.title, name) ? null : 'Page title does not contain the organisation name' };
-  } catch (error) { return { title: '', pageText: '', images: [], preferred: null, finalUrl: website, reason: error instanceof Error ? error.message : 'Website could not be loaded' }; }
+  } catch (error) { return { title: '', pageText: '', images: [], preferred: null, twitterImage: null, finalUrl: website, reason: error instanceof Error ? error.message : 'Website could not be loaded' }; }
 }
 export async function inspectWebsiteCover(website: string, name: string) {
   const page = await inspectWebsite(website, name);
   // Loading failures are not the same as a title mismatch, which the domain rule may allow.
   if (page.reason && page.reason !== 'Page title does not contain the organisation name') return { image: null, title: page.title, reason: page.reason };
-  const candidates = [...new Set([page.preferred, ...page.images.map(i => i.url)].filter((url): url is string => Boolean(url)))].slice(0, 16);
+  const candidates = [...new Set([page.preferred, page.twitterImage, ...page.images.map(i => i.url)].filter((url): url is string => Boolean(url)))].slice(0, 16);
   let reason = 'No candidate image found'; let best: { image: string; width: number; reason: string | null } | null = null;
   for (const image of candidates) {
     try {
       const fetched = await safeFetch(image, true); const width = imageSize(fetched.bytes).width ?? 0;
       const checked = coverSafetyReason({ title: page.title, name, website, finalUrl: page.finalUrl, pageText: page.pageText, alt: page.images.find(i => i.url === image)?.alt ?? '', image: fetched.url, width });
       if (checked) { reason = checked; if (checked.startsWith('Unsafe content') || checked.startsWith('Known advertising')) return { image: null, title: page.title, reason: checked }; continue; }
-      if (image === page.preferred) return { image: fetched.url, title: page.title, reason: null };
+      if (image === page.preferred || image === page.twitterImage) return { image: fetched.url, title: page.title, reason: null };
       if (!best || width > best.width) best = { image: fetched.url, width, reason: null };
     } catch (error) { reason = error instanceof Error ? error.message : 'Image could not be checked'; }
   }

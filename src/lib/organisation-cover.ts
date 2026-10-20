@@ -50,7 +50,10 @@ export function coverPageDetails(html: string, website: string) {
     try { return source ? { url: new URL(source, website).href, alt: node.getAttribute('alt') ?? '' } : null; } catch { return null; }
   }).filter((image): image is { url: string; alt: string } => image !== null && publicWebsite(image.url) !== null);
   const preferred = extractCover(html, website);
-  return { title, pageText, images, preferred };
+  const twitter = root.querySelectorAll('meta').find(m => ['twitter:image', 'twitter:image:src'].includes((m.getAttribute('name') ?? m.getAttribute('property') ?? '').toLowerCase()))?.getAttribute('content');
+  let twitterImage: string | null = null;
+  try { if (twitter) { const candidate = new URL(twitter, website).href; if (publicWebsite(candidate)) twitterImage = candidate; } } catch { /* Invalid fallback. */ }
+  return { title, pageText, images, preferred, twitterImage };
 }
 export function coverSafetyReason(input: { title: string; name: string; website: string; finalUrl: string; pageText: string; alt: string; image: string; width: number }): string | null {
   const spam = `${input.pageText} ${input.alt}`.match(SPAM);

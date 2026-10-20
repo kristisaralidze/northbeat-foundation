@@ -20,7 +20,7 @@ export const getCoverReview = createServerFn({ method: 'POST' }).middleware([req
       for (const entry of result.data ?? []) {
         const row = entry as unknown as Record<string, unknown>;
         if (!row['cover_image_pending_url'] && !row['cover_image_flag']) continue;
-        rows.push({ id: String(row['id']), kind: table, name: String(row['name'] ?? row['title']), website: (row['website'] ?? row['source_url'] ?? row['registration_url']) as string | null, image: row['cover_image_pending_url'] as string | null, title: row['cover_page_title'] as string | null, status: String(row['cover_image_status']), reason: row['cover_image_flag'] as string | null });
+        rows.push({ id: String(row['id']), kind: table, name: String(row['name'] ?? row['title']), website: (table === 'organisations' ? row['website'] : row['registration_url'] ?? row['source_url']) as string | null, image: row['cover_image_pending_url'] as string | null, title: row['cover_page_title'] as string | null, status: String(row['cover_image_status']), reason: row['cover_image_flag'] as string | null });
       }
       if ((result.data?.length ?? 0) < 1000) break;
     }
@@ -48,10 +48,12 @@ export const refillCoverBatch = createServerFn({ method: 'POST' }).middleware([r
   if (result.error) throw new Error('Could not load entries.');
   const outcomes = await Promise.all((result.data ?? []).map(async entry => {
     const row = entry as unknown as Record<string, unknown>;
-    if (row['cover_image_url'] || row['cover_image_pending_url'] || row['cover_image_status'] === 'rejected') return { id: String(row['id']), status: 'skipped' };
-    const website = (row['website'] ?? row['source_url'] ?? row['registration_url']) as string | null;
+    if (row['cover_image_url'] || row['cover_image_status'] === 'rejected' || row['cover_page_title'] === 'Uploaded by admin') return { id: String(row['id']), status: 'skipped' };
+    const website = (data.kind === 'organisations' ? row['website'] : row['registration_url'] ?? row['source_url']) as string | null;
     const checked = website ? await inspectWebsiteCover(website, String(row['name'] ?? row['title'])) : { image: null, title: '', reason: 'No website stored' };
-    const saved = await context.supabase.from(data.kind).update({ cover_image_pending_url: checked.image, cover_image_status: checked.reason ? 'rejected' : 'pending', cover_page_title: checked.title, cover_image_flag: checked.reason }).eq('id', String(row['id'])).is('cover_image_url', null).is('cover_image_pending_url', null);
+    let update = context.supabase.from(data.kind).update({ cover_image_pending_url: checked.image, cover_image_status: checked.reason ? 'rejected' : 'pending', cover_page_title: checked.title, cover_image_flag: checked.reason }).eq('id', String(row['id'])).eq('cover_image_status', 'pending').is('cover_image_url', null);
+    update = row['cover_image_pending_url'] ? update.eq('cover_image_pending_url', String(row['cover_image_pending_url'])) : update.is('cover_image_pending_url', null);
+    const saved = await update;
     if (saved.error) throw new Error('Could not save candidate.');
     return { id: String(row['id']), status: checked.reason ? 'rejected' : 'pending', reason: checked.reason };
   }));
