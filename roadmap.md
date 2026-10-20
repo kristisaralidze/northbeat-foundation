@@ -1,3 +1,7 @@
+# Footer and Happening now
+- [ ] Redesign footer as a full-width fabric signup band and plain copyright/link bar, without a wordmark; keep signup hidden on Newsletter.
+- [ ] Show full Happening now cards, remove excess bottom space and verify a clean fast-scroll transition into Learn.
+
 # Public detail and copy fixes
 - [x] Correct detail sticky titles, decorative wordmark alt text, solid covering mobile menu and mobile T fallback.
 - [x] Hide journey tags outside Learn; use compact facts and one main detail column without timezone; website domain link text.
