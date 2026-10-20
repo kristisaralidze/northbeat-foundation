@@ -264,20 +264,15 @@ html.lenis, html.lenis body { height: auto; }
 .nb-home-opening-content { width: 100%; text-align: center; }
 .nb-atmospheric-image { display: block; pointer-events: none; }
 .nb-atmospheric-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.nb-living-fabric { position: relative; pointer-events: none; --fabric-light: rgb(250, 250, 252); --fabric-frost: rgb(220, 221, 229); --fabric-lilac: rgb(184, 175, 201); --fabric-berry: rgb(170, 119, 147); }
-.nb-living-fabric > .nb-atmospheric-image,
-.nb-living-fabric > canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.nb-living-fabric > canvas { display: block; opacity: 0; }
-.nb-living-fabric > canvas[data-fabric-ready="true"] { opacity: 1; }
 .nb-arrival-atmosphere { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .nb-arrival-atmosphere .nb-atmospheric-image { position: absolute; inset: -5% 0; opacity: .55; }
 .nb-home-opening-content { position: relative; }
 .nb-home-wordmark-section .nb-home-tagline { color: var(--ink); }
 .nb-site-footer { background: var(--background); }
 .nb-footer-signup { position: relative; isolation: isolate; overflow: hidden; padding: var(--space-24) var(--gutter); color: var(--ink); --muted-foreground: var(--ink); }
-.nb-footer-signup > .nb-living-fabric { position: absolute; inset: 0; z-index: -1; opacity: 1; }
-.nb-footer-signup-content { position: relative; isolation: isolate; background: var(--fabric-glass); backdrop-filter: blur(20px); border-radius: 16px; padding: var(--space-12); }
-.nb-footer-signup { --fabric-glass: rgb(255 255 255 / .72); --fabric-edge-fade: linear-gradient(to bottom, var(--background), transparent); }
+.nb-footer-signup > .nb-atmospheric-image { position: absolute; inset: 0; z-index: -1; opacity: .45; }
+.nb-footer-signup-content { position: relative; padding: var(--space-12); }
+.nb-footer-signup { --fabric-edge-fade: linear-gradient(to bottom, var(--background), transparent); }
 .nb-footer-signup::before { content: ''; position: absolute; inset: 0 0 auto; height: 48px; background: var(--fabric-edge-fade); pointer-events: none; }
 .nb-footer-signup-content { max-width: 40rem; margin-inline: auto; }
 .nb-footer-signup-content h2 { text-align: center; }
@@ -296,7 +291,6 @@ html.lenis, html.lenis body { height: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   .nb-arrival-atmosphere img { transform: none !important; }
-  .nb-living-fabric > canvas { display: none; }
 }
 .nb-home-wordmark-slot { width: 100%; aspect-ratio: 9 / 1; }
 .nb-home-tagline { margin-top: var(--space-8); color: var(--ink-soft); font-size: 1.125rem; }
