@@ -1,3 +1,10 @@
+# Official brand assets
+- [ ] Add secret-backed, admin-only Brandfetch imports, stored light/dark logos, covers, colours and timestamps; prioritise published investors/universities then startups; stop/report 429. Blocker: API key required.
+- [ ] Put Brandfetch covers in pending review and apply brand accents only to thin logo border and field tags; report import counts and empty results.
+- [ ] Remove organisation/event header placeholders and show official logos, approved credited covers and compact facts only.
+- [ ] Store logo/cover provenance and enforce own-domain or verified admin-upload approval, including existing assets.
+- [ ] Add Missing official assets with website/edit links and real Brandfetch checks; test and verify public/admin flows.
+
 # Urgent listing safety
 - [x] Remove 4MindHealth cover and set its listing to draft; clear 35 other website-fetched covers.
 - [x] Require cover approval for organisations/events; refill published candidates only after title, spam, domain and 800px checks; store rejection reasons.
