@@ -11,6 +11,8 @@ export function OrganisationLogo({ name, slug, uploaded, website, eager = false 
   const org = data?.organisations.find(org => org.slug === slug);
   const src = organisationLogoUrl(uploaded ?? org?.logo_url, website ?? org?.website);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const automatic = !uploaded?.trim() && !org?.logo_url?.trim();
+  if (automatic && src && src === failedSrc) return null;
   return <span className="nb-org-logo" data-organisation-logo={slug}>
     {src && src !== failedSrc
       ? <img ref={image => { if (image?.complete && image.naturalWidth === 0) setFailedSrc(src); }} src={src} alt={`${name} logo`} width={128} height={128} loading={eager ? 'eager' : 'lazy'} decoding="async" onError={() => setFailedSrc(src)} />

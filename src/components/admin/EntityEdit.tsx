@@ -59,19 +59,24 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
 
   useEffect(() => {
     if (!bundle.data) return;
-    const r = bundle.data.row ?? {};
-    const v: Values = { ...r };
+    const r: Values = bundle.data.row ?? {};
+    const v: Values = { ...r, ...(['organisations', 'events'].includes(entity) ? { cover_image_url: r['cover_image_pending_url'] ?? r['cover_image_url'] } : {}) };
     for (const f of cfg.fields) if (f.kind === "datetime") v[f.name] = toLocalInput(r[f.name as keyof typeof r]);
     if (!bundle.data.row) v["status"] = "draft";
     setValues(v);
     setCoverEdited(false);
     setTermIds(bundle.data.termIds);
     setLinks(bundle.data.links);
-  }, [bundle.data, cfg.fields]);
+  }, [bundle.data, cfg.fields, entity]);
 
   const save = useMutation({
     mutationFn: async () => {
-      const newId = await saveEntry(cfg, id, normalise(cfg.fields, values), termIds, links);
+      const payload = normalise(cfg.fields, values);
+      if (['organisations', 'events'].includes(entity)) {
+        if (!coverEdited) delete payload['cover_image_url'];
+        else { payload['cover_image_pending_url'] = payload['cover_image_url']; payload['cover_image_status'] = payload['cover_image_url'] ? 'pending' : 'rejected'; payload['cover_image_url'] = null; payload['cover_image_flag'] = null; payload['cover_page_title'] = 'Uploaded by admin'; }
+      }
+      const newId = await saveEntry(cfg, id, payload, termIds, links);
       if (entity === 'organisations' && shouldDiscoverCover(bundle.data?.row?.['website'], values['website'], values['cover_image_url'], coverEdited)) {
         try { await fetchCover({ data: { id: newId, website: String(values['website']) } }); } catch { toast.error('Saved, but the website cover could not be fetched.'); }
       }
@@ -153,6 +158,7 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
       <section className="grid gap-4 sm:grid-cols-2">
         {cfg.fields.map((f) => <FieldInput key={f.name} field={f} terms={terms.data ?? []} value={values[f.name]} onChange={(v) => set(f.name, v)} />)}
       </section>
+      {['organisations', 'events'].includes(entity) && <p className="text-sm text-muted-foreground">Cover review: {String(bundle.data?.row?.['cover_image_status'] ?? 'pending')}. <Link to="/admin/cover-images" className="underline">Cover images</Link>{bundle.data?.row?.['cover_image_flag'] ? `: ${String(bundle.data.row['cover_image_flag'])}` : ''}</p>}
 
       <TagPicker kinds={cfg.tagKinds ?? DEFAULT_TAG_KINDS} terms={terms.data ?? []} selected={termIds} onChange={setTermIds} />
 

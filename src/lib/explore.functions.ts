@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import type { DirectoryData } from "./explore";
+import { approvedCover } from './organisation-cover';
 
 export const getDirectory = createServerFn({ method: "GET" }).handler(async (): Promise<DirectoryData> => {
   const url = process.env["SUPABASE_URL"];
@@ -22,10 +23,10 @@ export const getDirectory = createServerFn({ method: "GET" }).handler(async (): 
   // Page each table to avoid silently truncating the directory at the API row limit.
   for (let offset = 0; ; offset += 1000) {
     const { data, error } = await client.from("organisations")
-      .select("id, slug, name, type, short_description, logo_url, cover_image_url, website, city")
+      .select("id, slug, name, type, short_description, logo_url, cover_image_url, cover_image_status, website, city")
       .eq("status", "published").order("name").order("id").range(offset, offset + 999);
     if (error) throw new Error("The organisations could not be loaded. Please try again.");
-    organisations.push(...(data ?? []).map((org) => ({ ...org, termIds: [] })));
+    organisations.push(...(data ?? []).map((org) => ({ ...org, cover_image_url: approvedCover(org.cover_image_url, org.cover_image_status), termIds: [] })));
     if (!data || data.length < 1000) break;
   }
   for (let offset = 0; ; offset += 1000) {

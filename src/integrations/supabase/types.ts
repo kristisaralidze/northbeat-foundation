@@ -198,6 +198,11 @@ export type Database = {
         Row: {
           apply_deadline_at: string | null
           city: string | null
+          cover_image_flag: string | null
+          cover_image_pending_url: string | null
+          cover_image_status: string
+          cover_image_url: string | null
+          cover_page_title: string | null
           created_at: string
           created_by: string | null
           description: string | null
@@ -222,6 +227,11 @@ export type Database = {
         Insert: {
           apply_deadline_at?: string | null
           city?: string | null
+          cover_image_flag?: string | null
+          cover_image_pending_url?: string | null
+          cover_image_status?: string
+          cover_image_url?: string | null
+          cover_page_title?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -246,6 +256,11 @@ export type Database = {
         Update: {
           apply_deadline_at?: string | null
           city?: string | null
+          cover_image_flag?: string | null
+          cover_image_pending_url?: string | null
+          cover_image_status?: string
+          cover_image_url?: string | null
+          cover_page_title?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -1043,7 +1058,11 @@ export type Database = {
           city: string | null
           contact_email: string | null
           contact_email_public: boolean
+          cover_image_flag: string | null
+          cover_image_pending_url: string | null
+          cover_image_status: string
           cover_image_url: string | null
+          cover_page_title: string | null
           created_at: string
           created_by: string | null
           description: string | null
@@ -1063,12 +1082,20 @@ export type Database = {
           type: Database["public"]["Enums"]["organisation_type"]
           updated_at: string
           website: string | null
+          website_health_checked_at: string | null
+          website_health_reason: string | null
+          website_health_status: string | null
+          website_health_title: string | null
         }
         Insert: {
           city?: string | null
           contact_email?: string | null
           contact_email_public?: boolean
+          cover_image_flag?: string | null
+          cover_image_pending_url?: string | null
+          cover_image_status?: string
           cover_image_url?: string | null
+          cover_page_title?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -1088,12 +1115,20 @@ export type Database = {
           type: Database["public"]["Enums"]["organisation_type"]
           updated_at?: string
           website?: string | null
+          website_health_checked_at?: string | null
+          website_health_reason?: string | null
+          website_health_status?: string | null
+          website_health_title?: string | null
         }
         Update: {
           city?: string | null
           contact_email?: string | null
           contact_email_public?: boolean
+          cover_image_flag?: string | null
+          cover_image_pending_url?: string | null
+          cover_image_status?: string
           cover_image_url?: string | null
+          cover_page_title?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -1113,6 +1148,10 @@ export type Database = {
           type?: Database["public"]["Enums"]["organisation_type"]
           updated_at?: string
           website?: string | null
+          website_health_checked_at?: string | null
+          website_health_reason?: string | null
+          website_health_status?: string | null
+          website_health_title?: string | null
         }
         Relationships: []
       }

@@ -22,8 +22,10 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SubmitRouteImport } from './routes/submit'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminCoverImagesRouteImport } from './routes/admin.cover-images'
 import { Route as AdminNewsletterRouteImport } from './routes/admin.newsletter'
 import { Route as AdminTagsRouteImport } from './routes/admin.tags'
+import { Route as AdminWebsiteHealthRouteImport } from './routes/admin.website-health'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
 import { Route as EventSlugRouteImport } from './routes/event.$slug'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
@@ -117,6 +119,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCoverImagesRoute = AdminCoverImagesRouteImport.update({
+  id: '/cover-images',
+  path: '/cover-images',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminNewsletterRoute = AdminNewsletterRouteImport.update({
   id: '/newsletter',
   path: '/newsletter',
@@ -125,6 +132,11 @@ const AdminNewsletterRoute = AdminNewsletterRouteImport.update({
 const AdminTagsRoute = AdminTagsRouteImport.update({
   id: '/tags',
   path: '/tags',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminWebsiteHealthRoute = AdminWebsiteHealthRouteImport.update({
+  id: '/website-health',
+  path: '/website-health',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -276,8 +288,10 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/submit': typeof SubmitRoute
+  '/admin/cover-images': typeof AdminCoverImagesRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/tags': typeof AdminTagsRoute
+  '/admin/website-health': typeof AdminWebsiteHealthRoute
   '/admin/login': typeof AdminLoginRoute
   '/event/$slug': typeof EventSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
@@ -318,8 +332,10 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/submit': typeof SubmitRoute
+  '/admin/cover-images': typeof AdminCoverImagesRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/tags': typeof AdminTagsRoute
+  '/admin/website-health': typeof AdminWebsiteHealthRoute
   '/admin/login': typeof AdminLoginRoute
   '/event/$slug': typeof EventSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
@@ -363,8 +379,10 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/submit': typeof SubmitRoute
+  '/admin/cover-images': typeof AdminCoverImagesRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/tags': typeof AdminTagsRoute
+  '/admin/website-health': typeof AdminWebsiteHealthRoute
   '/admin_/login': typeof AdminLoginRoute
   '/event/$slug': typeof EventSlugRoute
   '/learn/$slug': typeof LearnSlugRoute
@@ -409,8 +427,10 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/submit'
+    | '/admin/cover-images'
     | '/admin/newsletter'
     | '/admin/tags'
+    | '/admin/website-health'
     | '/admin/login'
     | '/event/$slug'
     | '/learn/$slug'
@@ -451,8 +471,10 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/submit'
+    | '/admin/cover-images'
     | '/admin/newsletter'
     | '/admin/tags'
+    | '/admin/website-health'
     | '/admin/login'
     | '/event/$slug'
     | '/learn/$slug'
@@ -495,8 +517,10 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/reset-password'
     | '/submit'
+    | '/admin/cover-images'
     | '/admin/newsletter'
     | '/admin/tags'
+    | '/admin/website-health'
     | '/admin_/login'
     | '/event/$slug'
     | '/learn/$slug'
@@ -644,6 +668,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/cover-images': {
+      id: '/admin/cover-images'
+      path: '/cover-images'
+      fullPath: '/admin/cover-images'
+      preLoaderRoute: typeof AdminCoverImagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/newsletter': {
       id: '/admin/newsletter'
       path: '/newsletter'
@@ -656,6 +687,13 @@ declare module '@tanstack/react-router' {
       path: '/tags'
       fullPath: '/admin/tags'
       preLoaderRoute: typeof AdminTagsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/website-health': {
+      id: '/admin/website-health'
+      path: '/website-health'
+      fullPath: '/admin/website-health'
+      preLoaderRoute: typeof AdminWebsiteHealthRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin_/login': {
@@ -851,8 +889,10 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminCoverImagesRoute: typeof AdminCoverImagesRoute
   AdminNewsletterRoute: typeof AdminNewsletterRoute
   AdminTagsRoute: typeof AdminTagsRoute
+  AdminWebsiteHealthRoute: typeof AdminWebsiteHealthRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminEpisodesIdRoute: typeof AdminEpisodesIdRoute
   AdminEventsIdRoute: typeof AdminEventsIdRoute
@@ -873,8 +913,10 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminCoverImagesRoute: AdminCoverImagesRoute,
   AdminNewsletterRoute: AdminNewsletterRoute,
   AdminTagsRoute: AdminTagsRoute,
+  AdminWebsiteHealthRoute: AdminWebsiteHealthRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminEpisodesIdRoute: AdminEpisodesIdRoute,
   AdminEventsIdRoute: AdminEventsIdRoute,
