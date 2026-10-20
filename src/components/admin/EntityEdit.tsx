@@ -195,6 +195,8 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
         <Button type="submit" disabled={save.isPending}>{save.isPending ? "Saving…" : "Save"}</Button>
       </div>
     </form>
+    {entity === 'organisations' && id !== 'new' && bundle.data?.row && <OrgEnrichment id={id} name={String(values['name'] ?? '')} type={String(values['type'] ?? '')} row={bundle.data.row} />}
+    </>
   );
 }
 
