@@ -1009,3 +1009,13 @@ html.lenis, html.lenis body { height: auto; }
 @media (max-width: 359px) {
   .direction-wordmark, .direction-chart .direction-wordmark, .direction-archive .direction-wordmark { font-size: 36px; }
 }
+
+.theme-site .nb-specimen { --specimen-color: var(--network-care); position: relative; display: flex; align-items: center; justify-content: space-between; min-height: 220px; margin: 0 0 36px; padding: 32px; background: color-mix(in oklch, var(--specimen-color) 12%, var(--background)); color: var(--ink); overflow: hidden; }
+.theme-site .nb-specimen-bio { --specimen-color: var(--network-research); }
+.theme-site .nb-specimen-med { --specimen-color: var(--network-lab); }
+.theme-site .nb-specimen-digital { --specimen-color: var(--network-agency); }
+.theme-site .nb-specimen-women { --specimen-color: var(--berry); }
+.nb-specimen-initials { font-family: var(--font-display); font-size: 96px; line-height: 1; }
+.nb-specimen svg { width: min(45%, 260px); height: 180px; color: var(--specimen-color); }
+.nb-specimen figcaption { position: absolute; left: 32px; bottom: 18px; }
+@media (max-width: 600px) { .theme-site .nb-specimen { padding: 24px; min-height: 180px; } .nb-specimen-initials { font-size: 72px; } .nb-specimen svg { height: 140px; } .nb-specimen figcaption { left: 24px; } }

@@ -9,6 +9,7 @@ import { safeWebUrl, text, type PublicProfile, type RelatedEntry } from '@/lib/p
 import { RelationshipMap } from './RelationshipMap';
 import { OrganisationLogo } from './OrganisationLogo';
 import { OrganisationCover } from './OrganisationCover';
+import { SpecimenCard } from './SpecimenCard';
 import { organisationDomain } from '@/lib/organisation-logo';
 import { relationshipNodes, publicProfileTerms } from '@/lib/profiles';
 
@@ -72,7 +73,7 @@ export function ProfilePage({ profile }: { profile: PublicProfile }) {
     {text(row, 'last_checked') && <p className="nb-small text-muted-foreground">Last checked {date(text(row, 'last_checked'))}</p>}
   </aside>;
   return <article className="nb-container nb-section">
-    {isOrg && <OrganisationCover image={text(row, 'cover_image_url')} website={text(row, 'website')} />}
+    {(isOrg || kind === 'events') && <OrganisationCover image={text(row, 'cover_image_url')} website={text(row, isOrg ? 'website' : 'source_url')} fallback={<SpecimenCard name={profile.title} terms={profile.terms} />} />}
     <div className="mb-8"><Link to="/explore" search={EMPTY_SEARCH} className="nb-link inline-flex items-center gap-2"><ArrowLeft className="h-4 w-4" aria-hidden />Explore</Link></div>
     <header data-profile-identity data-profile-detail={isOrg ? [label, text(row, 'city')].filter(Boolean).join(', ') : undefined} className="pb-10">
       <div className={isOrg ? 'flex items-start gap-4' : 'flex flex-col gap-6 sm:flex-row sm:items-start'}>

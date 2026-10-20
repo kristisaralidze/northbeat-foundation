@@ -3,7 +3,7 @@ import { BRANDFETCH_CLIENT_ID, organisationDomain, organisationLogoUrl } from '.
 describe('organisation logos', () => {
   it('uses the supplied public client ID for organisation logos', () => {
     expect(BRANDFETCH_CLIENT_ID).toBe('1idCGaWDUDXkjAD579-');
-    expect(organisationLogoUrl(null, 'https://curifylabs.com')).toBe('https://cdn.brandfetch.io/domain/curifylabs.com/w/128/h/128/type/icon?c=1idCGaWDUDXkjAD579-');
+    expect(organisationLogoUrl(null, 'https://curifylabs.com')).toBe('https://cdn.brandfetch.io/domain/curifylabs.com/w/128/h/128/fallback/404/type/icon?c=1idCGaWDUDXkjAD579-');
   });
   it('strips protocol, www and paths from website domains', () => {
     expect(organisationDomain('https://www.curifylabs.com/about?x=1')).toBe('curifylabs.com');
@@ -11,7 +11,7 @@ describe('organisation logos', () => {
     expect(organisationDomain('http://www.curifylabs.com:8080/')).toBe('curifylabs.com');
   });
   it('builds the specified 128px Brandfetch icon URL', () => {
-    expect(organisationLogoUrl(null, 'https://www.curifylabs.com/about', 'test-client')).toBe('https://cdn.brandfetch.io/domain/curifylabs.com/w/128/h/128/type/icon?c=test-client');
+    expect(organisationLogoUrl(null, 'https://www.curifylabs.com/about', 'test-client')).toBe('https://cdn.brandfetch.io/domain/curifylabs.com/w/128/h/128/fallback/404/type/icon?c=test-client');
   });
   it('always uses the uploaded logo instead of Brandfetch', () => {
     expect(organisationLogoUrl('https://images.example.org/upload.png', 'https://curifylabs.com', 'test-client')).toBe('https://images.example.org/upload.png');

@@ -59,7 +59,7 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
 
   useEffect(() => {
     if (!bundle.data) return;
-    const r = bundle.data.row ?? {};
+    const r: Values = bundle.data.row ?? {};
     const v: Values = { ...r, ...(['organisations', 'events'].includes(entity) ? { cover_image_url: r['cover_image_pending_url'] ?? r['cover_image_url'] } : {}) };
     for (const f of cfg.fields) if (f.kind === "datetime") v[f.name] = toLocalInput(r[f.name as keyof typeof r]);
     if (!bundle.data.row) v["status"] = "draft";
