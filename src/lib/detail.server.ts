@@ -5,7 +5,8 @@ import { publicEntry, text, publicTitle, type DetailContext, type DetailItem, ty
 async function all(client: SupabaseClient, table: string, columns: string, published = true) {
   const rows: ProfileRow[] = [];
   for (let offset = 0; ; offset += 1000) {
-    let query = client.from(table).select(columns).order('id').range(offset, offset + 999);
+    let query = client.from(table).select(columns).order(published ? 'id' : columns.split(',')[0] ?? 'term_id').range(offset, offset + 999);
+    if (!published) query = query.order('term_id');
     if (published) query = query.eq('status', 'published');
     const result = await query;
     if (result.error) throw new Error('Related recommendations could not be loaded.');
@@ -31,9 +32,9 @@ export async function detailContext(client: SupabaseClient, kind: 'organisations
     similar = ranked.map(org => publicEntry('organisations', org));
   }
   if (kind === 'events' && (steps.length || fields.length)) {
-    const [entries, tags] = await Promise.all([all(client, 'guides', 'id,slug,title,summary,journey_step_id,status'), all(client, 'guide_terms', 'guide_id,term_id', false)]);
+    const [entries, tags] = await Promise.all([all(client, 'guides', 'id,slug,title,one_sentence,journey_step_id,status'), all(client, 'guide_terms', 'guide_id,term_id', false)]);
     const score = (guide: ProfileRow) => (steps.includes(String(guide['journey_step_id'])) ? 10 : 0) + (tags.some(tag => tag['guide_id'] === guide.id && fields.includes(String(tag['term_id']))) ? 1 : 0);
-    guides = entries.filter(guide => score(guide) > 0).sort((a, b) => score(b) - score(a) || String(a['title']).localeCompare(String(b['title']))).slice(0, 2).map(guide => ({ slug: guide.slug, title: publicTitle(String(guide['title'])), summary: text(guide, 'summary') }));
+    guides = entries.filter(guide => score(guide) > 0).sort((a, b) => score(b) - score(a) || String(a['title']).localeCompare(String(b['title']))).slice(0, 2).map(guide => ({ slug: guide.slug, title: publicTitle(String(guide['title'])), summary: text(guide, 'one_sentence') }));
   }
   return { now, coming, sameWeek, similar, guides };
 }

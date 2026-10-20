@@ -7,7 +7,7 @@ import { SUBMIT_TABS, validTab, type SubmitTab } from "@/lib/submit";
 import { sendSubmission } from "@/lib/submit.functions";
 
 export const Route = createFileRoute("/submit")({
-  validateSearch: zodValidator(z.object({ tab: z.string().optional() })),
+  validateSearch: zodValidator(z.object({ tab: z.string().optional(), edit: z.string().max(200).optional(), entryUrl: z.string().max(500).optional() })),
   head: () => ({
     meta: [
       { title: "Submit: Northbeat" },
@@ -22,10 +22,10 @@ export const Route = createFileRoute("/submit")({
 });
 
 function SubmitPage() {
-  const { tab: rawTab } = Route.useSearch();
+  const { tab: rawTab, edit, entryUrl } = Route.useSearch();
   const navigate = useNavigate({ from: "/submit" });
   const tab = validTab(rawTab);
-  const active = SUBMIT_TABS.find((item) => item.id === tab)!;
+  const active = SUBMIT_TABS.find((item) => item.id === tab) ?? SUBMIT_TABS[0];
   return (
     <div className="nb-page">
       <header className="nb-page-header">
@@ -46,10 +46,10 @@ function SubmitPage() {
           </button>
         ))}
       </div>
-      <section aria-label={active.heading} className="nb-card mt-6 max-w-xl">
-        <h2 className="nb-h3">{active.heading}</h2>
-        <p className="nb-small text-muted-foreground">{active.intro}</p>
-        <SubmitForm key={tab} tab={tab} />
+      <section aria-label={edit ? 'Suggest an edit' : active.heading} className="nb-card mt-6 max-w-xl">
+        <h2 className="nb-h3">{edit ? 'Suggest an edit' : active.heading}</h2>
+        <p className="nb-small text-muted-foreground">{edit ? `Correction for ${edit}` : active.intro}</p>
+        <SubmitForm key={`${tab}:${edit ?? ''}`} tab={tab} edit={edit} entryUrl={entryUrl} />
       </section>
     </div>
   );
@@ -65,9 +65,9 @@ function Field({ label, children, hint }: { label: string; children: React.React
   );
 }
 
-function SubmitForm({ tab }: { tab: SubmitTab }) {
+function SubmitForm({ tab, edit, entryUrl }: { tab: SubmitTab; edit?: string | undefined; entryUrl?: string | undefined }) {
   const send = useServerFn(sendSubmission);
-  const [values, setValues] = useState<Record<string, string>>({});
+  const [values, setValues] = useState<Record<string, string>>(() => edit ? { [tab === 'event' ? 'event_title' : 'organisation_name']: edit, message: `Suggested edit for ${edit}${entryUrl ? ` (${entryUrl})` : ''}:\n` } : {});
   const [consent, setConsent] = useState(false);
   const [state, setState] = useState<"idle" | "busy" | "done" | "error">("idle");
   const [msg, setMsg] = useState("");
