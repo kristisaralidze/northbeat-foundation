@@ -12,6 +12,7 @@ import { OrganisationCover } from './OrganisationCover';
 import { SpecimenCard } from './SpecimenCard';
 import { organisationDomain } from '@/lib/organisation-logo';
 import { relationshipNodes, publicProfileTerms } from '@/lib/profiles';
+import { VentureDetail } from './VentureDetail';
 
 export function EntryLink({ kind, entry, children, className }: { kind: EntityKey; entry: { slug: string }; children: ReactNode; className?: string }) {
   const props = { params: { slug: entry.slug }, className, children };
@@ -50,6 +51,7 @@ function date(value: string | null, timezone?: string | null) {
   try { return new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: timezone ?? 'UTC' }).format(parsed); } catch { return new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: 'UTC' }).format(parsed); }
 }
 export function ProfilePage({ profile }: { profile: PublicProfile }) {
+  if (profile.kind === 'organisations' || profile.kind === 'events') return <VentureDetail profile={profile} />;
   const { row, kind } = profile;
   const isOrg = kind === 'organisations';
   const isPerson = kind === 'people';

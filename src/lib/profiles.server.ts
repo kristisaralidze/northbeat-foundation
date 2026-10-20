@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { ENTITIES, type EntityKey } from './admin/entities';
 import { ORG_RELATION_ORDER, orgRelationLabel, publicEntry, publishedOnly, type ProfileRow, type ProfileTerm, type PublicProfile, type RelatedGroup } from './profiles';
 import { approvedCover } from './organisation-cover';
+import { detailContext } from './detail.server';
 const COLUMNS: Record<EntityKey, string> = {
   organisations: '', people: '',
   events: 'id,slug,status,title,event_type,summary,description,starts_at,ends_at,apply_deadline_at,timezone,format,venue,city,registration_url,price_note,source_url,last_checked',
@@ -64,7 +65,9 @@ export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey,
   }));
   if (kind === 'organisations') related.push(...await loadOrgRelations(client, row.id));
   const entry = publicEntry(kind, row);
-  return { kind, row, title: entry.title, summary: entry.summary, image: entry.image, terms, related: related.filter((group) => group.entries.length) };
+  const groups = related.filter((group) => group.entries.length);
+  const detail = kind === 'organisations' || kind === 'events' ? await detailContext(client, kind, row, terms, groups) : undefined;
+  return { kind, row, title: entry.title, summary: entry.summary, image: entry.image, terms, related: groups, ...(detail ? { detail } : {}) };
 }
 
 /** Organisation relationships in both directions, grouped into plain-language sections. */
