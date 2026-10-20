@@ -52,6 +52,9 @@ function date(value: string | null, timezone?: string | null) {
 }
 export function ProfilePage({ profile }: { profile: PublicProfile }) {
   if (profile.kind === 'organisations' || profile.kind === 'events') return <VentureDetail profile={profile} />;
+  return <StandardProfilePage profile={profile} />;
+}
+function StandardProfilePage({ profile }: { profile: PublicProfile }) {
   const { row, kind } = profile;
   const isOrg = kind === 'organisations';
   const isPerson = kind === 'people';

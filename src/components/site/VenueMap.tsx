@@ -10,7 +10,8 @@ export function VenueMap({ latitude, longitude, name }: { latitude: number; long
       const map = L.map(host.current, { scrollWheelZoom: false }).setView([latitude, longitude], 14);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>', maxZoom: 19 }).addTo(map);
       const marker = L.divIcon({ className: 'nb-venue-marker', html: '<span></span>', iconSize: [16, 16], iconAnchor: [8, 8] });
-      L.marker([latitude, longitude], { icon: marker, title: name }).addTo(map).bindPopup(document.createTextNode(name));
+      const popup = document.createElement('span'); popup.textContent = name;
+      L.marker([latitude, longitude], { icon: marker, title: name }).addTo(map).bindPopup(popup);
       const resize = new ResizeObserver(() => map.invalidateSize()); resize.observe(host.current);
       dispose = () => { resize.disconnect(); map.remove(); };
     });
