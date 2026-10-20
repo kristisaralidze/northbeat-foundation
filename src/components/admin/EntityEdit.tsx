@@ -17,6 +17,7 @@ import { fetchOrganisationCover } from '@/lib/organisation-cover.functions';
 import { shouldDiscoverCover } from '@/lib/organisation-cover';
 import { ownDomain, isMediaUpload } from '@/lib/brand';
 import { BrandSearch } from '@/components/BrandSearch';
+import { OrgEnrichment } from './OrgEnrichment';
 
 type Values = Record<string, unknown>;
 
@@ -78,6 +79,12 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
       if (['organisations', 'events'].includes(entity)) {
         if (payload['video_url'] && !officialVideo(payload['video_url'] as string, payload['video_source_url'] as string)) throw new Error('Use a YouTube or Vimeo video and the official channel URL on the same platform, like youtube.com/@name or vimeo.com/name.');
         if (!payload['video_url']) payload['video_source_url'] = null;
+        const old = bundle.data?.row ?? {};
+        if (payload['news_feed_url'] && (!String(payload['news_feed_url']).startsWith('https://') || !ownDomain(payload['news_feed_url'] as string, values['website'] as string))) throw new Error('The news feed must be an https address on the organisation’s own website.');
+        if (payload['news_feed_url'] !== old['news_feed_url']) { payload['news_items'] = null; payload['news_fetched_at'] = null; }
+        const coordsEdited = payload['latitude'] !== old['latitude'] || payload['longitude'] !== old['longitude'];
+        if (coordsEdited) payload['geocoded_at'] = payload['latitude'] != null && payload['longitude'] != null ? new Date().toISOString() : null;
+        else if (payload['city'] !== old['city'] || payload['venue'] !== old['venue']) { payload['latitude'] = null; payload['longitude'] = null; payload['geocoded_at'] = null; }
         if (!coverEdited) delete payload['cover_image_url'];
         else {
           const image = payload['cover_image_url'] as string | null;
