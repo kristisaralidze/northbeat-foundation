@@ -42,7 +42,7 @@ export const importCsvRows = createServerFn({ method: 'POST' })
     const matches = await snapshot(context.supabase, data.entity);
     const summary = { added: 0, skipped: 0, errors: [] as { row: number; message: string }[] };
     for (const row of data.rows) {
-      const prepared = prepareRow(data.entity, row.values, matches, data.choices, new Date().toISOString().slice(0, 10));
+      const prepared = prepareRow(data.entity, row.values, matches, data.choices, new Date().toISOString().slice(0, 10), data.parents);
       if (prepared.duplicate) { summary.skipped++; continue; }
       if (prepared.errors.length) { summary.errors.push({ row: row.number, message: prepared.errors.join('; ') }); continue; }
       const { data: result, error } = await context.supabase.rpc('admin_import_csv_row', {

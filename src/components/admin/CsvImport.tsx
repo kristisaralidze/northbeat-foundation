@@ -17,6 +17,7 @@ export function CsvImport({ entity }: { entity: ImportEntity }) {
   const [mapping, setMapping] = useState<Record<string, string>>({});
   const [matches, setMatches] = useState<Snapshot | null>(null);
   const [choices, setChoices] = useState<Record<string, TagChoice>>({});
+  const [parents, setParents] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [summary, setSummary] = useState<Summary | null>(null);
@@ -29,12 +30,12 @@ export function CsvImport({ entity }: { entity: ImportEntity }) {
   const unknown = matches ? unknownTags(entity, rows, matches) : [];
   const previewSnapshot: Snapshot = matches ? { ...matches, entries: [...matches.entries] } : { entries: [], organisations: [], terms: [] };
   const prepared = rows.map(row => {
-    const result = prepareRow(entity, row, previewSnapshot, choices, new Date().toISOString().slice(0, 10));
+    const result = prepareRow(entity, row, previewSnapshot, choices, new Date().toISOString().slice(0, 10), parents);
     if (!result.duplicate && !result.errors.length) previewSnapshot.entries.push({ id: '', name: result.name, website: String(result.values['website'] ?? '') });
     return result;
   });
   async function upload(file: File) {
-    setBusy(true); setError(''); setSummary(null); setCsv(null); setChoices({});
+    setBusy(true); setError(''); setSummary(null); setCsv(null); setChoices({}); setParents({});
     try {
       if (!file.name.toLowerCase().endsWith('.csv')) throw new Error('Choose a .csv file.');
       if (file.size > 5 * 1024 * 1024) throw new Error('Choose a file smaller than 5 MB.');
@@ -50,7 +51,7 @@ export function CsvImport({ entity }: { entity: ImportEntity }) {
     try {
       for (let offset = 0; offset < rows.length; offset += 50) {
         setProgress(`Importing ${Math.min(offset + 50, rows.length)} of ${rows.length}`);
-        const result = await importRows({ data: { entity, choices, rows: rows.slice(offset, offset + 50).map((values, i) => ({ number: offset + i + 2, values })) } });
+        const result = await importRows({ data: { entity, choices, parents, rows: rows.slice(offset, offset + 50).map((values, i) => ({ number: offset + i + 2, values })) } });
         total.added += result.added; total.skipped += result.skipped; total.errors.push(...result.errors);
       }
       setSummary(total);
@@ -75,9 +76,10 @@ export function CsvImport({ entity }: { entity: ImportEntity }) {
             {CSV_COLUMNS[entity].map(col => <label key={col} className="grid gap-1 text-sm">{humanize(col)}<select aria-label={`Map ${col}`} disabled={busy} value={mapping[col] ?? ''} onChange={e => setMapping(prev => ({ ...prev, [col]: e.target.value }))} className="h-9 rounded-md border border-input bg-background px-2 text-foreground"><option value="">Skip column</option>{csv.headers.map(h => <option key={h} value={h}>{h}</option>)}</select></label>)}
           </div>
           {unknown.length > 0 && <section className="space-y-2"><h2 className="font-medium">Unknown tags</h2>{unknown.map(tag => <label key={tag.key} className="flex flex-wrap items-center justify-between gap-2 text-sm"><span>{tag.name} ({humanize(tag.kind)})</span><select aria-label={`Action for ${tag.name}`} disabled={busy} value={choices[tag.key] ?? ''} onChange={e => setChoices(prev => ({ ...prev, [tag.key]: e.target.value as TagChoice }))} className="h-9 rounded-md border border-input bg-background px-2"><option value="">Choose action</option><option value="create">Create tag</option><option value="skip">Skip tag</option></select></label>)}</section>}
+          {unknown.filter(tag => tag.kind === 'sub_area' && choices[tag.key] === 'create').map(tag => <label key={tag.key} className="grid gap-1 text-sm">Parent field for {tag.name}<select aria-label={`Parent field for ${tag.name}`} disabled={busy} value={parents[tag.key] ?? ''} onChange={e => setParents(prev => ({ ...prev, [tag.key]: e.target.value }))} className="h-9 rounded-md border border-input bg-background px-2"><option value="">Choose parent field</option>{matches.terms.filter(t => t.kind === 'field').map(t => <option key={t.id} value={t.id}>{t.name}</option>)}</select></label>)}
           <p className="text-sm text-muted-foreground">{rows.length} rows. {prepared.filter(p => p.duplicate).length} duplicates to skip. {prepared.filter(p => !p.duplicate && p.errors.length).length} rows with errors. Previewing the first {Math.min(20, rows.length)}.</p>
           <div className="max-h-80 overflow-auto rounded-md border"><Table><TableHeader><TableRow><TableHead>Row</TableHead><TableHead>Check</TableHead>{CSV_COLUMNS[entity].filter(col => mapping[col]).map(col => <TableHead key={col}>{humanize(col)}</TableHead>)}</TableRow></TableHeader><TableBody>{rows.slice(0, 20).map((row, i) => <TableRow key={i}><TableCell>{i + 2}</TableCell><TableCell className="min-w-48">{prepared[i]?.duplicate ? 'Duplicate: will skip' : prepared[i]?.errors.length ? prepared[i]?.errors.join('; ') : 'Ready'}{prepared[i]?.organisationId && <p className="text-muted-foreground">Organisation matched</p>}{prepared[i]?.warnings.map(w => <p key={w} className="text-muted-foreground">{w}</p>)}</TableCell>{CSV_COLUMNS[entity].filter(col => mapping[col]).map(col => <TableCell key={col} className="min-w-36 max-w-72 whitespace-normal break-words">{row[col]}</TableCell>)}</TableRow>)}</TableBody></Table></div>
-          <Button disabled={busy || unknown.some(tag => !choices[tag.key]) || !prepared.some(p => !p.duplicate && !p.errors.length)} onClick={() => void runImport()}>Import drafts</Button>
+          <Button disabled={busy || unknown.some(tag => !choices[tag.key] || (tag.kind === 'sub_area' && choices[tag.key] === 'create' && !parents[tag.key])) || !rows.length} onClick={() => void runImport()}>Import drafts</Button>
         </>}
         {summary && <section aria-live="polite" className="space-y-3"><h2 className="font-medium">Import summary</h2><p>{summary.added} added, {summary.skipped} skipped, {summary.errors.length} errors.</p>{summary.errors.length > 0 && <ul className="max-h-64 space-y-2 overflow-auto text-sm text-destructive">{summary.errors.map(e => <li key={e.row}>Row {e.row}: {e.message}</li>)}</ul>}<Button variant="outline" onClick={() => setOpen(false)}>Done</Button></section>}
       </DialogContent>

@@ -1,7 +1,7 @@
 # Admin CSV import
-- [ ] Add mapped CSV previews, unknown-tag create/skip choices and organisation matching to the three admin lists.
-- [ ] Import only drafts checked today, skip duplicates, preserve eligibility and return added/skipped/errors.
-- [ ] Test rules and verify authenticated upload, preview, import and readback.
+- [x] Add mapped CSV previews, unknown-tag create/skip choices and organisation matching to the three admin lists.
+- [x] Import only drafts checked today, skip duplicates, preserve eligibility and return added/skipped/errors.
+- [x] Test rules and verify authenticated upload, preview, import and readback; remove temporary verification data.
 
 # Living fabric
 - [x] Make Learn/footer silk fill the centre with stronger layered folds sweeping every 3 to 5 seconds; add frosted signup glass and soft footer edge.

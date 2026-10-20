@@ -20,7 +20,7 @@ export function websiteDomain(value: string) {
 export type CsvRow = Record<string, string>;
 export type Snapshot = { entries: { id: string; name: string; website: string | null }[]; organisations: { id: string; name: string }[]; terms: { id: string; kind: string; name: string }[] };
 export type TagChoice = 'create' | 'skip';
-export const importInputSchema = z.object({ entity: importEntitySchema, rows: z.array(z.object({ number: z.number().int().positive(), values: z.record(z.string().max(20000)) })).max(50), choices: z.record(z.enum(['create', 'skip'])) });
+export const importInputSchema = z.object({ entity: importEntitySchema, rows: z.array(z.object({ number: z.number().int().positive(), values: z.record(z.string().max(20000)) })).max(50), choices: z.record(z.enum(['create', 'skip'])), parents: z.record(z.string().uuid()).default({}) });
 
 export function parseCsv(text: string) {
   const parsed = Papa.parse<string[]>(text.replace(/^\uFEFF/, ''), { skipEmptyLines: 'greedy' });
@@ -48,7 +48,7 @@ export function unknownTags(entity: ImportEntity, rows: CsvRow[], snapshot: Snap
   }
   return [...unknown].map(([key, value]) => ({ key, ...value }));
 }
-export function prepareRow(entity: ImportEntity, row: CsvRow, snapshot: Snapshot, choices: Record<string, TagChoice>, today: string) {
+export function prepareRow(entity: ImportEntity, row: CsvRow, snapshot: Snapshot, choices: Record<string, TagChoice>, today: string, parents: Record<string, string> = {}) {
   const cfg = ENTITIES[entity];
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -56,7 +56,7 @@ export function prepareRow(entity: ImportEntity, row: CsvRow, snapshot: Snapshot
   const duplicate = snapshot.entries.some(e => normalize(e.name) === normalize(name) || (entity === 'organisations' && websiteDomain(row['website'] ?? '') !== '' && websiteDomain(e.website ?? '') === websiteDomain(row['website'] ?? '')));
   const values: Record<string, string | number | boolean | null> = { status: 'draft', last_checked: today, slug: slugify(name), [cfg.titleField]: name };
   if (!name) errors.push(`${cfg.titleField} is required`);
-  const tags: { kind: string; name: string; create: boolean }[] = [];
+  const tags: { kind: string; name: string; create: boolean; parent_id?: string }[] = [];
   for (const column of CSV_COLUMNS[entity]) {
     const value = row[column]?.trim() ?? '';
     if (!value) continue;
@@ -65,7 +65,11 @@ export function prepareRow(entity: ImportEntity, row: CsvRow, snapshot: Snapshot
       for (const name of splitTags(value)) {
         const known = snapshot.terms.some(t => t.kind === kind && normalize(t.name) === normalize(name));
         const choice = choices[tagKey(kind, name)];
-        if (known || choice === 'create') tags.push({ kind, name, create: !known });
+        if (known || choice === 'create') {
+          const parentId = parents[tagKey(kind, name)];
+          if (!known && kind === 'sub_area' && !snapshot.terms.some(t => t.kind === 'field' && t.id === parentId)) errors.push(`Choose a parent field for ${name}`);
+          tags.push({ kind, name, create: !known, ...(!known && kind === 'sub_area' && parentId ? { parent_id: parentId } : {}) });
+        }
         else if (choice === 'skip') warnings.push(`Skipped tag: ${name}`);
         else errors.push(`Choose create or skip for ${name}`);
       }
@@ -79,7 +83,7 @@ export function prepareRow(entity: ImportEntity, row: CsvRow, snapshot: Snapshot
       if (!options?.includes(normalized)) errors.push(`Invalid ${column}: ${value}`);
       else values[column] = normalized;
     } else if (column.endsWith('_at')) {
-      if (!/^\d{4}-\d{2}-\d{2}(?:T|\s|$)/.test(value) || !Number.isFinite(Date.parse(value))) errors.push(`Invalid ${column}: use an ISO date`);
+      if (!/^\d{4}-\d{2}-\d{2}(?:T|\s|$)/.test(value) || !Number.isFinite(Date.parse(value)) || new Date(`${value.slice(0, 10)}T00:00:00Z`).toISOString().slice(0, 10) !== value.slice(0, 10)) errors.push(`Invalid ${column}: use an ISO date`);
       else values[column] = new Date(value).toISOString();
     } else if (['founded_year', 'amount_min_eur', 'amount_max_eur'].includes(column)) {
       const number = Number(value);
