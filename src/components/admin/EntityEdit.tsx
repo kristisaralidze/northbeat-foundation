@@ -18,6 +18,7 @@ import { shouldDiscoverCover } from '@/lib/organisation-cover';
 import { ownDomain, isMediaUpload } from '@/lib/brand';
 import { BrandSearch } from '@/components/BrandSearch';
 import { OrgEnrichment } from './OrgEnrichment';
+import { LogoPicker } from './LogoPicker';
 
 type Values = Record<string, unknown>;
 
@@ -196,6 +197,7 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
         <Button type="submit" disabled={save.isPending}>{save.isPending ? "Saving…" : "Save"}</Button>
       </div>
     </form>
+    {entity === 'organisations' && id !== 'new' && bundle.data?.row && <LogoPicker id={id} name={String(values['name'] ?? '')} website={String(bundle.data.row['website'] ?? '')} row={bundle.data.row} />}
     {entity === 'organisations' && id !== 'new' && bundle.data?.row && <OrgEnrichment id={id} name={String(values['name'] ?? '')} type={String(values['type'] ?? '')} row={bundle.data.row} />}
     </>
   );

@@ -1170,6 +1170,7 @@ export type Database = {
           latitude: number | null
           linkedin_url: string | null
           logo_api_image_source_url: string | null
+          logo_choice: string
           logo_image_source: string | null
           logo_image_source_url: string | null
           logo_uploaded_by: string | null
@@ -1237,6 +1238,7 @@ export type Database = {
           latitude?: number | null
           linkedin_url?: string | null
           logo_api_image_source_url?: string | null
+          logo_choice?: string
           logo_image_source?: string | null
           logo_image_source_url?: string | null
           logo_uploaded_by?: string | null
@@ -1304,6 +1306,7 @@ export type Database = {
           latitude?: number | null
           linkedin_url?: string | null
           logo_api_image_source_url?: string | null
+          logo_choice?: string
           logo_image_source?: string | null
           logo_image_source_url?: string | null
           logo_uploaded_by?: string | null

@@ -5,7 +5,7 @@ export type DirectoryTerm = { id: string; kind: string; name: string; slug: stri
 export type DirectoryOrganisation = {
   id: string; slug: string; name: string; type: string; short_description: string | null;
   logo_url: string | null; cover_image_url?: string | null; website: string | null; city: string | null; termIds: string[];
-  logo_image_source?: string | null; logo_image_source_url?: string | null; image_source_url?: string | null;
+  logo_choice?: string | null; logo_image_source?: string | null; logo_image_source_url?: string | null; image_source_url?: string | null;
 };
 export type DirectoryData = { organisations: DirectoryOrganisation[]; terms: DirectoryTerm[] };
 export const EMPTY_SEARCH: ExploreSearch = { q: "", type: [], field: [], sub_area: [], country: [], stage: [] };

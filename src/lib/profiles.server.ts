@@ -30,7 +30,7 @@ export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey,
   const [row] = await readEntries(client, kind, { slug });
   if (!row) return null;
   if (kind === 'organisations' || kind === 'events') {
-    const columns = kind === 'organisations' ? 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url,brand_accent,video_url,video_source_url,openalex_id,research,business_id,registration_date,company_form,main_business_line,latitude,longitude,news_items' : 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url,video_url,video_source_url,latitude,longitude';
+    const columns = kind === 'organisations' ? 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_choice,logo_image_source,logo_image_source_url,brand_accent,video_url,video_source_url,openalex_id,research,business_id,registration_date,company_form,main_business_line,latitude,longitude,news_items' : 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url,video_url,video_source_url,latitude,longitude';
     const cover = await client.from(kind).select(columns).eq('id', row.id).eq('status', 'published').maybeSingle();
     if (cover.error) throw new Error('This profile could not be loaded. Please try again.');
     const assets = cover.data as unknown as Record<string, unknown> | null;

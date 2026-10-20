@@ -1,3 +1,4 @@
+import { officialLogo } from '@/lib/brand';
 import { lazy, Suspense, useState } from 'react';
 import { ClientOnly, Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
@@ -58,7 +59,7 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
     <OrganisationCover image={text(row, 'cover_image_url')} website={text(row, 'image_source_url') ?? text(row, isOrg ? 'website' : 'registration_url') ?? text(row, 'source_url')} name={profile.title} />
     <div className="mb-8">{isOrg ? <Link to="/explore" search={EMPTY_SEARCH} className="nb-link">Explore</Link> : <Link to="/events" search={{ type: '', city: '', month: '', archive: false, view: 'list' }} className="nb-link">Events</Link>}</div>
     <header data-profile-identity data-profile-detail={isOrg ? [label, city].filter(Boolean).join(', ') : label} className="nb-detail-identity">
-      <OrganisationLogo name={profile.title} uploaded={text(row,'logo_url')} website={text(row,isOrg ? 'website' : 'registration_url') ?? text(row,'source_url')} source={text(row,'logo_image_source')} sourceUrl={text(row,'logo_image_source_url')} large eager automatic={isOrg} />
+      <OrganisationLogo name={profile.title} uploaded={isOrg ? text(row,'logo_url') : officialLogo(text(row,'logo_url'), text(row,'registration_url') ?? text(row,'source_url'), text(row,'logo_image_source'), text(row,'logo_image_source_url'))} website={text(row,isOrg ? 'website' : 'registration_url') ?? text(row,'source_url')} choice={isOrg ? (text(row,'logo_choice') ?? 'icon') : 'verified'} large eager />
       <div className="min-w-0 flex-1"><h1 data-page-title className="nb-h1 break-words">{profile.title}</h1>{!isOrg && days !== null && <p className="nb-countdown mt-4">{days > 0 ? `In ${days} ${days === 1 ? 'day' : 'days'}` : days === 0 ? 'Today' : text(row, 'ends_at') && Date.parse(String(row['ends_at'])) >= Date.parse(now) ? 'Happening now' : 'Past event'}</p>}{profile.summary && <p className="nb-lead mt-5">{profile.summary}</p>}<dl className="nb-facts-strip">{facts.filter(([,value])=>value).map(([name,value])=><div key={name}><dt>{name}</dt><dd className={name === 'Fields' ? 'nb-official-field' : undefined}>{value}</dd></div>)}</dl>{businessId && <p className="nb-registry-note">Verified in the Finnish Trade Register. <a className="nb-link" href={ytjRecordUrl(businessId)} target="_blank" rel="noopener noreferrer">View the official YTJ record</a></p>}</div>
     </header>
     {!isOrg && <CalendarActions profile={profile} />}
