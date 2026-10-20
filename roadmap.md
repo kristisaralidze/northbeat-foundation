@@ -1,6 +1,7 @@
 # Urgent listing safety
 - [x] Remove 4MindHealth cover and set its listing to draft; clear 35 other website-fetched covers.
-- [ ] Require cover approval for organisations/events, add review queue and automatic title flags.
+- [ ] Require cover approval for organisations/events; refill published candidates only after title, spam, domain and 800px checks; store rejection reasons.
+- [ ] Add 20-image review pages with approve/reject/upload/bulk approval and specimen fallback on detail pages.
 - [ ] Hide Brandfetch fallback tiles; add and run website health checks; report failures.
 - [ ] Review uploaded organisation/event detail redesign after safety changes. Awaiting a separate redesign plan after safety verification.
 
