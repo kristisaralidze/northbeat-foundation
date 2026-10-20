@@ -45,12 +45,12 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
   const steps = terms.filter(term => term.kind === 'journey_step');
   const names = (kind: string) => terms.filter(term => term.kind === kind).map(term => term.name).join(', ') || null;
   const label = humanize(text(row, isOrg ? 'type' : 'event_type') ?? '');
+  const businessId = isOrg ? text(row, 'business_id') : null; const registered = text(row, 'registration_date');
   const facts: [string, string | null][] = isOrg ? [['Type', label], ['Location', [text(row, 'city'), names('country')].filter(Boolean).join(', ')], ['Founded', row['founded_year'] ? String(row['founded_year']) : null], ['Stages', names('stage')], ['Fields', names('field')], ['Business ID', businessId ? `${businessId}${registered ? `, registered ${registered.slice(0, 4)}` : ''}` : null]] : [['Dates', start ? `${dateLabel(start, text(row, 'timezone'))}${text(row, 'ends_at') && dayKey(String(row['ends_at'])) !== dayKey(start) ? ` to ${dateLabel(String(row['ends_at']), text(row, 'timezone'))}` : ''}` : null], ['Venue', [text(row, 'venue'), text(row, 'city')].filter(Boolean).join(', ')], ['Format', text(row, 'format') ? humanize(String(row['format'])) : null], ['Type', label], ['Fields', names('field')], ['Price', text(row, 'price_note')], ['Apply by', text(row, 'apply_deadline_at') ? dateLabel(String(row['apply_deadline_at'])) : null]];
   const connections = profile.related.filter(group => group.kind === 'organisations'); const connectionProfile = { ...profile, related: connections };
   const otherGroups = profile.related.filter(group => !['organisations', 'events', 'opportunities'].includes(group.kind));
   const venue = text(row, 'venue'); const city = text(row, 'city'); const lat = row['latitude'], lng = row['longitude']; const coordinates: [number, number] | null = row['format'] !== 'online' && typeof lat === 'number' && typeof lng === 'number' ? [lat, lng] : null;
   const research = isOrg ? asResearch(row['research']) : null; const trials = isOrg && Array.isArray(row['trials']) ? row['trials'] as unknown as Parameters<typeof TrialsSection>[0]['trials'] : []; const news = isOrg && Array.isArray(row['news_items']) ? row['news_items'] as unknown as NewsItem[] : [];
-  const businessId = isOrg ? text(row, 'business_id') : null; const registered = text(row, 'registration_date');
   const website = safeWebUrl(text(row, 'website')); const description = text(row, 'description');
   const video = officialVideo(text(row, 'video_url'), text(row, 'video_source_url'));
   const accent = isOrg ? brandColour(row['brand_accent']) : null;
