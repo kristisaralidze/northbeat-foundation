@@ -15,6 +15,7 @@ function checkType(src: string) {
 
 /** Resolves the logo the admin chose: an upload/own-domain file, or a hotlinked Brandfetch version (icon by default). */
 export function chosenLogoSrc(choice: string | null | undefined, uploaded: string | null | undefined, website: string | null | undefined) {
+  if (choice === 'verified') return uploaded ?? null;
   if (choice === 'upload') return uploaded && (isMediaUpload(uploaded) || ownDomain(uploaded, website)) ? uploaded : null;
   return brandfetchLogoUrl(website, choice ?? 'icon');
 }
