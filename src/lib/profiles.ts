@@ -3,7 +3,9 @@ export type ProfileRow = Record<string, string | number | boolean | string[] | n
 export type ProfileTerm = { id: string; name: string; kind: string; slug: string };
 export type RelatedEntry = { id: string; slug: string; title: string; summary: string | null; image: string | null; roles: string[]; type?: string | undefined };
 export type RelatedGroup = { kind: EntityKey; label: string; entries: RelatedEntry[] };
-export type PublicProfile = { kind: EntityKey; row: ProfileRow; title: string; summary: string | null; image: string | null; terms: ProfileTerm[]; related: RelatedGroup[] };
+export type DetailItem = RelatedEntry & { date: string | null; end: string | null; city: string | null; kind: EntityKey };
+export type DetailContext = { now: string; coming: DetailItem[]; similar: RelatedEntry[]; sameWeek: DetailItem[]; guides: { slug: string; title: string; summary: string | null }[] };
+export type PublicProfile = { kind: EntityKey; row: ProfileRow; title: string; summary: string | null; image: string | null; terms: ProfileTerm[]; related: RelatedGroup[]; detail?: DetailContext };
 export function relationshipNodes(profile: PublicProfile) {
   const seen = new Set<string>();
   return profile.related.flatMap(group => group.entries.flatMap(entry => {

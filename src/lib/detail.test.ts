@@ -1,0 +1,8 @@
+import { describe, it, expect } from 'vitest';
+import { daysUntil, withinSevenDays, nearbyFirst, eventCalendar } from './detail';
+describe('detail date and recommendation rules', () => {
+  it('counts calendar days in the event timezone', () => { expect(daysUntil('2026-11-18T08:00:00Z', '2026-10-20T06:27:00Z')).toBe(29); expect(daysUntil(null, '2026-10-20')).toBeNull(); });
+  it('includes seven days but excludes eight days from same-week recommendations', () => { expect(withinSevenDays('2026-11-25T08:00:00Z', '2026-11-18T08:00:00Z')).toBe(true); expect(withinSevenDays('2026-11-26T08:00:00Z', '2026-11-18T08:00:00Z')).toBe(false); });
+  it('caps similar organisations at four and puts the same city first', () => { const rows = Array.from({ length: 6 }, (_, i) => ({ id: String(i), title: String(i), city: i === 5 ? 'Helsinki' : 'Turku', countryIds: ['fi'] })); const result = nearbyFirst(rows, 'Helsinki', ['fi']); expect(result).toHaveLength(4); expect(result[0]?.id).toBe('5'); });
+  it('exports a valid UTC event range and escapes calendar text', () => { const value = eventCalendar({ id: 'slush', title: 'Slush, 2026', start: '2026-11-18T08:00:00Z', end: '2026-11-19T16:00:00Z', location: 'Helsinki', description: 'Meet; founders', url: 'https://slush.org' }); expect(value).toContain('DTSTART:20261118T080000Z'); expect(value).toContain('DTEND:20261119T160000Z'); expect(value).toContain('SUMMARY:Slush\\, 2026'); });
+});
