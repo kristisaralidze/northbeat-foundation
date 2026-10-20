@@ -1043,6 +1043,7 @@ export type Database = {
           city: string | null
           contact_email: string | null
           contact_email_public: boolean
+          cover_image_url: string | null
           created_at: string
           created_by: string | null
           description: string | null
@@ -1067,6 +1068,7 @@ export type Database = {
           city?: string | null
           contact_email?: string | null
           contact_email_public?: boolean
+          cover_image_url?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -1091,6 +1093,7 @@ export type Database = {
           city?: string | null
           contact_email?: string | null
           contact_email_public?: boolean
+          cover_image_url?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null

@@ -4,7 +4,7 @@ export type ExploreSearch = { q: string } & Record<Facet, string[]>;
 export type DirectoryTerm = { id: string; kind: string; name: string; slug: string; parent_id: string | null; sort_order: number };
 export type DirectoryOrganisation = {
   id: string; slug: string; name: string; type: string; short_description: string | null;
-  logo_url: string | null; website: string | null; city: string | null; termIds: string[];
+  logo_url: string | null; cover_image_url?: string | null; website: string | null; city: string | null; termIds: string[];
 };
 export type DirectoryData = { organisations: DirectoryOrganisation[]; terms: DirectoryTerm[] };
 export const EMPTY_SEARCH: ExploreSearch = { q: "", type: [], field: [], sub_area: [], country: [], stage: [] };

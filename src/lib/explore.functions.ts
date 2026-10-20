@@ -22,7 +22,7 @@ export const getDirectory = createServerFn({ method: "GET" }).handler(async (): 
   // Page each table to avoid silently truncating the directory at the API row limit.
   for (let offset = 0; ; offset += 1000) {
     const { data, error } = await client.from("organisations")
-      .select("id, slug, name, type, short_description, logo_url, website, city")
+      .select("id, slug, name, type, short_description, logo_url, cover_image_url, website, city")
       .eq("status", "published").order("name").order("id").range(offset, offset + 999);
     if (error) throw new Error("The organisations could not be loaded. Please try again.");
     organisations.push(...(data ?? []).map((org) => ({ ...org, termIds: [] })));

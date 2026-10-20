@@ -92,6 +92,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
       { name: "website", label: "Website", kind: "url" },
       { name: "linkedin_url", label: "LinkedIn", kind: "url" },
       { name: "logo_url", label: "Logo", kind: "image" },
+      { name: "cover_image_url", label: "Cover image", kind: "image" },
       { name: "city", label: "City", kind: "text" },
       { name: "founded_year", label: "Founded year", kind: "number" },
       { name: "contact_email", label: "Contact email", kind: "email" },
