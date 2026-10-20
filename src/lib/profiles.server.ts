@@ -38,7 +38,7 @@ export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey,
     row['cover_image_url'] = approvedCover(typeof assets?.['cover_image_url'] === 'string' ? assets['cover_image_url'] : null, typeof assets?.['cover_image_status'] === 'string' ? assets['cover_image_status'] : null);
   }
   if (kind === 'organisations') {
-    const trials = await client.from('organisation_trials').select('nct_id,title,status,phase,start_date').eq('organisation_id', row.id).order('start_date', { ascending: false, nullsFirst: false }).limit(50);
+    const trials = await client.from('organisation_trials').select('nct_id,title,status,phase,start_date').eq('organisation_id', row.id).order('start_date', { ascending: false, nullsFirst: false }).range(0, 49);
     if (trials.error) throw new Error('This profile could not be loaded. Please try again.');
     row['trials'] = (trials.data ?? []) as never;
   }
