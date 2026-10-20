@@ -136,6 +136,7 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
   };
 
   return (
+    <>
     <form onSubmit={submit} className="max-w-3xl space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
