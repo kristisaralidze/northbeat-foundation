@@ -65,7 +65,7 @@ function Field({ label, children, hint }: { label: string; children: React.React
   );
 }
 
-function SubmitForm({ tab, edit, entryUrl }: { tab: SubmitTab; edit?: string; entryUrl?: string }) {
+function SubmitForm({ tab, edit, entryUrl }: { tab: SubmitTab; edit?: string | undefined; entryUrl?: string | undefined }) {
   const send = useServerFn(sendSubmission);
   const [values, setValues] = useState<Record<string, string>>(() => edit ? { [tab === 'event' ? 'event_title' : 'organisation_name']: edit, message: `Suggested edit for ${edit}${entryUrl ? ` (${entryUrl})` : ''}:\n` } : {});
   const [consent, setConsent] = useState(false);

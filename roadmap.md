@@ -3,7 +3,7 @@
 - [x] Require cover approval for organisations/events; refill published candidates only after title, spam, domain and 800px checks; store rejection reasons.
 - [x] Add 20-image review pages with approve/reject/upload/bulk approval and specimen fallback on detail pages.
 - [x] Hide Brandfetch fallback tiles; add and run website health checks; report failures.
-- [ ] Apply uploaded organisation/event detail redesign after approval of the plan; approval-only covers and specimen fallback are already verified.
+- [x] Apply uploaded organisation/event detail redesign with facts, journey sentences, relationships, published recommendations, calendar/share/edit actions and known-venue maps; verify populated desktop/phone pages and calendar download.
 
 # Organisation cover images
 - [x] Add editable cover image upload and automatic website-image discovery on new website saves.
