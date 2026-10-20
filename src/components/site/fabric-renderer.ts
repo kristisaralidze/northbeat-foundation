@@ -8,35 +8,36 @@ const fragmentShader = /* glsl */ `
   uniform vec2 uPointer;
   uniform float uScroll;
   uniform vec3 uLight;
+  uniform vec3 uFrost;
+  uniform vec3 uLilac;
+  uniform vec3 uBerry;
   varying vec2 vUv;
   float folds(vec2 p, float t) {
-    float bend = sin(p.x * 2.8 + t * .73) * .22 + sin(p.x * 5.1 - t * .41) * .06;
-    float a = sin((p.y + bend) * 8.0 + p.x * 1.6 + t);
-    float b = sin((p.y - bend * .7) * 12.0 - p.x * 2.2 - t * .618);
-    float c = sin(p.y * 19.0 + sin(p.x * 4.0 + t * .37) - t * .43);
-    return a * .55 + b * .28 + c * .09;
+    float bend = sin(p.x * 3.2 + t * .73) * .3 + sin(p.y * 2.1 - t * .57) * .16;
+    float a = sin((p.y + bend) * 8.0 + p.x * 2.6 + t);
+    float b = sin((p.x - bend * .7) * 9.0 - p.y * 4.2 - t * 1.19);
+    float c = sin(p.y * 26.0 + p.x * 13.0 + sin(p.x * 5.0 + t) * 1.4 - t * 3.1);
+    float d = sin(p.x * 39.0 - p.y * 18.0 + t * 4.3);
+    return a * .56 + b * .32 + c * .085 + d * .035;
   }
   void main() {
     float t = uTime * 6.2831853 / ${FABRIC_MOVEMENT_SECONDS.toFixed(1)};
-    vec2 p = (vUv - .5) * vec2(min(uAspect, 2.0), 1.0);
+    vec2 p = (vUv - .5) * vec2(uAspect, 1.0);
     p += uPointer * .025 + vec2(0., uScroll * .022);
     float h = folds(p, t);
     float dx = (folds(p + vec2(.003, 0.), t) - h) / .003;
     float dy = (folds(p + vec2(0., .003), t) - h) / .003;
-    vec3 normal = normalize(vec3(-dx * .065, -dy * .065, 1.0));
-    float light = dot(normal, normalize(vec3(-.45, .65, 1.0)));
-    vec2 uv = vUv;
-    // Preserve the photograph's cover crop and exact lilac/berry palette.
-    if (uAspect > 1.5) uv.y = (uv.y - .5) * 1.5 / uAspect + .5;
-    else uv.x = (uv.x - .5) * uAspect / 1.5 + .5;
-    uv += vec2(sin(p.y * 4.0 + t * .61), h) * .018;
-    uv += uPointer * .012 + vec2(0., uScroll * .012);
-    vec3 silk = texture2D(uImage, clamp(uv, .001, .999)).rgb;
-    float edge = smoothstep(.2, .65, length(vUv - .5));
-    float shade = (1.0 - light) * .23 * (.35 + edge);
-    silk *= 1.0 - shade;
-    float sheen = pow(max(light, 0.), 12.0) * .14;
-    silk = mix(silk, uLight, sheen);
+    vec3 normal = normalize(vec3(-dx * .16, -dy * .16, 1.0));
+    vec3 lamp = normalize(vec3(-.45, .65, 1.0));
+    float light = max(dot(normal, lamp), 0.0);
+    // Continuous coloured folds cover the centre as well as the edges.
+    float tone = .5 + .5 * sin(p.x * 3.7 - p.y * 4.2 + t * .67 + h * 1.2);
+    vec3 colour = mix(uLilac, uBerry, smoothstep(.25, .8, tone));
+    vec3 silk = mix(uFrost, colour, .35 + .4 * smoothstep(-.6, .6, h));
+    silk = mix(silk, texture2D(uImage, vUv).rgb, .04);
+    silk *= .72 + .28 * light;
+    float sheen = pow(max(dot(normal, normalize(lamp + vec3(0., 0., 1.))), 0.), 16.0);
+    silk = mix(silk, uLight, .14 + .65 * sheen);
     gl_FragColor = vec4(silk, 1.0);
     #include <colorspace_fragment>
   }
@@ -44,7 +45,7 @@ const fragmentShader = /* glsl */ `
 
 /** One shaded full-screen triangle, no postprocessing or geometry-heavy scene. */
 export function mountFabric(canvas: HTMLCanvasElement, host: HTMLElement, imageUrl: string) {
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: false, powerPreference: 'low-power', depth: false, stencil: false });
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true, powerPreference: 'high-performance', depth: false, stencil: false });
   renderer.setPixelRatio(1);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   const scene = new THREE.Scene();
@@ -56,6 +57,9 @@ export function mountFabric(canvas: HTMLCanvasElement, host: HTMLElement, imageU
       uImage: { value: null as THREE.Texture | null }, uTime: { value: 0 }, uAspect: { value: 1 },
       uPointer: { value: new THREE.Vector2() }, uScroll: { value: 0 },
       uLight: { value: new THREE.Color(getComputedStyle(host).getPropertyValue('--fabric-light').trim()) },
+      uFrost: { value: new THREE.Color(getComputedStyle(host).getPropertyValue('--fabric-frost').trim()) },
+      uLilac: { value: new THREE.Color(getComputedStyle(host).getPropertyValue('--fabric-lilac').trim()) },
+      uBerry: { value: new THREE.Color(getComputedStyle(host).getPropertyValue('--fabric-berry').trim()) },
   };
   const material = new THREE.ShaderMaterial({
     depthTest: false, depthWrite: false, uniforms,
@@ -71,7 +75,7 @@ export function mountFabric(canvas: HTMLCanvasElement, host: HTMLElement, imageU
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const resize = () => {
     const rect = host.getBoundingClientRect();
-    const [w, h] = fabricResolution(rect.width, rect.height);
+    const [w, h] = fabricResolution(rect.width, rect.height, window.devicePixelRatio);
     renderer.setSize(w, h, false);
     uniforms.uAspect.value = rect.width / Math.max(1, rect.height);
   };
@@ -111,6 +115,7 @@ export function mountFabric(canvas: HTMLCanvasElement, host: HTMLElement, imageU
   canvas.addEventListener('webglcontextlost', contextLost);
   document.addEventListener('visibilitychange', sync);
   window.addEventListener('pointermove', move, { passive: true });
+  window.addEventListener('resize', resize, { passive: true });
   resize();
   new THREE.TextureLoader().load(imageUrl, (image) => {
     if (disposed) { image.dispose(); return; }
@@ -128,6 +133,7 @@ export function mountFabric(canvas: HTMLCanvasElement, host: HTMLElement, imageU
     observer.disconnect(); resizer.disconnect();
     document.removeEventListener('visibilitychange', sync);
     window.removeEventListener('pointermove', move);
+    window.removeEventListener('resize', resize);
     canvas.removeEventListener('webglcontextlost', contextLost);
     texture?.dispose(); geometry.dispose(); material.dispose(); renderer.dispose(); renderer.forceContextLoss();
   };

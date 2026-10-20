@@ -15,16 +15,17 @@ describe('living fabric performance', () => {
     expect(fabricCanRender(true, false, false)).toBe(true);
   });
   it('does not render in hidden tabs', () => { expect(fabricCanRender(true, true, false)).toBe(false); });
-  it('caps rendering at 30 fps', () => {
-    expect(fabricFrameDue(33, 0)).toBe(false);
-    expect(fabricFrameDue(1000 / 30, 0)).toBe(true);
+  it('targets 60 fps without dropping normal display frames', () => {
+    expect(fabricFrameDue(8.33, 0)).toBe(false);
+    expect(fabricFrameDue(1000 / 60, 0)).toBe(true);
   });
-  it('keeps a full movement within 20 to 30 seconds', () => {
-    expect(FABRIC_MOVEMENT_SECONDS).toBeGreaterThanOrEqual(20);
-    expect(FABRIC_MOVEMENT_SECONDS).toBeLessThanOrEqual(30);
+  it('sweeps large folds every 3 to 5 seconds', () => {
+    expect(FABRIC_MOVEMENT_SECONDS).toBeGreaterThanOrEqual(3);
+    expect(FABRIC_MOVEMENT_SECONDS).toBeLessThanOrEqual(5);
   });
-  it('renders at half resolution with bounded buffers', () => {
-    expect(fabricResolution(1280, 600)).toEqual([640, 300]);
-    expect(fabricResolution(3840, 2160)).toEqual([960, 540]);
+  it('renders at device resolution capped at 2x', () => {
+    expect(fabricResolution(1280, 600)).toEqual([1280, 600]);
+    expect(fabricResolution(390, 844, 2)).toEqual([780, 1688]);
+    expect(fabricResolution(390, 844, 3)).toEqual([780, 1688]);
   });
 });
