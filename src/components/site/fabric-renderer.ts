@@ -52,13 +52,13 @@ export function mountFabric(canvas: HTMLCanvasElement, host: HTMLElement, imageU
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute([-1, -1, 0, 3, -1, 0, -1, 3, 0], 3));
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 2, 0, 0, 2], 2));
-  const material = new THREE.ShaderMaterial({
-    depthTest: false, depthWrite: false,
-    uniforms: {
-      uImage: { value: null }, uTime: { value: 0 }, uAspect: { value: 1 },
+  const uniforms = {
+      uImage: { value: null as THREE.Texture | null }, uTime: { value: 0 }, uAspect: { value: 1 },
       uPointer: { value: new THREE.Vector2() }, uScroll: { value: 0 },
       uLight: { value: new THREE.Color(getComputedStyle(host).getPropertyValue('--fabric-light').trim()) },
-    },
+  };
+  const material = new THREE.ShaderMaterial({
+    depthTest: false, depthWrite: false, uniforms,
     vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position, 1.0); }',
     fragmentShader,
   });
@@ -73,7 +73,7 @@ export function mountFabric(canvas: HTMLCanvasElement, host: HTMLElement, imageU
     const rect = host.getBoundingClientRect();
     const [w, h] = fabricResolution(rect.width, rect.height);
     renderer.setSize(w, h, false);
-    material.uniforms.uAspect.value = rect.width / Math.max(1, rect.height);
+    uniforms.uAspect.value = rect.width / Math.max(1, rect.height);
   };
   const draw = (now: number) => {
     frame = 0;
@@ -81,14 +81,14 @@ export function mountFabric(canvas: HTMLCanvasElement, host: HTMLElement, imageU
     if (fabricFrameDue(now, last)) {
       const dt = Math.min((now - last) / 1000, .05);
       last = now;
-      material.uniforms.uTime.value += dt;
-      material.uniforms.uPointer.value.lerp(pointer, 1 - Math.exp(-2 * dt));
+      uniforms.uTime.value += dt;
+      uniforms.uPointer.value.lerp(pointer, 1 - Math.exp(-2 * dt));
       const bounds = host.getBoundingClientRect();
       const scroll = Math.max(-1, Math.min(1, (innerHeight / 2 - bounds.top - bounds.height / 2) / innerHeight));
-      material.uniforms.uScroll.value += (scroll - material.uniforms.uScroll.value) * (1 - Math.exp(-2 * dt));
+      uniforms.uScroll.value += (scroll - uniforms.uScroll.value) * (1 - Math.exp(-2 * dt));
       renderer.render(scene, camera);
-      canvas.dataset.fabricTime = material.uniforms.uTime.value.toFixed(3);
-      canvas.dataset.fabricState = 'running';
+      canvas.dataset['fabricTime'] = uniforms.uTime.value.toFixed(3);
+      canvas.dataset['fabricState'] = 'running';
     }
     frame = requestAnimationFrame(draw);
   };
@@ -96,7 +96,7 @@ export function mountFabric(canvas: HTMLCanvasElement, host: HTMLElement, imageU
     if (frame) cancelAnimationFrame(frame);
     frame = 0;
     last = performance.now();
-    canvas.dataset.fabricState = 'paused';
+    canvas.dataset['fabricState'] = 'paused';
     if (loaded && fabricCanRender(visible, document.hidden, motion.matches) && !disposed) frame = requestAnimationFrame(draw);
   };
   const observer = new IntersectionObserver(([entry]) => { visible = !!entry?.isIntersecting; sync(); });
@@ -107,7 +107,7 @@ export function mountFabric(canvas: HTMLCanvasElement, host: HTMLElement, imageU
     if (!visible || !finePointer.matches || event.pointerType === 'touch') return;
     pointer.set((event.clientX / innerWidth - .5) * 2, (.5 - event.clientY / innerHeight) * 2);
   };
-  const contextLost = (event: Event) => { event.preventDefault(); loaded = false; canvas.dataset.fabricReady = 'false'; sync(); };
+  const contextLost = (event: Event) => { event.preventDefault(); loaded = false; canvas.dataset['fabricReady'] = 'false'; sync(); };
   canvas.addEventListener('webglcontextlost', contextLost);
   document.addEventListener('visibilitychange', sync);
   window.addEventListener('pointermove', move, { passive: true });
@@ -116,12 +116,12 @@ export function mountFabric(canvas: HTMLCanvasElement, host: HTMLElement, imageU
     if (disposed) { image.dispose(); return; }
     texture = image;
     image.colorSpace = THREE.SRGBColorSpace;
-    material.uniforms.uImage.value = image;
+    uniforms.uImage.value = image;
     loaded = true;
     renderer.render(scene, camera);
-    canvas.dataset.fabricReady = 'true';
+    canvas.dataset['fabricReady'] = 'true';
     sync();
-  }, undefined, () => { canvas.dataset.fabricReady = 'false'; });
+  }, undefined, () => { canvas.dataset['fabricReady'] = 'false'; });
   return () => {
     disposed = true;
     cancelAnimationFrame(frame);

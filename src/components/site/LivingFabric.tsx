@@ -17,13 +17,13 @@ export function LivingFabric({ className = '' }: { className?: string }) {
     const start = async () => {
       const current = ++generation;
       dispose?.(); dispose = undefined;
-      canvas.dataset.fabricReady = 'false';
-      if (useStillFabric({ reducedMotion: motion.matches, saveData: device.connection?.saveData, cores: device.hardwareConcurrency, memory: device.deviceMemory })) return;
+      canvas.dataset['fabricReady'] = 'false';
+      if (useStillFabric({ reducedMotion: motion.matches, saveData: device.connection?.saveData ?? false, cores: device.hardwareConcurrency, memory: device.deviceMemory ?? 8 })) return;
       try {
         const { mountFabric } = await import('./fabric-renderer');
         if (cancelled || current !== generation) return;
         dispose = mountFabric(canvas, host, matchMedia('(max-width: 767px)').matches ? phone.url : desktop.url);
-      } catch { canvas.dataset.fabricReady = 'false'; }
+      } catch { canvas.dataset['fabricReady'] = 'false'; }
     };
     void start();
     motion.addEventListener('change', start);
