@@ -264,13 +264,21 @@ html.lenis, html.lenis body { height: auto; }
 .nb-home-opening-content { width: 100%; text-align: center; }
 .nb-atmospheric-image { display: block; pointer-events: none; }
 .nb-atmospheric-image img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.nb-living-fabric { position: relative; pointer-events: none; --fabric-light: rgb(244, 244, 244); }
+.nb-living-fabric > .nb-atmospheric-image,
+.nb-living-fabric > canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.nb-living-fabric > canvas { display: block; opacity: 0; }
+.nb-living-fabric > canvas[data-fabric-ready="true"] { opacity: 1; }
 .nb-arrival-atmosphere { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
 .nb-arrival-atmosphere .nb-atmospheric-image { position: absolute; inset: -5% 0; opacity: .55; }
 .nb-home-opening-content { position: relative; }
 .nb-home-wordmark-section .nb-home-tagline { color: var(--ink); }
 .nb-site-footer { background: var(--background); }
 .nb-footer-signup { position: relative; isolation: isolate; overflow: hidden; padding: var(--space-24) var(--gutter); color: var(--ink); --muted-foreground: var(--ink); }
-.nb-footer-signup > .nb-atmospheric-image { position: absolute; inset: 0; z-index: -1; opacity: .45; }
+.nb-footer-signup > .nb-living-fabric { position: absolute; inset: 0; z-index: -1; opacity: .65; }
+.nb-footer-signup-content { position: relative; isolation: isolate; }
+.nb-footer-signup-content::before { content: ''; position: absolute; inset: -2rem -3rem; z-index: -1; background: var(--fabric-text-veil); filter: blur(28px); pointer-events: none; }
+.nb-footer-signup { --fabric-text-veil: rgb(250 250 252 / .65); }
 .nb-footer-signup-content { max-width: 40rem; margin-inline: auto; }
 .nb-footer-signup-content h2 { text-align: center; }
 .nb-footer-signup-content > p { margin-block: var(--space-6) var(--space-8); text-align: center; }
@@ -287,6 +295,7 @@ html.lenis, html.lenis body { height: auto; }
 }
 @media (prefers-reduced-motion: reduce) {
   .nb-arrival-atmosphere img { transform: none !important; }
+  .nb-living-fabric > canvas { display: none; }
 }
 .nb-home-wordmark-slot { width: 100%; aspect-ratio: 9 / 1; }
 .nb-home-tagline { margin-top: var(--space-8); color: var(--ink-soft); font-size: 1.125rem; }

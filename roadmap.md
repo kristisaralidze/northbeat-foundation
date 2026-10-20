@@ -1,3 +1,7 @@
+# Living fabric
+- [x] Animate only the Learn circle and footer signup fabric with slow silk folds and subtle parallax.
+- [x] Verify reduced-resolution 30 fps rendering, visibility pauses and still-image fallbacks.
+
 # Footer and Happening now
 - [x] Redesign footer as a full-width fabric signup band and plain copyright/link bar, without a wordmark; keep signup hidden on Newsletter.
 - [x] Show full Happening now cards, remove excess bottom space and verify a clean fast-scroll transition into Learn on desktop and phone.
