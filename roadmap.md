@@ -1,6 +1,6 @@
 # Living fabric
-- [ ] Make Learn/footer silk fill the centre with stronger layered folds sweeping every 3 to 5 seconds; add frosted signup glass and soft footer edge.
-- [ ] Verify device-resolution rendering up to 2x, 60 fps scheduling, visibility pauses and unchanged still-image fallbacks.
+- [x] Make Learn/footer silk fill the centre with stronger layered folds sweeping every 3 to 5 seconds; add frosted signup glass and soft footer edge.
+- [x] Verify device-resolution rendering up to 2x, 60 fps scheduling, visibility pauses and unchanged still-image fallbacks.
 
 # Footer and Happening now
 - [x] Redesign footer as a full-width fabric signup band and plain copyright/link bar, without a wordmark; keep signup hidden on Newsletter.
