@@ -5,6 +5,7 @@ import { zodValidator } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { SUBMIT_TABS, validTab, type SubmitTab } from "@/lib/submit";
 import { sendSubmission } from "@/lib/submit.functions";
+import { BrandSearch } from '@/components/BrandSearch';
 
 export const Route = createFileRoute("/submit")({
   validateSearch: zodValidator(z.object({ tab: z.string().optional(), edit: z.string().max(200).optional(), entryUrl: z.string().max(500).optional() })),
@@ -99,7 +100,7 @@ function SubmitForm({ tab, edit, entryUrl }: { tab: SubmitTab; edit?: string | u
     <form onSubmit={submit} className="mt-4 space-y-4" noValidate>
       {tab === "company" && (
         <>
-          <Field label="Company or organisation name"><input className="nb-input" required value={values['organisation_name'] ?? ""} onChange={set("organisation_name")} /></Field>
+          <div className="space-y-1"><label htmlFor="organisation-name" className="nb-small font-medium">Company or organisation name</label><BrandSearch id="organisation-name" className="nb-input" value={values['organisation_name'] ?? ''} onChange={name=>setValues(prev=>({...prev,organisation_name:name}))} onSelect={(name,website)=>setValues(prev=>({...prev,organisation_name:name,website}))} /></div>
           <Field label="Website" hint="Optional, but it helps us check it quickly."><input className="nb-input" type="url" placeholder="https://" value={values['website'] ?? ""} onChange={set("website")} /></Field>
         </>
       )}

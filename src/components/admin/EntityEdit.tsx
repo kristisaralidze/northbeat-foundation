@@ -15,6 +15,7 @@ import { useServerFn } from '@tanstack/react-start';
 import { fetchOrganisationCover } from '@/lib/organisation-cover.functions';
 import { shouldDiscoverCover } from '@/lib/organisation-cover';
 import { ownDomain, isMediaUpload } from '@/lib/brand';
+import { BrandSearch } from '@/components/BrandSearch';
 
 type Values = Record<string, unknown>;
 
@@ -168,7 +169,7 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2">
-        {cfg.fields.map((f) => <FieldInput key={f.name} field={f} terms={terms.data ?? []} value={values[f.name]} onChange={(v) => set(f.name, v)} />)}
+        {cfg.fields.map((f) => entity === 'organisations' && id === 'new' && f.name === 'name' ? <div key={f.name} className="space-y-1"><Label htmlFor="name">Name *</Label><BrandSearch id="name" value={String(values['name'] ?? '')} onChange={name=>set('name',name)} onSelect={(name,website)=>setValues(prev=>({...prev,name,website}))} /></div> : <FieldInput key={f.name} field={f} terms={terms.data ?? []} value={values[f.name]} onChange={(v) => set(f.name, v)} />)}
       </section>
       {['organisations', 'events'].includes(entity) && <p className="text-sm text-muted-foreground">Cover review: {String(bundle.data?.row?.['cover_image_status'] ?? 'pending')}. <Link to="/admin/cover-images" className="underline">Cover images</Link>{bundle.data?.row?.['cover_image_flag'] ? `: ${String(bundle.data.row['cover_image_flag'])}` : ''}</p>}
 
