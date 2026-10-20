@@ -1,5 +1,5 @@
 /** Public Brandfetch client ID, safe to include in image URLs. */
-export const BRANDFETCH_CLIENT_ID = '1idCGaWDUDXkjAD579';
+export const BRANDFETCH_CLIENT_ID = '1idCGaWDUDXkjAD579-';
 export function organisationDomain(website?: string | null): string | null {
   if (!website?.trim()) return null;
   try {
