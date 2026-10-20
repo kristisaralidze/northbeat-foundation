@@ -8,7 +8,7 @@ export function VenueMap({ latitude, longitude, name }: { latitude: number; long
     void import('leaflet').then(L => {
       if (cancelled || !host.current) return;
       const map = L.map(host.current, { scrollWheelZoom: false }).setView([latitude, longitude], 14);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>', maxZoom: 19 }).addTo(map);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', maxZoom: 19 }).addTo(map);
       const marker = L.divIcon({ className: 'nb-venue-marker', html: '<span></span>', iconSize: [16, 16], iconAnchor: [8, 8] });
       const popup = document.createElement('span'); popup.textContent = name;
       L.marker([latitude, longitude], { icon: marker, title: name }).addTo(map).bindPopup(popup);
