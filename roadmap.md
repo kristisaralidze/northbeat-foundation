@@ -133,3 +133,5 @@
 # Podcast
 - [x] Build /podcast episode grid with covers, guests, topics and duration; add video embed, key takeaways and show notes to episode pages.
 - [x] Test labels and ordering; verify grid, embed, guest links and reciprocal person link in preview with temporary entries and remove them.
+- [ ] OpenAlex research profiles: admin match, weekly refresh, public Research section
+- [ ] ClinicalTrials.gov trials: admin pick, weekly refresh, public Clinical trials section
