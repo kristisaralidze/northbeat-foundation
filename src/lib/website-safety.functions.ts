@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
-import { inspectWebsite, inspectWebsiteCover } from './organisation-cover.server';
+import { inspectWebsite, inspectWebsiteCover, validateUploadedCover } from './organisation-cover.server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 const kind = z.enum(['organisations', 'events']);
@@ -32,6 +32,7 @@ export const reviewCovers = createServerFn({ method: 'POST' }).middleware([requi
   await admin(context.supabase, context.userId);
   let changed = 0;
   for (const entry of data.entries) {
+    if (data.decision === 'approved') await validateUploadedCover(entry.image);
     const result = await context.supabase.from(entry.kind).update({ cover_image_status: data.decision, cover_image_flag: data.decision === 'rejected' ? 'Rejected by admin' : null }).eq('id', entry.id).eq('cover_image_status', 'pending').eq('cover_image_pending_url', entry.image).is('cover_image_flag', null).select('id');
     if (result.error) throw new Error('Could not save the review.'); changed += result.data?.length ?? 0;
   }
@@ -39,7 +40,8 @@ export const reviewCovers = createServerFn({ method: 'POST' }).middleware([requi
 });
 export const uploadCoverCandidate = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth]).inputValidator(z.object({ id: z.string().uuid(), kind, image: z.string().url().max(4096) })).handler(async ({ data, context }) => {
   await admin(context.supabase, context.userId);
-  const result = await context.supabase.from(data.kind).update({ cover_image_pending_url: data.image, cover_image_status: 'pending', cover_image_url: null, cover_image_flag: null, cover_page_title: 'Uploaded by admin' }).eq('id', data.id);
+  const image = await validateUploadedCover(data.image);
+  const result = await context.supabase.from(data.kind).update({ cover_image_pending_url: image, cover_image_status: 'pending', cover_image_url: null, cover_image_flag: null, cover_page_title: 'Uploaded by admin' }).eq('id', data.id);
   if (result.error) throw new Error('Could not save the uploaded candidate.'); return { ok: true };
 });
 export const refillCoverBatch = createServerFn({ method: 'POST' }).middleware([requireSupabaseAuth]).inputValidator(z.object({ kind, offset: z.number().int().min(0) })).handler(async ({ data, context }) => {

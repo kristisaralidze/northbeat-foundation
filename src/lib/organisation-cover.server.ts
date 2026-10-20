@@ -52,3 +52,10 @@ export async function inspectWebsiteCover(website: string, name: string) {
   return { image: best?.image ?? null, title: page.title, reason: best ? null : reason };
 }
 export async function discoverWebsiteCover(website: string): Promise<string | null> { return (await inspectWebsiteCover(website, new URL(website).hostname)).image; }
+
+export async function validateUploadedCover(image: string) {
+  const fetched = await safeFetch(image, true);
+  const dimensions = imageSize(fetched.bytes);
+  if (dimensions.type === 'svg' || (dimensions.width ?? 0) < 800) throw new Error('Cover images must be at least 800px wide.');
+  return fetched.url;
+}

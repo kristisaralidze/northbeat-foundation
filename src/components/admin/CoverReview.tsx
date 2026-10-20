@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { ImageField } from './ImageField';
 import { organisationDomain } from '@/lib/organisation-logo';
 import { getCoverReview, refillCoverBatch, reviewCovers, uploadCoverCandidate, type CoverReviewRow } from '@/lib/website-safety.functions';
@@ -40,6 +41,6 @@ export function CoverReview() {
       </div>
     </article>)}</div>}
     <div className="flex items-center gap-4"><Button variant="outline" disabled={page === 0 || busy} onClick={() => setPage(page - 1)}>Previous</Button><span>Page {page + 1}</span><Button variant="outline" disabled={(page + 1) * 20 >= (query.data?.total ?? 0) || busy} onClick={() => setPage(page + 1)}>Next</Button></div>
-    {upload && <div role="dialog" aria-modal="true" aria-label={`Upload cover for ${upload.name}`} className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 p-5"><div className="w-full max-w-xl space-y-4 rounded-md border border-border bg-background p-6"><h2 className="text-xl font-semibold">{upload.name}</h2><ImageField id="review-upload" folder="cover_image" value={image} onChange={setImage} /><div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setUpload(null)}>Cancel</Button><Button disabled={!image || busy} onClick={async () => { setBusy(true); try { await saveUpload({ data: { kind: upload.kind, id: upload.id, image } }); setUpload(null); await refresh(); toast.success('Uploaded cover is pending review'); } catch { toast.error('Could not save uploaded cover.'); } finally { setBusy(false); } }}>Save candidate</Button></div></div></div>}
+    <Dialog open={Boolean(upload)} onOpenChange={open => { if (!open) setUpload(null); }}><DialogContent aria-describedby={undefined}>{upload && <><DialogTitle>{upload.name}</DialogTitle><ImageField id="review-upload" folder="cover_image" value={image} onChange={setImage} /><div className="flex justify-end gap-2"><Button variant="outline" onClick={() => setUpload(null)}>Cancel</Button><Button disabled={!image || busy} onClick={async () => { setBusy(true); try { await saveUpload({ data: { kind: upload.kind, id: upload.id, image } }); setUpload(null); await refresh(); toast.success('Uploaded cover is pending review'); } catch (error) { toast.error(error instanceof Error ? error.message : 'Could not save uploaded cover.'); } finally { setBusy(false); } }}>Save candidate</Button></div></>}</DialogContent></Dialog>
   </section>;
 }
