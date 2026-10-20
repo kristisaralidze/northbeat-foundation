@@ -9,6 +9,7 @@ import { slugify } from "@/lib/admin/entities";
 import { selectClass } from "@/components/admin/EntityList";
 
 export const Route = createFileRoute("/admin/tags")({
+  head: () => ({ meta: [{'title': 'Tags | Northbeat admin'}, {'name': 'description', 'content': 'Tags for Northbeat.'}, {'property': 'og:title', 'content': 'Tags | Northbeat admin'}, {'property': 'og:description', 'content': 'Tags for Northbeat.'}, {'property': 'og:type', 'content': 'website'}, {'name': 'twitter:card', 'content': 'summary'}] }),
   component: TagsPage,
 });
 
