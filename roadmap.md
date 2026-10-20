@@ -1,4 +1,14 @@
+# Organisation cover images
+- [x] Add editable cover image upload and automatic website-image discovery on new website saves.
+- [x] Check 61 existing websites and save 36 discovered covers; show credited profile banners and Explore strips with failure hiding.
+- [x] Test discovery and replacement/removal rules and verify admin/public views.
+
 # Admin CSV import
+- [x] Import three batch-four drafts with 23 tags and three provider links; preserve Next call TBA in descriptions; update Eir deadline and Terkko website.
+- [ ] Show Next call TBA instead of the existing undated-list heading/label. Blocker: requested no-code import cannot change the current page labels.
+- [x] Import 11 batch-three drafts with 42 tags and two organiser links; no duplicate rows or unknown tags.
+- [x] Reconcile batch-two sub-area links against the source CSV: all 14 links already present.
+- [x] Insert all 42 batch-two rows as organisation drafts checked 2026-10-20, with 138 existing-tag links; no duplicates or unknown tags.
 - [x] Insert attached batch as drafts checked today, skip existing names/websites and unknown tags; add HealthCap and Sandwater investment links to CurifyLabs and report results.
 - [x] Add mapped CSV previews, unknown-tag create/skip choices and organisation matching to the three admin lists.
 - [x] Import only drafts checked today, skip duplicates, preserve eligibility and return added/skipped/errors.

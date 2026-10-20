@@ -11,6 +11,9 @@ import { DEFAULT_TAG_KINDS, ENTITIES, STATUS, humanize, type EntityKey, type Fie
 import { deleteEntry, getEntry, listIncomingRelations, listOptions, listTerms, saveEntry, type LinkRow, type Term } from "@/lib/admin/db";
 import { selectClass } from "./EntityList";
 import { ImageField } from "./ImageField";
+import { useServerFn } from '@tanstack/react-start';
+import { fetchOrganisationCover } from '@/lib/organisation-cover.functions';
+import { shouldDiscoverCover } from '@/lib/organisation-cover';
 
 type Values = Record<string, unknown>;
 
@@ -45,6 +48,8 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
   const cfg = ENTITIES[entity];
   const navigate = useNavigate();
   const qc = useQueryClient();
+  const fetchCover = useServerFn(fetchOrganisationCover);
+  const [coverEdited, setCoverEdited] = useState(false);
   const bundle = useQuery({ queryKey: [entity, "entry", id], queryFn: () => getEntry(cfg, id) });
   const terms = useQuery({ queryKey: ["terms"], queryFn: listTerms });
 
@@ -59,12 +64,19 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
     for (const f of cfg.fields) if (f.kind === "datetime") v[f.name] = toLocalInput(r[f.name as keyof typeof r]);
     if (!bundle.data.row) v["status"] = "draft";
     setValues(v);
+    setCoverEdited(false);
     setTermIds(bundle.data.termIds);
     setLinks(bundle.data.links);
   }, [bundle.data, cfg.fields]);
 
   const save = useMutation({
-    mutationFn: () => saveEntry(cfg, id, normalise(cfg.fields, values), termIds, links),
+    mutationFn: async () => {
+      const newId = await saveEntry(cfg, id, normalise(cfg.fields, values), termIds, links);
+      if (entity === 'organisations' && shouldDiscoverCover(bundle.data?.row?.['website'], values['website'], values['cover_image_url'], coverEdited)) {
+        try { await fetchCover({ data: { id: newId, website: String(values['website']) } }); } catch { toast.error('Saved, but the website cover could not be fetched.'); }
+      }
+      return newId;
+    },
     onSuccess: (newId) => {
       qc.invalidateQueries({ queryKey: [entity] });
       cfg.links.forEach((l) => qc.invalidateQueries({ queryKey: [l.other] }));
@@ -84,7 +96,7 @@ export function EntityEdit({ entity, id }: { entity: EntityKey; id: string }) {
     onError: (e: Error) => toast.error(e.message),
   });
 
-  const set = (name: string, v: unknown) => setValues((prev) => ({ ...prev, [name]: v }));
+  const set = (name: string, v: unknown) => { if (name === 'cover_image_url') setCoverEdited(true); setValues((prev) => ({ ...prev, [name]: v })); };
 
   if (bundle.isLoading) return <p className="text-muted-foreground">Loading…</p>;
   if (bundle.error) return <p role="alert" className="text-destructive">{(bundle.error as Error).message}</p>;

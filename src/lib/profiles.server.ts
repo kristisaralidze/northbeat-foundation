@@ -27,6 +27,11 @@ async function readEntries(client: SupabaseClient, kind: EntityKey, filter: { sl
 export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey, slug: string): Promise<PublicProfile | null> {
   const [row] = await readEntries(client, kind, { slug });
   if (!row) return null;
+  if (kind === 'organisations') {
+    const cover = await client.from('organisations').select('cover_image_url').eq('id', row.id).eq('status', 'published').maybeSingle();
+    if (cover.error) throw new Error('This profile could not be loaded. Please try again.');
+    row['cover_image_url'] = cover.data?.cover_image_url ?? null;
+  }
   const cfg = ENTITIES[kind];
   const { data: tagLinks, error: tagError } = await client.from(cfg.termTable).select('term_id').eq(cfg.termFk, row.id);
   if (tagError) throw new Error('The profile tags could not be loaded.');

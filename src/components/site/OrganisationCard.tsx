@@ -5,11 +5,13 @@ import { humanize } from "@/lib/admin/entities";
 import { networkGroup } from '@/lib/ecosystem';
 import { OrganisationLogo } from './OrganisationLogo';
 import { publicCopy } from '@/lib/profiles';
+import { OrganisationCover } from './OrganisationCover';
 
 export function OrganisationCard({ organisation: org, terms }: { organisation: DirectoryOrganisation; terms: DirectoryTerm[] }) {
   const { shown, extra } = cardTags(org, terms);
   return (
     <article data-result-id={org.id} className="nb-card flex h-full min-w-0 flex-col gap-6">
+      <OrganisationCover image={org.cover_image_url} website={org.website} strip />
       <div className="flex items-start justify-between gap-4">
         <OrganisationLogo name={org.name} slug={org.slug} uploaded={org.logo_url} website={org.website} />
         <span className="nb-small text-muted-foreground text-right"><span className={`nb-group-dot nb-network-group-${networkGroup('organisation', org.type)}`} aria-hidden />{humanize(org.type)}</span>

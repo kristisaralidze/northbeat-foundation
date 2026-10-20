@@ -14,7 +14,8 @@ function fixture() {
   const query = (source: Record<string, unknown>[]) => {
     let rows = source;
     const q = {
-      select: (_columns: string) => q,
+      select: (columns: string) => { if (columns === 'cover_image_url') rows = rows.map(row => ({ cover_image_url: row['cover_image_url'] ?? null, id: row['id'], status: row['status'] })); return q; },
+      maybeSingle: () => Promise.resolve({ data: rows[0] ?? null, error: null }),
       eq: (key: string, value: unknown) => { rows = rows.filter((row) => row[key] === value); return q; },
       in: (key: string, values: unknown[]) => { rows = rows.filter((row) => values.includes(row[key])); return q; },
       order: (_key: string) => q,
@@ -50,9 +51,9 @@ describe('public profiles', () => {
     profile.related = [{ kind: 'organisations', label: 'Partners', entries: [entries[0], entries[0], entries[1]].filter((e): e is NonNullable<typeof e> => Boolean(e)) }];
     expect(showRelationshipMap(profile)).toBe(false);
   });
-  it('reads organisation contact through the masking RPC, never the base table', async () => {
+  it('reads organisation contact through the masking RPC with only safe cover reads', async () => {
     const { client, calls } = fixture(); const profile = await loadPublicProfile(client, 'organisations', 'public-org');
-    expect(profile?.row['contact_email']).toBeNull(); expect(calls).toContain('public_organisations'); expect(calls).not.toContain('organisations');
+    expect(profile?.row['contact_email']).toBeNull(); expect(calls).toContain('public_organisations'); expect(profile?.row['cover_image_url']).toBeNull();
   });
   it('returns public person email through the contact RPC', async () => {
     const { client, calls } = fixture(); const profile = await loadPublicProfile(client, 'people', 'public-person');

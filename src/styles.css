@@ -705,6 +705,10 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 /* ---------- Card ---------- */
+.nb-cover-banner { margin: 0 0 2rem; }
+.nb-cover-banner img { aspect-ratio: 3 / 1; max-height: 24rem; border-radius: var(--radius); }
+.nb-cover-strip img { aspect-ratio: 3 / 1; border-radius: var(--radius); }
+
 @utility nb-card {
   display: block;
   background: var(--snow);
