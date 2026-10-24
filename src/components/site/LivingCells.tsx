@@ -45,7 +45,8 @@ export function LivingCells() {
   const names = new Map(data.organisations.map(o => [o.id, o.name]));
   const selectedOrg = selection?.orgId ? data.organisations.find(o => o.id === selection.orgId) : null;
   const group = selection ? CELL_GROUPS[selection.group] : null;
-  const sentences = selection ? selectedOrg ? data.relations.filter(r => r.from_org_id === selectedOrg.id || r.to_org_id === selectedOrg.id).map(r => relationSentence(r, selectedOrg.id, names)) : CELL_LINKS.filter(l => l.from === selection.group || l.to === selection.group).map(l => l.sentence) : [];
+  const populatedGroups = new Set(data.organisations.map(o => cellGroup(o.type)));
+  const sentences = selection ? selectedOrg ? data.relations.filter(r => r.from_org_id === selectedOrg.id || r.to_org_id === selectedOrg.id).map(r => relationSentence(r, selectedOrg.id, names)) : CELL_LINKS.filter(l => populatedGroups.has(l.from) && populatedGroups.has(l.to) && (l.from === selection.group || l.to === selection.group)).map(l => l.sentence) : [];
   const href = selectedOrg ? `/org/${encodeURIComponent(selectedOrg.slug)}` : selection ? cellHref(selection.group) : '';
   const atPointer = (event: React.PointerEvent<HTMLCanvasElement>) => { const rect = event.currentTarget.getBoundingClientRect(); return sceneRef.current?.hit(event.clientX - rect.left, event.clientY - rect.top) ?? null; };
   return <section className="nb-living-cells nb-container" aria-labelledby="ecosystem-heading">

@@ -137,7 +137,7 @@ export function createCellScene(canvas: HTMLCanvasElement, data: CellData, reduc
     // Nuclei belong to groups; tiny dot targets never steal the group-count tap.
     for (const cell of cells) {
       const nucleus = phone ? cell.group === 0 ? 16 : 10 : cell.group === 0 ? 21 : 13;
-      if (Math.hypot(x - cell.x, y - cell.y) <= nucleus + 2) return { group: cell.group };
+      if (Math.hypot(x - cell.x, y - cell.y) <= nucleus) return { group: cell.group };
     }
     let closest: { id: string; group: number; distance: number } | undefined;
     for (const cell of cells) for (const o of cell.orgs) {
