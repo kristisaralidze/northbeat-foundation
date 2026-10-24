@@ -68,4 +68,13 @@ export function groupPositions(width: number, height: number) {
     ? [[.5,.47],[.25,.12],[.75,.12],[.25,.29],[.75,.29],[.75,.65],[.25,.65],[.25,.82],[.75,.82],[.25,.95],[.75,.95]]
     : [[.5,.48],[.28,.32],[.7,.3],[.5,.12],[.83,.52],[.73,.77],[.5,.85],[.15,.62],[.25,.85],[.15,.12],[.85,.12]];
   return coords.map(([x = .5, y = .5]) => ({ x: width * x, y: 28 + (height - 75) * y }));
+}export interface GroupOrg { slug: string; name: string; type: string; website: string | null; logo_url: string | null; logo_choice: string | null; links: number }
+export interface EcosystemGroup { group: number; name: string; count: number; href: string; orgs: GroupOrg[] }
+/** Organisation-only groups, largest first, empty groups hidden; up to `limit` orgs per group, most connected first. */
+export function buildGroups(orgs: GroupOrg[], limit = 6): EcosystemGroup[] {
+  return ECOSYSTEM_GROUPS.map((name, group) => {
+    const members = orgs.filter(o => networkGroup('organisation', o.type) === group);
+    const ranked = [...members].sort((a, b) => b.links - a.links || Number(Boolean(b.logo_url)) - Number(Boolean(a.logo_url)) || a.name.localeCompare(b.name));
+    return { group, name, count: members.length, href: groupHref(group), orgs: ranked.filter(o => o.website || o.logo_url).slice(0, limit) };
+  }).filter(g => g.count > 0).sort((a, b) => b.count - a.count || a.group - b.group);
 }

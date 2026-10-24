@@ -60,3 +60,17 @@ describe('group ecosystem', () => {
     for (const width of [390,834,1280]) { const positions=groupPositions(width,670); const distances=positions.map(p=>Math.hypot(p.x-width/2,p.y-335)); expect(distances.indexOf(Math.min(...distances))).toBe(0); }
   });
 });
+import { buildGroups as groupsOf } from './ecosystem';
+describe('buildGroups', () => {
+  const org = (slug: string, type: string, links = 0) => ({ slug, name: slug, type, website: `https://${slug}.fi`, logo_url: null, logo_choice: null, links });
+  it('sorts groups largest first and hides empty ones', () => {
+    const g = groupsOf([org('a', 'investor'), org('b', 'startup'), org('c', 'startup')]);
+    expect(g.map(x => x.name)).toEqual(['Startups', 'Investors']);
+    expect(g[0]!.count).toBe(2);
+  });
+  it('shows at most 6 organisations, most connected first', () => {
+    const list = Array.from({ length: 8 }, (_, i) => org(`s${i}`, 'startup', i));
+    const g = groupsOf(list)[0]!;
+    expect(g.orgs).toHaveLength(6); expect(g.orgs[0]!.slug).toBe('s7');
+  });
+});
