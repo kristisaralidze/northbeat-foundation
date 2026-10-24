@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import { OPP_TYPES, humanize } from '@/lib/admin/entities';
 import { opportunitiesQuery } from '@/lib/opportunities.query';
 import { compactSearch } from '@/lib/search-params';
-import { amountLabel, deadlineLabel, filterOpportunities } from '@/lib/opportunities';
-import { publicTitle, publicCopy } from '@/lib/profiles';
-import { DateTimeline } from '@/components/site/DateTimeline';
-import { closingDays } from '@/lib/timeline';
+import { amountLabel, filterOpportunities, friendlyDate, isRolling, splitOpen, type OpportunityRow } from '@/lib/opportunities';
+import { publicTitle, publicCopy, safeWebUrl } from '@/lib/profiles';
+import { CardGrid, EntryCard } from '@/components/site/EntryCard';
+import { CalendarMenu } from '@/components/site/CalendarMenu';
+import { daysUntil, type CalendarEvent } from '@/lib/detail';
 
 const searchSchema = z.object({
   type: fallback(z.string(), '').default(''),
@@ -71,19 +72,19 @@ function Opportunities() {
       </div>
     </header>
     <div className="flex flex-wrap items-end gap-4 border-b border-hairline pb-6">
-      <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">Type</span>
+      <label className="min-w-0 flex-1 basis-40"><span className="nb-small mb-2 block text-muted-foreground">Type</span>
         <select aria-label="Opportunity type" className="nb-input" value={search.type} onChange={(e) => update({ type: e.target.value })}>
           <option value="">All types</option>
           {types.map((type) => <option key={type} value={type}>{humanize(type)}</option>)}
           {search.type && !OPP_TYPES.some((type) => type === search.type) && <option value={search.type}>{humanize(search.type)}</option>}
         </select></label>
-      <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">Field</span>
+      <label className="min-w-0 flex-1 basis-40"><span className="nb-small mb-2 block text-muted-foreground">Field</span>
         <select aria-label="Field" className="nb-input" value={search.field} onChange={(e) => update({ field: e.target.value })}>
           <option value="">All fields</option>
           {fields.map((term) => <option key={term.id} value={term.slug}>{term.name}</option>)}
           {search.field && !fields.some((term) => term.slug === search.field) && <option value={search.field}>{humanize(search.field)}</option>}
         </select></label>
-      <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">Stage</span>
+      <label className="min-w-0 flex-1 basis-40"><span className="nb-small mb-2 block text-muted-foreground">Stage</span>
         <select aria-label="Stage" className="nb-input" value={search.stage} onChange={(e) => update({ stage: e.target.value })}>
           <option value="">All stages</option>
           {stages.map((term) => <option key={term.id} value={term.slug}>{term.name}</option>)}
