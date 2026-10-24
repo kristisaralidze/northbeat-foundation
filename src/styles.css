@@ -1403,3 +1403,4 @@ html, body { overflow-x: clip; }
   .theme-site .nb-heart-circle, .theme-site .nb-heart-line { animation: none; }
   .theme-site .nb-heart-panel-line path { animation: none; stroke-dashoffset: 0; }
 }
+@media (max-width: 1023px) { .theme-site:has(.nb-action-bar) .nb-heart-button { bottom: 128px; } }
