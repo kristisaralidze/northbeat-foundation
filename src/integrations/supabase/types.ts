@@ -1909,6 +1909,17 @@ export type Database = {
         Returns: boolean
       }
       is_admin_media_asset: { Args: { _url: string }; Returns: boolean }
+      public_founders: {
+        Args: never
+        Returns: {
+          id: string
+          linkedin_url: string
+          name: string
+          one_line: string
+          photo_url: string
+          sort_order: number
+        }[]
+      }
       public_organisations: {
         Args: never
         Returns: {
@@ -1958,6 +1969,17 @@ export type Database = {
           instagram_url: string
           linkedin_url: string
           podcast_themes: string[]
+        }[]
+      }
+      public_terms: {
+        Args: never
+        Returns: {
+          id: string
+          kind: Database["public"]["Enums"]["term_kind"]
+          name: string
+          parent_id: string
+          slug: string
+          sort_order: number
         }[]
       }
     }

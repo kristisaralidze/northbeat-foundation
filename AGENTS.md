@@ -24,7 +24,7 @@
 - Tags use one `terms` table plus a `<entry>_terms` link table per entry type. Why: real foreign keys instead of polymorphic tags.
 - Visitors read contact emails only via `public_organisations()` / `public_people()` RPCs; anon has no column grant on `contact_email`. Why: email shown only when `contact_email_public` is true.
 - Newsletter sign-up/unsubscribe must go through server functions using the admin client; visitors have no direct table access. Why: protect subscriber emails.
-- Media bucket `media` is private (workspace blocks public buckets) but readable by anyone through storage policies; use signed or authenticated download URLs. Why: workspace policy.
+- Media bucket `media` (private) holds only public assets: anyone may download logo/photo/cover files, only admins write or list; private files go to admin-only `admin-files`. Why: workspace policy.
 - Admin auth: sign-up is restricted by `admin_allowlist` via triggers on auth.users, which also grant the admin role. `/admin` layout gates itself client-side (ssr:false) and redirects to `/admin/login` (`admin_.login.tsx`). Why: only founders get accounts; no public sign-up.
 - Admin CRUD is config-driven. CSV imports use shared validation and admin-authenticated per-row transactions. Why: consistent forms and no partial imports.
 - Public site theme is scoped to `.theme-site` (tokens + `nb-*` utilities in src/styles.css); `__root.tsx` wraps public paths in `SiteLayout` except the standalone /directions comparison. Why: admin stays plain and design experiments do not alter the existing public shell.
@@ -36,4 +36,4 @@
 - Public Learn pages read through one public server-function module (learn.functions.ts) with pure, tested helpers in learn.ts; journey step selection lives in the URL. Why: shareable step views and published-only reads in one place.
 - Guide hub picks use organisation/opportunity FK links with a shared three-pick trigger; no automatic guide picks. Why: editorial control and published-only reads.
 - Link preview images render at /api/public/og/$kind/$slug with pure-JS pureimage/pngjs (no wasm or native code) from published rows and official logos only. Why: the server runtime cannot compile wasm from bytes or load native image libraries.
-- Site contact, social links and founders live in site_settings/founders (public read, admin write); the Systole waitlist is insert-only through a server function. Why: admin-editable trust details without exposing emails.
+- Public pages read site_settings, founders and terms only via public_site_settings()/public_founders()/public_terms(); signup tables are visitor insert-only, admin-managed. Why: no direct table access to emails.

@@ -162,6 +162,13 @@
       "when": 1792880038582,
       "tag": "0022_tighten_signup_and_storage_access",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1792880142031,
+      "tag": "0023_public_read_functions_and_scoped_media",
+      "breakpoints": true
     }
   ]
 }

@@ -26,7 +26,7 @@ async function all<T>(page: (from: number, to: number) => PromiseLike<{ data: T[
 const GUIDE_CARD = 'id,slug,title,one_sentence,level,reading_minutes,area_id,journey_step_id';
 const cleanGuide = <T extends GuideCard>(g: T): T => ({ ...g, title: publicTitle(g.title) });
 const terms = (c: Client, kinds: ('area' | 'journey_step' | 'field')[]) =>
-  all<LearnTerm & { kind: string }>((a, b) => c.from('terms').select('id,name,slug,sort_order,kind').in('kind', kinds).order('sort_order').order('name').order('id').range(a, b));
+  all<LearnTerm & { kind: string }>((a, b) => c.rpc('public_terms').select('id,name,slug,sort_order,kind').in('kind', kinds).order('sort_order').order('name').order('id').range(a, b));
 const guides = (c: Client) => all<GuideCard>((a, b) => c.from('guides').select(GUIDE_CARD).eq('status', 'published').order('id').range(a, b)).then((rows) => rows.map(cleanGuide));
 
 type Kind = 'organisations' | 'opportunities' | 'events';

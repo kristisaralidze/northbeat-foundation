@@ -18,7 +18,7 @@ export const getSiteInfo = createServerFn({ method: 'GET' }).handler(async (): P
   const newest = (table: 'organisations' | 'events' | 'opportunities') => c.from(table).select('last_checked').eq('status', 'published').not('last_checked', 'is', null).order('last_checked', { ascending: false }).limit(1);
   const [settings, founders, o, e, p] = await Promise.all([
     c.rpc('public_site_settings').maybeSingle(),
-    c.from('founders').select('id,name,one_line,photo_url,linkedin_url').order('sort_order').order('created_at'),
+    c.rpc('public_founders'),
     newest('organisations'), newest('events'), newest('opportunities'),
   ]);
   return {
