@@ -22,14 +22,20 @@ function OptionList({ facet, data, search, onToggle }: { facet: Facet; data: Dir
   })}</div>;
 }
 
-/** Desktop: a row of chips that open small option lists. */
+/** Desktop: each group is its own chip with its count, then Country, Field and Stage open small option lists. */
 export function FilterChipRow(props: { data: DirectoryData; search: ExploreSearch; onToggle: (facet: Facet, value: string) => void }) {
-  return <div className="nb-filter-chips" role="group" aria-label="Filters">{VISIBLE_FACETS.map((facet) => {
+  const groups = facetOptions(props.data, props.search, "group");
+  return <div className="flex flex-col gap-3">
+    {groups.length > 0 && <div className="nb-filter-chips" role="group" aria-label="Group">{groups.map((o) => {
+      const on = props.search.group.includes(o.value);
+      return <button key={o.value} type="button" className="nb-filter-chip" data-active={on} aria-pressed={on} onClick={() => props.onToggle("group", o.value)}>{o.label}<span className="tabular-nums text-muted-foreground">{o.count}</span></button>;
+    })}</div>}
+    <div className="nb-filter-chips" role="group" aria-label="Filters">{VISIBLE_FACETS.filter((f) => f !== "group").map((facet) => {
     const n = props.search[facet].length;
     if (!facetOptions(props.data, props.search, facet).length) return null;
     return <Popover key={facet}><PopoverTrigger asChild><button type="button" className="nb-filter-chip" data-active={n > 0}>{FACET_LABELS[facet]}{n > 0 ? ` (${n})` : ""}<ChevronDown className="h-4 w-4" aria-hidden /></button></PopoverTrigger>
       <PopoverContent align="start" className="theme-site nb-filter-pop w-72"><OptionList facet={facet} {...props} /></PopoverContent></Popover>;
-  })}</div>;
+  })}</div></div>;
 }
 
 /** Phone bottom sheet body: the same facets stacked. */

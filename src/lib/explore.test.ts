@@ -57,3 +57,16 @@ d2('explore groups and sort', () => {
     e2(sortOrganisations(data.organisations, 'recent').map(o => o.id)).toEqual(['A', 'C', 'B']);
   });
 });
+
+d2('featured sort', () => {
+  i2('puts prominence first, then most connections, then A to Z', () => {
+    const rows = [
+      { id: 'a', name: 'Alpha', prominence: 0, connections: 1 },
+      { id: 'b', name: 'Beta', prominence: 5, connections: 0 },
+      { id: 'c', name: 'Gamma', prominence: 0, connections: 4 },
+      { id: 'd', name: 'Delta', prominence: 0, connections: 1 },
+    ] as never[];
+    e2(sortOrganisations(rows, 'featured').map((o: { id: string }) => o.id)).toEqual(['b', 'c', 'a', 'd']);
+  });
+  i2('defaults to featured', () => { e2(pe({}).sort).toBe('featured'); });
+});

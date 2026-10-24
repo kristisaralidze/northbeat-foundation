@@ -100,6 +100,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
       { name: "longitude", label: "Map longitude", kind: "number" },
       { name: "news_feed_url", label: "News feed (RSS or Atom on their own website)", kind: "url" },
       { name: "founded_year", label: "Founded year", kind: "number" },
+      { name: "prominence", label: "Prominence (higher shows first in Explore Featured)", kind: "number" },
       { name: "contact_email", label: "Contact email", kind: "email" },
       { name: "contact_email_public", label: "Show contact email publicly", kind: "boolean" },
       { name: "ticket_min_eur", label: "Ticket min (EUR, investors)", kind: "number" },
