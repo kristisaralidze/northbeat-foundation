@@ -3,15 +3,15 @@ import { animate, motion, scroll, stagger, useReducedMotion } from 'framer-motio
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** Fade-and-rise transition every time the public page changes. */
+/** Soft 300ms fade every time the public page changes. */
 export function PageTransition({ children, pathname }: { children: ReactNode; pathname: string }) {
   const reduce = useReducedMotion();
   return (
     <motion.div
       key={pathname}
-      initial={reduce ? false : { opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: EASE }}
+      initial={reduce ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
     >
       {children}
     </motion.div>
@@ -66,7 +66,7 @@ export function enhancePageMotion(page: HTMLElement): () => void {
   // page root, so no hydration mismatch); we only add the revealed class.
   // A scroll-position check (not IntersectionObserver) so anchor jumps and
   // fast scrolling past a section still reveal it.
-  const selector = 'section, .nb-card, [data-reveal]';
+  const selector = 'section, .nb-card, [data-reveal], hr, .nb-cover-banner, .nb-cover-strip';
   const pending = new Set<HTMLElement>();
   const seen = new Map<HTMLElement, number>();
   for (const el of page.querySelectorAll<HTMLElement>(selector)) {
@@ -74,7 +74,7 @@ export function enhancePageMotion(page: HTMLElement): () => void {
     const parent = el.parentElement ?? page;
     const order = seen.get(parent) ?? 0;
     seen.set(parent, order + 1);
-    el.style.setProperty('--reveal-delay', `${Math.min(order, 5) * 60}ms`);
+    el.style.setProperty('--reveal-delay', `${Math.min(order, 8) * 70}ms`);
     pending.add(el);
   }
   let ticking = false;
