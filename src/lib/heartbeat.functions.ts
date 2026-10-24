@@ -14,7 +14,7 @@ export const getHeartbeat = createServerFn({ method: 'GET' }).handler(async (): 
   const from = new Date(now.getTime() - 2 * 86_400_000).toISOString();
   const to = new Date(now.getTime() + 37 * 86_400_000).toISOString();
   const [events, opps] = await Promise.all([
-    client.from('events').select('id,slug,title,starts_at,city').eq('status', 'published').gte('starts_at', from).lte('starts_at', to).limit(500),
+    client.from('events').select('id,slug,title,starts_at,city,registration_url').eq('status', 'published').gte('starts_at', from).lte('starts_at', to).limit(500),
     client.from('opportunities').select('id,slug,title,deadline_at,location').eq('status', 'published').gte('deadline_at', from).lte('deadline_at', to).limit(500),
   ]);
   if (events.error || opps.error) throw new Error('The calendar could not be loaded.');
@@ -33,7 +33,7 @@ export const getHeartbeat = createServerFn({ method: 'GET' }).handler(async (): 
   for (const row of (eo.data ?? []) as { event_id: string; organisations: unknown }[]) add(row.event_id, row.organisations);
   for (const row of (oo.data ?? []) as { opportunity_id: string; organisations: unknown }[]) add(row.opportunity_id, row.organisations);
   const items: HeartbeatItem[] = [
-    ...(events.data ?? []).filter(e => e.starts_at).map(e => ({ id: e.id, slug: e.slug, kind: 'event' as const, title: e.title, date: e.starts_at!, city: e.city, orgs: orgsFor.get(e.id) ?? [] })),
+    ...(events.data ?? []).filter(e => e.starts_at).map(e => ({ id: e.id, slug: e.slug, kind: 'event' as const, title: e.title, date: e.starts_at!, city: e.city, website: e.registration_url, orgs: orgsFor.get(e.id) ?? [] })),
     ...(opps.data ?? []).filter(o => o.deadline_at).map(o => ({ id: o.id, slug: o.slug, kind: 'opportunity' as const, title: o.title, date: o.deadline_at!, city: o.location, orgs: orgsFor.get(o.id) ?? [] })),
   ];
   return { items, now: now.toISOString() };

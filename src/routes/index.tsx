@@ -42,7 +42,7 @@ function Index() {
       <section className="nb-home-wordmark-section">
         <div className="nb-arrival-atmosphere"><AtmosphericImage eager /></div>
         <div className="nb-home-opening-content">
-          <h1 className="nb-home-wordmark-slot"><LaboratoryWordmark /></h1>
+          <div className="nb-home-wordmark-slot"><LaboratoryWordmark /></div>
           <p className="nb-home-tagline">The heartbeat of Nordic health innovation.</p>
         </div>
       </section>
