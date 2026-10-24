@@ -75,7 +75,7 @@ export function closeToThem<T extends CloseCandidate>(rows: T[], self: { id: str
     const signals = Number(Boolean(relation)) + Number(sameType) + Number(sameCity) + Number(Boolean(sharedField));
     return { row, relation, sameType, sameCity, sharedField, signals };
   }).filter(c => {
-    if (c.signals < 2) return false;
+    if (!c.relation && c.signals < 2) return false;
     const cross = (RESEARCH_TYPES.has(self.type ?? '') && VENTURE_TYPES.has(c.row.type ?? '')) || (VENTURE_TYPES.has(self.type ?? '') && RESEARCH_TYPES.has(c.row.type ?? ''));
     return cross ? Boolean(c.relation) : true;
   });

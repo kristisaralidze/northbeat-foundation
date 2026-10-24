@@ -24,10 +24,20 @@ describe('action-first detail rules', () => {
     expect(registrationClosed(null, '2026-11-01T00:00:00Z', '2026-10-24T00:00:00Z')).toBe(false);
     expect(registrationClosed(null, null, '2026-10-24T00:00:00Z')).toBe(false);
   });
-  it('caps at four and uses city once as the last fallback', () => {
+  it('needs two shared signals or a direct relation, and ranks relations first', () => {
     const rows=[{id:'r',title:'Relation',city:null,fieldIds:[]},{id:'f',title:'Field',city:'Oulu',fieldIds:['med']},{id:'c1',title:'City 1',city:'Oulu',fieldIds:[]},{id:'c2',title:'City 2',city:'Oulu',fieldIds:[]},{id:'t',title:'Type',city:null,type:'investor',fieldIds:[]}];
-    const out=closeToThem(rows,{id:'self',city:'Oulu',type:'investor',fieldNames:{med:'Medtech'},relations:{r:'Partner'}});
-    expect(out).toHaveLength(4);expect(out.map(o=>o.reason)).toEqual(['Partner','Same field: Medtech','Also an investor','Also in Oulu']);
+    const out=closeToThem(rows,{id:'self',slug:'self',city:'Oulu',type:'investor',fieldNames:{med:'Medtech'},relations:{r:'Partner'}});
+    expect(out).toHaveLength(2);expect(out.map(o=>o.reason)).toEqual(['Partner','Same field: Medtech']);
+  });
+  it('hides the section when fewer than two qualify', () => {
+    const rows=[{id:'f',title:'Field',city:'Oulu',fieldIds:['med']},{id:'c1',title:'City 1',city:'Oulu',fieldIds:[]}];
+    expect(closeToThem(rows,{id:'self',slug:'self',city:'Oulu',type:'investor',fieldNames:{med:'Medtech'},relations:{}})).toHaveLength(0);
+  });
+  it('never puts universities next to startups without a direct relation', () => {
+    const rows=[{id:'u',title:'Uni',city:'Oulu',type:'university',fieldIds:['med']},{id:'s',title:'Startup',city:'Oulu',type:'startup',fieldIds:['med']}];
+    const self={id:'self',slug:'self',city:'Oulu',type:'startup',fieldNames:{med:'Medtech'},relations:{}};
+    expect(closeToThem(rows,self).map(o=>o.id)).toEqual(['s']);
+    expect(closeToThem(rows,{...self,relations:{u:'Partner'}}).map(o=>o.id)).toEqual(['u','s']);
   });
 });
 import {urgencyLevel,offerChips} from './detail';
