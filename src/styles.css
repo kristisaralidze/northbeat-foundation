@@ -1348,10 +1348,9 @@ html, body { overflow-x: clip; }
 .nb-home-shell .nb-systole + * { margin-top: 0; }
 
 /* 404 */
-.nb-404 { position: relative; min-height: 70vh; display: flex; align-items: center; overflow: hidden; }
-.nb-404-line { position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: var(--ink); opacity: .9; }
-.nb-404-content { position: relative; display: grid; gap: 16px; padding-block: 96px; }
-.nb-404-content h1 { font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-weight: 400; background: var(--background); width: fit-content; padding-right: 16px; }
-.nb-404-content p { background: var(--background); width: fit-content; padding-right: 16px; }
-.nb-404-links { display: flex; flex-wrap: wrap; gap: 8px 24px; background: var(--background); width: fit-content; padding-right: 16px; }
+.nb-404 { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; gap: 48px; padding-block: 96px; overflow: hidden; }
+.nb-404-line { height: 2px; width: 100%; background: var(--ink); }
+.nb-404-content { display: grid; gap: 16px; }
+.nb-404-content h1 { font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-weight: 400; }
+.nb-404-links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
 .nb-404-links a { display: inline-flex; align-items: center; min-height: 44px; }
