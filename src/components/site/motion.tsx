@@ -135,6 +135,7 @@ export function enhancePageMotion(page: HTMLElement): () => void {
     const match = original.match(/^([^\d]*)([\d][\d.,]*)(.*)$/);
     if (!match) continue;
     const [, prefix, num, suffix] = match;
+    if (!num) continue;
     const decimals = num.includes('.') ? (num.split('.')[1] ?? '').length : 0;
     const parsed = decimals ? Number(num.replace(/,/g, '')) : Number(num.replace(/[.,]/g, ''));
     if (!Number.isFinite(parsed) || parsed <= 0) continue;

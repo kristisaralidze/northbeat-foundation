@@ -14,7 +14,7 @@ function SystoleWord() {
   const [metrics, setMetrics] = useState({ cap: 65, width: 275, positions: [0, 35, 78, 113, 143, 188, 212], widths: [35,43,35,30,45,24,42] });
   useEffect(() => {
     let cancelled = false;
-    void document.fonts.ready.then(() => {
+    void document.fonts.load('italic 800 92px "Bodoni Moda"').then(() => document.fonts.ready).then(() => {
       if (cancelled || !host.current) return;
       const ctx = document.createElement('canvas').getContext('2d');
       if (!ctx) return;
@@ -80,6 +80,7 @@ export function SystoleHeart({ pathname }: { pathname: string }) {
   };
 
   return <Dialog.Root open={open} onOpenChange={setOpen}>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@1,6..96,500;1,6..96,800&display=swap" />
     <Dialog.Trigger asChild><Button ref={button} variant="ghost" className="nb-systole-tab" data-hidden={hidden && !open} aria-hidden={hidden && !open} tabIndex={hidden && !open ? -1 : 0} aria-label="Open Systole">
       <span>systole</span><Heart />
     </Button></Dialog.Trigger>
