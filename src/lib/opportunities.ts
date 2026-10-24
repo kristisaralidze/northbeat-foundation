@@ -28,13 +28,33 @@ export function filterOpportunities(data: OpportunitiesData, filters: Opportunit
     .sort((a, b) => (Date.parse(a.deadline_at ?? '') || Number.MAX_SAFE_INTEGER) - (Date.parse(b.deadline_at ?? '') || Number.MAX_SAFE_INTEGER));
 }
 
-export function amountLabel(opportunity: OpportunityRow): string {
+/** Full euro amounts; millions as "€2.5M". */
+export function euro(value: number): string {
+  if (value >= 1_000_000) return `€${Number((value / 1_000_000).toFixed(2)).toString()}M`;
+  return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+}
+export function amountLabel(opportunity: Pick<OpportunityRow, 'amount_min_eur' | 'amount_max_eur'>): string {
   const { amount_min_eur: min, amount_max_eur: max } = opportunity;
-  const format = (value: number) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
-  if (min != null && max != null) return min === max ? format(min) : `${format(min)}–${format(max)}`;
-  if (min != null) return `From ${format(min)}`;
-  if (max != null) return `Up to ${format(max)}`;
+  if (min != null && max != null) return min === max ? euro(min) : `${euro(min)} to ${euro(max)}`;
+  if (min != null) return `From ${euro(min)}`;
+  if (max != null) return `Up to ${euro(max)}`;
   return '';
+}
+/** "Today, 24 Oct", "Tomorrow, 25 Oct" or "14 Jan 2027". Never a raw ISO date. */
+export function friendlyDate(value: string, now: string, timezone = 'Europe/Helsinki'): string {
+  const key = (v: string) => new Intl.DateTimeFormat('en-CA', { timeZone: timezone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(v));
+  const days = Math.round((Date.parse(key(value)) - Date.parse(key(now))) / 86_400_000);
+  const short = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: timezone }).format(new Date(value));
+  if (days === 0) return `Today, ${short}`;
+  if (days === 1) return `Tomorrow, ${short}`;
+  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: timezone }).format(new Date(value));
+}
+/** Open opportunities split into dated (nearest first), rolling, and undated-not-rolling. */
+export function splitOpen(rows: OpportunityRow[]) {
+  const dated = rows.filter(r => r.deadline_at).sort((a, b) => Date.parse(a.deadline_at!) - Date.parse(b.deadline_at!));
+  const rolling = rows.filter(r => !r.deadline_at && isRolling(r));
+  const announced = rows.filter(r => !r.deadline_at && !isRolling(r));
+  return { dated, rolling, announced };
 }
 
 export function deadlineLabel(opportunity: OpportunityRow, now: string): string {
@@ -46,7 +66,7 @@ export function deadlineLabel(opportunity: OpportunityRow, now: string): string 
   if (days < 0) return `Closed ${date}`;
   if (days === 0) return 'Closes today';
   if (days === 1) return 'Closes tomorrow';
-  return `${date} · ${days} days left`;
+  return `${date}, ${days} days left`;
 }
 export function isRolling(opportunity: OpportunityRow): boolean {
   const timing = `${opportunity.summary ?? ''} ${opportunity.description ?? ''}`;
