@@ -79,7 +79,7 @@ export function enhancePageMotion(page: HTMLElement): () => void {
           el.style.transform = '';
         });
       },
-      { amount: 0.12, once: true },
+      { margin: '0px 0px -10% 0px', once: true },
     );
     cleanups.push(() => {
       stop();

@@ -69,7 +69,11 @@ export function PublicScrollFrame({ children, pathname }: { children: ReactNode;
       void document.fonts.ready.then(() => { if (!disposed) ScrollTrigger.refresh(); });
     });
     const letters = [...page.querySelectorAll<HTMLElement>('[id^="letter-"]')];
-    const motionCleanup = enhancePageMotion(page);
+    // Wait for hydration to finish before touching the DOM, or React warns about mismatches.
+    let motionCleanup = () => {};
+    void (document.readyState === 'complete' ? Promise.resolve() : new Promise<void>(resolve => window.addEventListener('load', () => resolve(), { once: true }))).then(() => {
+      requestAnimationFrame(() => requestAnimationFrame(() => { if (!disposed) motionCleanup = enhancePageMotion(page); }));
+    });
     const updateLetters = () => {
       let current = letters[0]?.id;
       for (const letter of letters) if (letter.getBoundingClientRect().top <= 240) current = letter.id;
