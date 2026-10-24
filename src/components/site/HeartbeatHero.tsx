@@ -93,7 +93,7 @@ export function HeartbeatHero() {
     let idle = -0.6, cur = reduced ? 0 : -0.6, prevCur = cur;
     let mx = 0.5, my = 0.5, smx = 0.5, smy = 0.5;
     let pulseUntil = 0, pulseScale = 1, pulseLen = 1;
-    const maxAmp = Math.max(REST_HEIGHT, mergeBeats, beatTitle, ...beats.map(b => b.amp));
+    const maxAmp = Math.max(REST_HEIGHT, ...beats.map(b => b.amp));
     let lastNext = '';
     let opening = false, openStart = 0;
     if (!reduced) {
