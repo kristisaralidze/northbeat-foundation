@@ -5,7 +5,7 @@ import { PNG } from 'pngjs';
 import jpeg from 'jpeg-js';
 
 const FONT_CSS = 'https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400&family=Inter+Tight:wght@500';
-const W = 1200, H = 630;
+const W = 1200, H = 630, S = 2; // drawn at 2x then averaged down, so serif hairlines stay whole.
 const COLOURS = { paper: '#F7F5F0', ink: '#131825', muted: '#5B6070', plum: '#86264F', hairline: '#DCD8CE', white: '#FFFFFF' };
 let fontsReady: Promise<void> | null = null;
 
@@ -36,7 +36,7 @@ function wrap(ctx: Ctx, text: string, maxWidth: number, maxLines: number) {
 
 async function decodeLogo(url: string): Promise<{ width: number; height: number; data: Uint8Array } | null> {
   try {
-    const res = await fetch(url, { headers: { Accept: 'image/png,image/jpeg' }, signal: AbortSignal.timeout(4000) });
+    const res = await fetch(url, { headers: { Accept: 'image/png,image/jpeg', 'User-Agent': 'NorthbeatPreview/1.0' }, signal: AbortSignal.timeout(4000) });
     if (!res.ok) return null;
     const bytes = new Uint8Array(await res.arrayBuffer());
     if (bytes[0] === 0x89 && bytes[1] === 0x50) { const png = PNG.sync.read(Buffer.from(bytes)); return { width: png.width, height: png.height, data: png.data }; }
@@ -54,7 +54,7 @@ function drawLogo(img: ReturnType<typeof PImage.make>, logo: { width: number; he
   for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) {
     const sx = Math.min(logo.width - 1, Math.floor(i / scale)), sy = Math.min(logo.height - 1, Math.floor(j / scale));
     const s = (sy * logo.width + sx) * 4, a = logo.data[s + 3]! / 255;
-    const d = ((oy + j) * W + (ox + i)) * 4;
+    const d = ((oy + j) * W * S + (ox + i)) * 4;
     for (let c = 0; c < 3; c++) out[d + c] = Math.round(logo.data[s + c]! * a + out[d + c]! * (1 - a));
     out[d + 3] = 255;
   }
@@ -69,8 +69,9 @@ export type OgInput = { eyebrow: string; title: string; subtitle?: string | null
 export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
   fontsReady ??= loadFonts().catch(e => { fontsReady = null; throw e; });
   await fontsReady;
-  const img = PImage.make(W, H);
+  const img = PImage.make(W * S, H * S);
   const ctx = img.getContext('2d');
+  ctx.scale(S, S);
   ctx.fillStyle = COLOURS.paper; ctx.fillRect(0, 0, W, H);
   const pad = 80;
   // Flat heartbeat line along the bottom, one beat in plum.
@@ -87,7 +88,7 @@ export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
   if (logo) {
     ctx.fillStyle = COLOURS.hairline; roundRect(ctx, pad - 2, pad - 2, 164, 164, 26);
     ctx.fillStyle = COLOURS.white; roundRect(ctx, pad, pad, 160, 160, 24);
-    drawLogo(img, logo, pad + 20, pad + 20, 120);
+    drawLogo(img, logo, (pad + 20) * S, (pad + 20) * S, 120 * S);
   }
   const top = logo ? pad + 160 + 64 : pad + 40;
   ctx.fillStyle = COLOURS.plum; ctx.font = '30pt Body'; ctx.fillText(input.eyebrow, textX, top);
@@ -100,7 +101,12 @@ export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
 }
 
 function encode(img: ReturnType<typeof PImage.make>) {
+  const src = img.data as unknown as Uint8Array, out = Buffer.alloc(W * H * 4);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) for (let c = 0; c < 4; c++) {
+    let sum = 0; for (let dy = 0; dy < S; dy++) for (let dx = 0; dx < S; dx++) sum += src[((y * S + dy) * W * S + (x * S + dx)) * 4 + c]!;
+    out[(y * W + x) * 4 + c] = Math.round(sum / (S * S));
+  }
   const png = new PNG({ width: W, height: H });
-  png.data = Buffer.from(img.data as unknown as Uint8Array);
+  png.data = out;
   return new Uint8Array(PNG.sync.write(png));
 }
