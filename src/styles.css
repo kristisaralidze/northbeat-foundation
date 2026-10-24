@@ -170,6 +170,7 @@
   --berry: oklch(0.43 0.135 358);
   --berry-hover: oklch(0.37 0.135 358);
   --berry-soft: oklch(0.94 0.03 358);
+  --signal: oklch(0.6 0.16 45);
   --frost: oklch(0.955 0.018 300);
   /* Footer surface: frost at 60% over cream, as a named token. */
   --frost-wash: color-mix(in oklab, var(--frost) 60%, var(--cream));
@@ -1226,7 +1227,7 @@ html, body { overflow-x: clip; }
 
 /* Detail pages: action-first layout */
 .nb-detail-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-.nb-countdown-signal { color: var(--signal, var(--destructive)); }
+.nb-countdown.nb-countdown-signal { color: var(--background); background: var(--signal); }
 .nb-detail-actions .nb-btn { min-height: 44px; }
 .nb-detail-organiser { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
 .nb-detail-organiser .nb-org-logo { width: 40px; height: 40px; }

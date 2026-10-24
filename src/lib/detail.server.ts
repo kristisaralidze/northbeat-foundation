@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { nearbyFirst, withinSevenDays } from './detail';
+import { closeToThem, RELATION_REASON, withinDays } from './detail';
 import { publicEntry, text, publicTitle, type DetailContext, type DetailItem, type ProfileRow, type ProfileTerm, type RelatedGroup } from './profiles';
 
 async function all(client: SupabaseClient, table: string, columns: string, published = true) {
@@ -19,17 +19,22 @@ export async function detailContext(client: SupabaseClient, kind: 'organisations
   const [events, opportunities] = await Promise.all([all(client, 'events', 'id,slug,title,summary,event_type,starts_at,ends_at,city,status'), all(client, 'opportunities', 'id,slug,title,summary,type,deadline_at,location,status')]);
   const dated: DetailItem[] = [...events.map(item => ({ ...publicEntry('events', item), kind: 'events' as const, date: text(item, 'starts_at'), end: text(item, 'ends_at'), city: text(item, 'city') })), ...opportunities.map(item => ({ ...publicEntry('opportunities', item), kind: 'opportunities' as const, date: text(item, 'deadline_at'), end: null, city: text(item, 'location') }))];
   const linked = new Set(related.flatMap(group => group.entries.map(entry => `${group.kind}:${entry.id}`)));
-  const coming = kind === 'organisations' ? dated.filter(item => linked.has(`${item.kind}:${item.id}`) && item.date && Date.parse(item.end ?? item.date) >= Date.parse(now)).sort((a, b) => Date.parse(a.date ?? '') - Date.parse(b.date ?? '')) : [];
-  const sameWeek = kind === 'events' ? dated.filter(item => item.id !== row.id && withinSevenDays(item.date, text(row, 'starts_at'))).sort((a, b) => Date.parse(a.date ?? '') - Date.parse(b.date ?? '')) : [];
+  const coming = kind === 'organisations' ? dated.filter(item => linked.has(`${item.kind}:${item.id}`) && (item.date ? Date.parse(item.end ?? item.date) >= Date.parse(now) : item.kind === 'opportunities')).sort((a, b) => (a.date ? Date.parse(a.date) : Infinity) - (b.date ? Date.parse(b.date) : Infinity)) : [];
+  const sameWeek = kind === 'events' ? dated.filter(item => item.id !== row.id && item.kind === 'events' && withinDays(item.date, text(row, 'starts_at'), 3)).sort((a, b) => Date.parse(a.date ?? '') - Date.parse(b.date ?? '')) : [];
   let similar: DetailContext['similar'] = []; let guides: DetailContext['guides'] = [];
   const fields = terms.filter(term => term.kind === 'field').map(term => term.id);
   const steps = terms.filter(term => term.kind === 'journey_step').map(term => term.id);
-  if (kind === 'organisations' && fields.length) {
+  if (kind === 'organisations') {
     const [orgs, tags] = await Promise.all([all(client, 'organisations', 'id,slug,name,short_description,logo_url,city,type,status'), all(client, 'organisation_terms', 'organisation_id,term_id', false)]);
-    const matching = new Set(tags.filter(tag => fields.includes(String(tag['term_id']))).map(tag => String(tag['organisation_id'])));
-    const countries = terms.filter(term => term.kind === 'country').map(term => term.id);
-    const ranked = nearbyFirst(orgs.filter(org => org.id !== row.id && matching.has(org.id)).map(org => ({ ...org, title: String(org['name']), city: text(org, 'city'), countryIds: tags.filter(tag => tag['organisation_id'] === org.id).map(tag => String(tag['term_id'])) })), text(row, 'city'), countries);
-    similar = ranked.map(org => publicEntry('organisations', org));
+    const fieldNames = Object.fromEntries(terms.filter(term => term.kind === 'field').map(term => [term.id, term.name]));
+    const relations: Record<string, string> = {};
+    for (const group of related) if (group.kind === 'organisations') for (const entry of group.entries) relations[entry.id] ??= RELATION_REASON[group.label] ?? 'Connected';
+    const ranked = closeToThem(orgs.map(org => ({ ...org, title: String(org['name']), city: text(org, 'city'), fieldIds: tags.filter(tag => tag['organisation_id'] === org.id).map(tag => String(tag['term_id'])) })), { id: row.id, city: text(row, 'city'), fieldNames, relations });
+    similar = ranked.map(org => ({ ...publicEntry('organisations', org), roles: [org.reason] }));
+  }
+  if (kind === 'organisations' && steps.length) {
+    const entries = await all(client, 'guides', 'id,slug,title,one_sentence,journey_step_id,status');
+    guides = entries.filter(guide => steps.includes(String(guide['journey_step_id']))).sort((a, b) => String(a['title']).localeCompare(String(b['title']))).slice(0, 2).map(guide => ({ slug: guide.slug, title: publicTitle(String(guide['title'])), summary: text(guide, 'one_sentence') }));
   }
   if (kind === 'events' && (steps.length || fields.length)) {
     const [entries, tags] = await Promise.all([all(client, 'guides', 'id,slug,title,one_sentence,journey_step_id,status'), all(client, 'guide_terms', 'guide_id,term_id', false)]);
