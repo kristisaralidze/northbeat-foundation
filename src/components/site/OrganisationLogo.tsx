@@ -9,8 +9,8 @@ export function chosenLogoSrc(choice: string | null | undefined, uploaded: strin
 }
 /** Stored admin resolution is shared everywhere; no per-view pixel analysis. */
 export function OrganisationLogo({name,slug,uploaded,website,eager=false,large=false,choice,resolved,tone,status}: {
-  name:string;slug?:string;uploaded?:string|null;website?:string|null;eager?:boolean;large?:boolean;choice?:string|null;
-  resolved?:string|null;tone?:string|null;status?:string|null;source?:string|null;sourceUrl?:string|null;automatic?:boolean;
+  name:string;slug?:string|undefined;uploaded?:string|null|undefined;website?:string|null|undefined;eager?:boolean;large?:boolean;choice?:string|null|undefined;
+  resolved?:string|null|undefined;tone?:string|null|undefined;status?:string|null|undefined;source?:string|null|undefined;sourceUrl?:string|null|undefined;automatic?:boolean;
 }) {
   const {data}=useQuery({...directoryQuery,enabled:Boolean(slug)});
   const org=data?.organisations.find(o=>o.slug===slug);

@@ -27,9 +27,9 @@ describe('logo choice rules', () => {
   it('defaults to the 256px icon with fallback=404', () => {
     expect(brandfetchLogoUrl('https://www.aalto.fi')).toBe('https://cdn.brandfetch.io/domain/aalto.fi/w/256/h/256/type/icon?c=1idCGaWDUDXkjAD579-&fallback=404');
   });
-  it('builds dark logo and symbol versions', () => {
+  it('builds dark logos and never symbols', () => {
     expect(brandfetchLogoUrl('aalto.fi', 'logo-dark')).toBe('https://cdn.brandfetch.io/domain/aalto.fi/w/256/h/256/theme/dark/type/logo?c=1idCGaWDUDXkjAD579-&fallback=404');
-    expect(brandfetchLogoUrl('aalto.fi', 'symbol')).toContain('/type/symbol?');
+    expect(brandfetchLogoUrl('aalto.fi', 'symbol')).toContain('/type/icon?');expect(brandfetchLogoUrl('aalto.fi', 'symbol')).not.toContain('/type/symbol');
   });
   it('rejects logos wider than 3:1', () => { expect(acceptableLogoShape(300, 100)).toBe(true); expect(acceptableLogoShape(301, 100)).toBe(false); });
   it('rejects JPEG photos', () => { expect(acceptableLogoType('image/jpeg')).toBe(false); expect(acceptableLogoType('image/svg+xml')).toBe(true); expect(acceptableLogoType('image/png')).toBe(true); });
