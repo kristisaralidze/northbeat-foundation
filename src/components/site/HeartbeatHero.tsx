@@ -71,11 +71,13 @@ export function HeartbeatHero() {
     };
     const beatLogos = new Map(beats.map(b => [b, b.items.flatMap(itemLogos)]));
 
-    let W = 0, H = 0, dpr = 1, phone = false;
+    let W = 0, H = 0, dpr = 1, phone = false; let headBox = { x: 0, y: 0, w: 0, h: 0 };
     const resize = () => {
       dpr = Math.min(2, window.devicePixelRatio || 1);
       W = el.clientWidth; H = el.clientHeight; phone = W < 640;
       el.width = Math.round(W * dpr); el.height = Math.round(H * dpr);
+      const hr = headline.current?.getBoundingClientRect(), cr = el.getBoundingClientRect();
+      if (hr) headBox = { x: 0, y: 0, w: hr.right - cr.left + 12, h: hr.bottom - cr.top + 12 };
     };
     resize();
     const ro = new ResizeObserver(resize); ro.observe(el);
@@ -251,12 +253,12 @@ export function HeartbeatHero() {
             flatDates.push(fp.x); ctx.globalAlpha = sceneAlpha * clamp01((m - 0.6) / 0.4); ctx.fillStyle = SOFT; ctx.font = `11px ${body}`;
             ctx.fillText(dateFor(b.day), peak.x, cy - r - 6);
           }
-        } else if (pp && mi < 0.3 && pp.z < 14 && !phone || (pp && phone && pp.z < 9)) {
+        } else if (pp && mi < 0.3 && pp.z < (phone ? 9 : 14)) {
           const titleSize = Math.max(13, Math.min(22, F / pp.z * 0.22));
           const title = publicTitle(b.items[0].title) + (b.items.length > 1 ? ` +${b.items.length - 1}` : '');
           ctx.font = `${titleSize}px ${display}`; const tw = Math.min(ctx.measureText(title).width, W * 0.5);
           const box = { x: peak.x - tw / 2, y: cy - r - titleSize - 26, w: tw, h: titleSize + 22 };
-          if (!labels.some(l => box.x < l.x + l.w && box.x + box.w > l.x && box.y < l.y + l.h && box.y + box.h > l.y)) {
+          if (![headBox, ...labels].some(l => box.x < l.x + l.w && box.x + box.w > l.x && box.y < l.y + l.h && box.y + box.h > l.y)) {
             labels.push(box); ctx.globalAlpha = alpha * (1 - mi / 0.3);
             ctx.fillStyle = SOFT; ctx.font = `12px ${body}`; ctx.fillText(dateFor(b.day), peak.x, box.y + 10);
             ctx.fillStyle = INK; ctx.font = `${titleSize}px ${display}`; ctx.fillText(title, peak.x, box.y + 12 + titleSize, W * 0.5);
