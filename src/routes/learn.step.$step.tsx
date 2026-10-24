@@ -3,7 +3,6 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { LearnError, LearnNotFound } from '@/components/site/LearnParts';
 import { journeyStepQuery } from '@/lib/learn.query';
 import { EMPTY_SEARCH } from '@/lib/explore';
-import { dateLabel } from '@/lib/events';
 
 export const Route = createFileRoute('/learn/step/$step')({
   loader: ({ context, params }) => context.queryClient.ensureQueryData(journeyStepQuery(params.step)),
@@ -72,5 +71,3 @@ function StepPage() {
     </nav>
   </div>;
 }
-
-void dateLabel;

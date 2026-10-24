@@ -59,6 +59,7 @@ import { Route as AdminPeopleIndexRouteImport } from './routes/admin.people.inde
 import { Route as AdminPeopleIdRouteImport } from './routes/admin.people.$id'
 import { Route as AdminSubmissionsIndexRouteImport } from './routes/admin.submissions.index'
 import { Route as AdminSubmissionsIdRouteImport } from './routes/admin.submissions.$id'
+import { Route as LearnStepStepRouteImport } from './routes/learn.step.$step'
 import { Route as ApiPublicJobsEnrichRouteImport } from './routes/api/public/jobs/enrich'
 import { Route as ApiPublicOgKindSlugRouteImport } from './routes/api/public/og/$kind.$slug'
 
@@ -312,6 +313,11 @@ const AdminSubmissionsIdRoute = AdminSubmissionsIdRouteImport.update({
   path: '/submissions/$id',
   getParentRoute: () => AdminRoute,
 } as any)
+const LearnStepStepRoute = LearnStepStepRouteImport.update({
+  id: '/learn/step/$step',
+  path: '/learn/step/$step',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicJobsEnrichRoute = ApiPublicJobsEnrichRouteImport.update({
   id: '/api/public/jobs/enrich',
   path: '/api/public/jobs/enrich',
@@ -366,6 +372,7 @@ export interface FileRoutesByFullPath {
   '/admin/organisations/$id': typeof AdminOrganisationsIdRoute
   '/admin/people/$id': typeof AdminPeopleIdRoute
   '/admin/submissions/$id': typeof AdminSubmissionsIdRoute
+  '/learn/step/$step': typeof LearnStepStepRoute
   '/admin/episodes/': typeof AdminEpisodesIndexRoute
   '/admin/events/': typeof AdminEventsIndexRoute
   '/admin/glossary/': typeof AdminGlossaryIndexRoute
@@ -418,6 +425,7 @@ export interface FileRoutesByTo {
   '/admin/organisations/$id': typeof AdminOrganisationsIdRoute
   '/admin/people/$id': typeof AdminPeopleIdRoute
   '/admin/submissions/$id': typeof AdminSubmissionsIdRoute
+  '/learn/step/$step': typeof LearnStepStepRoute
   '/admin/episodes': typeof AdminEpisodesIndexRoute
   '/admin/events': typeof AdminEventsIndexRoute
   '/admin/glossary': typeof AdminGlossaryIndexRoute
@@ -473,6 +481,7 @@ export interface FileRoutesById {
   '/admin/organisations/$id': typeof AdminOrganisationsIdRoute
   '/admin/people/$id': typeof AdminPeopleIdRoute
   '/admin/submissions/$id': typeof AdminSubmissionsIdRoute
+  '/learn/step/$step': typeof LearnStepStepRoute
   '/admin/episodes/': typeof AdminEpisodesIndexRoute
   '/admin/events/': typeof AdminEventsIndexRoute
   '/admin/glossary/': typeof AdminGlossaryIndexRoute
@@ -529,6 +538,7 @@ export interface FileRouteTypes {
     | '/admin/organisations/$id'
     | '/admin/people/$id'
     | '/admin/submissions/$id'
+    | '/learn/step/$step'
     | '/admin/episodes/'
     | '/admin/events/'
     | '/admin/glossary/'
@@ -581,6 +591,7 @@ export interface FileRouteTypes {
     | '/admin/organisations/$id'
     | '/admin/people/$id'
     | '/admin/submissions/$id'
+    | '/learn/step/$step'
     | '/admin/episodes'
     | '/admin/events'
     | '/admin/glossary'
@@ -635,6 +646,7 @@ export interface FileRouteTypes {
     | '/admin/organisations/$id'
     | '/admin/people/$id'
     | '/admin/submissions/$id'
+    | '/learn/step/$step'
     | '/admin/episodes/'
     | '/admin/events/'
     | '/admin/glossary/'
@@ -671,6 +683,7 @@ export interface RootRouteChildren {
   PodcastSlugRoute: typeof PodcastSlugRoute
   StartAudienceRoute: typeof StartAudienceRoute
   LearnIndexRoute: typeof LearnIndexRoute
+  LearnStepStepRoute: typeof LearnStepStepRoute
   ApiPublicJobsEnrichRoute: typeof ApiPublicJobsEnrichRoute
   ApiPublicOgKindSlugRoute: typeof ApiPublicOgKindSlugRoute
 }
@@ -1027,6 +1040,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSubmissionsIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/learn/step/$step': {
+      id: '/learn/step/$step'
+      path: '/learn/step/$step'
+      fullPath: '/learn/step/$step'
+      preLoaderRoute: typeof LearnStepStepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/jobs/enrich': {
       id: '/api/public/jobs/enrich'
       path: '/api/public/jobs/enrich'
@@ -1140,6 +1160,7 @@ const rootRouteChildren: RootRouteChildren = {
   PodcastSlugRoute: PodcastSlugRoute,
   StartAudienceRoute: StartAudienceRoute,
   LearnIndexRoute: LearnIndexRoute,
+  LearnStepStepRoute: LearnStepStepRoute,
   ApiPublicJobsEnrichRoute: ApiPublicJobsEnrichRoute,
   ApiPublicOgKindSlugRoute: ApiPublicOgKindSlugRoute,
 }
