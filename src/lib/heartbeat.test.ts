@@ -28,19 +28,11 @@ describe('heartbeat line', () => {
   });
 });
 
-import { warpedDay as warp } from './heartbeat';
 describe('warpedDay', () => {
-  it('covers the full range', () => { expect(warp(0, 0, 35, [{ day: 10 }])).toBeCloseTo(0); expect(warp(1, 0, 35, [{ day: 10 }])).toBeCloseTo(35); });
-  it('moves at 40% speed within 1.5 days before a beat', () => {
-    const b = [{ day: 10 }], d = 0.001;
-    const near = warp(0.3 + d, 0, 35, b) - warp(0.3, 0, 35, b);
-    const day = warp(0.3, 0, 35, b);
-    expect(day > 8.5 && day < 10 || true).toBe(true);
-    const fNear = 0.5; const x = warp(fNear, 0, 20, [{ day: 10 }]); // not asserted
-    void near; void x;
-    const s = (f: number) => warp(f + d, 0, 20, [{ day: 10 }]) - warp(f, 0, 20, [{ day: 10 }]);
-    // cost: 18.5 + 1.5/0.4=3.75 → total 22.25; day 9 sits at (9 + 0.5/0.4... ) find fractions
-    const fAt = (dayV: number) => (dayV <= 8.5 ? dayV : dayV <= 10 ? 8.5 + (dayV - 8.5) / 0.4 : 12.25 + (dayV - 10)) / 22.25;
-    expect(s(fAt(9)) / s(fAt(5))).toBeCloseTo(0.4, 1);
-  });
+  const b = [{ day: 10 }], d = 0.0005;
+  const s = (f: number) => warpedDay(f + d, 0, 20, b) - warpedDay(f, 0, 20, b);
+  const fAt = (v: number) => (v <= 8.5 ? v : v <= 10 ? 8.5 + (v - 8.5) / 0.4 : 12.25 + (v - 10)) / 22.25;
+  it('covers the full range', () => { expect(warpedDay(0, 0, 35, b)).toBeCloseTo(0); expect(warpedDay(1, 0, 35, b)).toBeCloseTo(35); });
+  it('moves at 40% speed within 1.5 days before a beat', () => { expect(s(fAt(9)) / s(fAt(5))).toBeCloseTo(0.4, 1); });
+  it('moves at full speed after the beat', () => { expect(s(fAt(14)) / s(fAt(5))).toBeCloseTo(1, 1); });
 });

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { heartbeatQuery } from '@/lib/heartbeat.query';
-import { buildBeats, clamp01, heightAt, HORIZON, localKey, restingBeats, smoothstep, type Beat, type HeartbeatItem } from '@/lib/heartbeat';
+import { buildBeats, clamp01, heightAt, HORIZON, localKey, restingBeats, smoothstep, warpedDay, type Beat, type HeartbeatItem } from '@/lib/heartbeat';
 import { chosenLogoSrc } from '@/components/site/OrganisationLogo';
 import { publicTitle } from '@/lib/profiles';
 
