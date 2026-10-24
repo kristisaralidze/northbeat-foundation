@@ -19,7 +19,10 @@ export async function checkLogoUrl(url: string): Promise<LogoResult> {
     const ctx=canvas.getContext('2d',{willReadFrequently:true});if(!ctx)throw new Error('Canvas unavailable');
     ctx.drawImage(image,0,0,128,128);const result=analyseLogoPixels(ctx.getImageData(0,0,128,128).data);
     return {logo_resolved_url:result.blank?null:url,logo_tone:result.tone,logo_status:result.blank?'missing':result.tone==='light'?'light':'ok',logo_check_error:result.blank?'Blank image':null};
-  } catch(e) {return {logo_resolved_url:null,logo_tone:'dark',logo_status:'missing',logo_check_error:e instanceof Error?e.message:'Image unavailable'};}
+  } catch(e) {return {logo_resolved_url:null,logo_tone:'dark',logo_status:'missing',logo_check_error:e instanceof Error?e.message:'Image unavailable',unreadable:true};}
+}
+/** True when the image could not be read at all (CORS, network, timeout): not a real "missing" result, never stored. */
+export function isUnreadable(r: LogoResult) { return Boolean((r as {unreadable?:boolean}).unreadable); }
 }
 export async function resolveOrganisationLogo(row: {website:string|null;logo_url:string|null;logo_choice:string|null;logo_image_source?:string|null;logo_manual_required?:boolean}): Promise<LogoResult> {
   if(row.logo_url && (row.logo_choice==='upload'||row.logo_image_source==='admin_upload')) return checkLogoUrl(row.logo_url);
