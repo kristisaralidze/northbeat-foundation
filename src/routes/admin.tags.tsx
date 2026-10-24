@@ -181,6 +181,74 @@ function TermRow({
         </select>
       )}
       <Button size="sm" variant="ghost" className="ml-auto" onClick={remove} disabled={busy}>Delete</Button>
+      {term.kind === "journey_step" && <StepPicks term={term} />}
     </li>
+  );
+}
+
+/** Hand-picked "Go here" organisations for one journey step, with a one-line reason each. */
+function StepPicks({ term }: { term: Term }) {
+  const qc = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [orgId, setOrgId] = useState("");
+  const [reason, setReason] = useState("");
+  const picks = useQuery({
+    queryKey: ["step-picks", term.id], enabled: open,
+    queryFn: async () => {
+      const { data, error } = await db.from("journey_step_organisations").select("id,organisation_id,reason,sort_order").eq("term_id", term.id).order("sort_order");
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  });
+  const orgs = useQuery({
+    queryKey: ["step-pick-orgs"], enabled: open,
+    queryFn: async () => {
+      const { data, error } = await db.from("organisations").select("id,name").order("name");
+      if (error) throw new Error(error.message);
+      return data;
+    },
+  });
+  const refresh = () => qc.invalidateQueries({ queryKey: ["step-picks", term.id] });
+  const list = picks.data ?? [];
+  const orgName = (id: string) => (orgs.data ?? []).find((o) => o.id === id)?.name ?? "Unknown";
+  const add = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!orgId) return;
+    const { error } = await db.from("journey_step_organisations").insert({ term_id: term.id, organisation_id: orgId, reason: reason.trim() || null, sort_order: list.length + 1 });
+    if (error) { toast.error(error.message.includes("duplicate key") ? "That organisation is already picked for this step." : error.message); return; }
+    setOrgId(""); setReason(""); void refresh();
+  };
+  const removePick = async (id: string) => {
+    const { error } = await db.from("journey_step_organisations").delete().eq("id", id);
+    if (error) { toast.error(error.message); return; }
+    void refresh();
+  };
+  return (
+    <div className="w-full pt-2">
+      <Button size="sm" variant="outline" onClick={() => setOpen(!open)} aria-expanded={open}>Go here picks{open && picks.data ? ` (${list.length})` : ""}</Button>
+      {open && (
+        <div className="mt-2 space-y-2 rounded-md border p-3">
+          {picks.isLoading && <p className="text-sm text-muted-foreground">Loading…</p>}
+          {list.map((p) => (
+            <div key={p.id} className="flex flex-wrap items-center gap-2 text-sm">
+              <span className="font-medium">{orgName(p.organisation_id)}</span>
+              {p.reason && <span className="text-muted-foreground">— {p.reason}</span>}
+              <Button size="sm" variant="ghost" className="ml-auto" onClick={() => void removePick(p.id)}>Remove</Button>
+            </div>
+          ))}
+          {list.length >= 4 && <p className="text-sm text-muted-foreground">Four picks is the maximum.</p>}
+          {list.length < 4 && (
+            <form onSubmit={(e) => void add(e)} className="flex flex-wrap gap-2">
+              <select aria-label={`Pick an organisation for ${term.name}`} className={selectClass} value={orgId} onChange={(e) => setOrgId(e.target.value)} required>
+                <option value="">Organisation…</option>
+                {(orgs.data ?? []).filter((o) => !list.some((p) => p.organisation_id === o.id)).map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
+              </select>
+              <Input aria-label="One-line reason" placeholder="Reason (one line)" value={reason} onChange={(e) => setReason(e.target.value)} className="w-64" />
+              <Button type="submit" size="sm">Add pick</Button>
+            </form>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
