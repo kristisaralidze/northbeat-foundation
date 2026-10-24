@@ -31,7 +31,7 @@ export function CsvImport({ entity }: { entity: ImportEntity }) {
   const previewSnapshot: Snapshot = matches ? { ...matches, entries: [...matches.entries] } : { entries: [], organisations: [], terms: [] };
   const prepared = rows.map(row => {
     const result = prepareRow(entity, row, previewSnapshot, choices, new Date().toISOString().slice(0, 10), parents);
-    if (!result.duplicate && !result.errors.length) previewSnapshot.entries.push({ id: '', name: result.name, website: String(result.values['website'] ?? '') });
+    if (!result.duplicate && !result.update && !result.errors.length) previewSnapshot.entries.push({ id: '', slug: String(result.values['slug'] ?? ''), name: result.name, website: String(result.values['website'] ?? '') });
     return result;
   });
   async function upload(file: File) {
@@ -47,12 +47,12 @@ export function CsvImport({ entity }: { entity: ImportEntity }) {
   }
   async function runImport() {
     setBusy(true); setError('');
-    const total: Summary = { added: 0, skipped: 0, errors: [] };
+    const total: Summary = { added: 0, updated: 0, skipped: 0, errors: [] };
     try {
       for (let offset = 0; offset < rows.length; offset += 50) {
         setProgress(`Importing ${Math.min(offset + 50, rows.length)} of ${rows.length}`);
         const result = await importRows({ data: { entity, choices, parents, rows: rows.slice(offset, offset + 50).map((values, i) => ({ number: offset + i + 2, values })) } });
-        total.added += result.added; total.skipped += result.skipped; total.errors.push(...result.errors);
+        total.added += result.added; total.updated += result.updated; total.skipped += result.skipped; total.errors.push(...result.errors);
       }
       setSummary(total);
     } catch (e) {
