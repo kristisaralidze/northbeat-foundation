@@ -17,7 +17,7 @@ export const getOpportunities = createServerFn({ method: 'GET' }).handler(async 
       .select('id,slug,title,type,summary,description,opens_at,deadline_at,amount_min_eur,amount_max_eur,location,employment_type,remote_ok,apply_url')
       .eq('status', 'published').order('id').range(offset, offset + 999);
     if (error) throw new Error('Opportunities could not be loaded.');
-    opportunities.push(...(data ?? []).map((item) => ({ ...item, provider:providerFor(item.id), termIds: [] })));
+    opportunities.push(...(data ?? []).map((item) => ({ ...item, termIds: [] })));
     if (!data || data.length < 1000) break;
   }
   for (let offset = 0; ; offset += 1000) {
