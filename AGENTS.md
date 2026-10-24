@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
+- Systole uses a portalled Radix dialog with local styles and browser-only query-link opening; its existing waitlist server function is unchanged. Why: accessible focus containment and a sheet unaffected by page-motion transforms.
 - Home uses native scrolling with no Lenis/GSAP; public pages use keyed PublicScrollFrame (the only Lenis/GSAP owner). Why: one scroll owner and no pinning on home.
 - Public-page motion (page transitions, word reveals, staggered section/card reveals, image parallax) lives in src/components/site/motion.tsx using framer-motion, driven by enhancePageMotion inside PublicScrollFrame; all of it self-gates on prefers-reduced-motion and never touches the home route. Why: one motion entry point, no per-page wiring.
 - Fabric is the static still image in every placement (Learn circle, footer band; the home hero is plain paper); no shader or animation. Why: the WebGL silk was explicitly removed.
