@@ -134,6 +134,13 @@
       "when": 1792875688276,
       "tag": "0018_grant_prominence_read",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792876121575,
+      "tag": "0019_event_rich_profiles",
+      "breakpoints": true
     }
   ]
 }
