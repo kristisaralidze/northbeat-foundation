@@ -320,8 +320,7 @@ html.lenis, html.lenis body { height: auto; }
 .nb-laboratory-wordmark {
   width: 100%;
   margin: 0;
-  font-family: var(--font-display);
-  font-variation-settings: "opsz" 144, "SOFT" 0;
+  font-family: "Bodoni Moda", ui-serif, Georgia, serif;
 }
 .nb-laboratory-lettering {
   display: block;
@@ -330,11 +329,64 @@ html.lenis, html.lenis body { height: auto; }
   overflow: visible;
 }
 .nb-laboratory-lettering text {
-  font-family: var(--font-display);
+  font-family: "Bodoni Moda", ui-serif, Georgia, serif;
   font-size: 200px;
-  font-weight: 300;
+  font-weight: 400;
   fill: var(--foreground);
   letter-spacing: 0;
+}
+.nb-wordmark-dot { fill: var(--berry); }
+
+/* Written wordmark intro (home hero only, once per visit) */
+.nb-wordmark-animated .nb-wordmark-letters { filter: url(#nb-wet-ink); }
+.nb-wordmark-animated .nb-laboratory-lettering text {
+  fill: var(--berry);
+  fill-opacity: 0;
+  stroke: var(--foreground);
+  stroke-width: 1px;
+  paint-order: stroke;
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation:
+    nb-letter-draw 1.6s cubic-bezier(.45,.05,.25,1) calc(var(--i) * 0.12s) both,
+    nb-letter-fill 1.4s ease calc(var(--i) * 0.12s + 1s) both;
+}
+@keyframes nb-letter-draw {
+  from { stroke-dashoffset: 1400; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes nb-letter-fill {
+  from { fill: var(--berry); fill-opacity: 0; stroke-opacity: 1; }
+  to { fill: var(--foreground); fill-opacity: 1; stroke-opacity: 0; }
+}
+.nb-wordmark-animated .nb-wordmark-dot {
+  transform: scale(0);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: nb-dot-pop 0.6s cubic-bezier(.34,1.56,.64,1) 3.2s both;
+}
+@keyframes nb-dot-pop {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+.nb-wordmark-animated .nb-home-tagline {
+  clip-path: inset(0 100% 0 0);
+  animation: nb-tagline-write 1.6s ease 2.4s both;
+}
+@keyframes nb-tagline-write {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nb-wordmark-animated .nb-wordmark-letters { filter: none; }
+  .nb-wordmark-animated .nb-laboratory-lettering text {
+    animation: none;
+    fill: var(--foreground);
+    fill-opacity: 1;
+    stroke: none;
+  }
+  .nb-wordmark-animated .nb-wordmark-dot { animation: none; transform: none; }
+  .nb-wordmark-animated .nb-home-tagline { animation: none; clip-path: none; }
 }
 @media (max-width: 40rem) {
   .nb-home-header-logo { width: 7rem; }
