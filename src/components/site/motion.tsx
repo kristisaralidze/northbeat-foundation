@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { animate, inView, motion, scroll, stagger, useReducedMotion } from 'framer-motion';
+import { animate, motion, scroll, stagger, useReducedMotion } from 'framer-motion';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
