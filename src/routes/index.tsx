@@ -5,6 +5,8 @@ import { LivingCells } from "@/components/site/LivingCells";
 import { livingCellsQuery } from "@/lib/ecosystem.query";
 import { HeartbeatHero } from "@/components/site/HeartbeatHero";
 import { heartbeatQuery } from "@/lib/heartbeat.query";
+import { StartCards } from "@/components/site/StartCards";
+import { SystoleTeaser } from "@/components/site/SystoleTeaser";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => Promise.all([
@@ -14,13 +16,20 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Northbeat: The heartbeat of Nordic health innovation." },
-      { name: "description", content: "The reference hub for Nordic health ventures: companies, investors, programmes, funding, events and jobs." },
+      { name: "description", content: "The reference hub for Nordic health ventures: organisations, investors, programmes, funding calls and events." },
       { property: "og:title", content: "Northbeat: The heartbeat of Nordic health innovation." },
       { property: "og:description", content: "We track Nordic health innovation so you don't miss it." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://nordic-heartbeat.lovable.app/" },
+      { property: "og:image", content: "https://nordic-heartbeat.lovable.app/api/public/og/site/home" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: "https://nordic-heartbeat.lovable.app/api/public/og/site/home" },
     ],
   }),
+  errorComponent: () => <div role="alert" className="nb-container nb-section"><h1 className="nb-h2">This page didn't load</h1><p className="nb-body mt-4">Please try again in a moment.</p></div>,
+  notFoundComponent: () => <div className="nb-container nb-section"><h1 className="nb-h2">Not found</h1></div>,
   component: Index,
 });
 
@@ -107,11 +116,13 @@ function Index() {
       </section>
       <HeartbeatHero />
       <LivingCells />
+      <StartCards />
       <section className="nb-home-learn nb-container">
         <h2 className="nb-network-heading">Start with Learn</h2>
         <p>From your first idea to funding and validation. Guides and a glossary for building in health.</p>
         <Link to="/learn" search={{}} className="nb-link">Explore Learn</Link>
       </section>
+      <SystoleTeaser />
     </div>
   );
 }
