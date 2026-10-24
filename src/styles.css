@@ -1484,3 +1484,19 @@ html, body { overflow-x: clip; }
   .theme-site .nb-journey-link { padding-right: 16px; }
 }
 @media (prefers-reduced-motion: reduce) { .theme-site .nb-journey-beat { transition: none; } }
+
+/* Page motion polish (public pages only; the home owns its own story) */
+.nb-motion-word { display: inline-block; will-change: transform, opacity; }
+.nb-page-skeleton { padding-block: 3rem; display: grid; gap: 20px; }
+.nb-skeleton { position: relative; overflow: hidden; background: color-mix(in oklab, var(--ink) 7%, var(--snow)); border-radius: var(--radius); }
+.nb-skeleton::after { content: ''; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--snow) 75%, transparent), transparent); animation: nb-shimmer 1.4s infinite; }
+@keyframes nb-shimmer { to { transform: translateX(100%); } }
+.nb-skeleton-title { height: 3rem; width: min(26rem, 70%); }
+.nb-skeleton-line { height: 1.1rem; width: min(34rem, 90%); }
+.nb-skeleton-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.nb-skeleton-card { height: 11rem; }
+@media (prefers-reduced-motion: reduce) {
+  .nb-skeleton::after { animation: none; }
+  .nb-public-page .nb-card { transition: none; }
+  .nb-public-page .nb-card:hover { transform: none; box-shadow: none; }
+}
