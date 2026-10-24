@@ -60,7 +60,7 @@ export function LivingCells() {
           window.location.assign(org ? `/org/${encodeURIComponent(org.slug)}` : cellHref(hit.group));
         } else select(hit);
       }} />
-      {selection && group && <aside className="nb-cells-card" aria-live="polite">
+      {selectedOrg && group && <aside className="nb-cells-card" aria-live="polite">
         {selectedOrg && <OrganisationLogo name={selectedOrg.name} website={selectedOrg.website} uploaded={selectedOrg.logo_url} choice={selectedOrg.logo_choice} />}
         <a className="nb-cells-card-title" href={href}>{selectedOrg?.name ?? group.name}</a>
         <p>{selectedOrg ? group.name : `${data.organisations.filter(o => cellGroup(o.type) === selection.group).length} organisations`}</p>
