@@ -14,7 +14,7 @@
 - Fabric is the static still image in every placement (arrival, Learn circle, footer band); no shader or animation. Why: the WebGL silk was explicitly removed.
 - Official covers require provenance and approval; failed logos hide. Brand imports are admin-only and quota-bounded; forms use uncached browser search copying only confirmed name/website. Why: authentic assets and search retention compliance.
 - Relationship maps use published links, network tokens and measured node lines; timelines use tested date helpers and URL filters. Why: preserve real connections across screen sizes.
-- The home ecosystem is a static grid from buildGroups (organisations only, largest group first, most-connected logos first) linking to Explore's canonical type search. Why: clear group browsing without animation.
+- The home ecosystem uses one visibility-paused 2D canvas with pure tested living-cells geometry, Query-backed published organisation data and real organisation_relations; editorial group links are separate from individual relationships. Why: animate the founder's cell model without inventing connections or adding scroll owners/libraries.
 - The home Heartbeat section follows the wordmark hero, draws one 2D canvas from pure, tested line maths in heartbeat.ts and reads scroll position itself inside a sticky section. Why: one shared line function for flight and flat views.
 - LaboratoryWordmark uses local assets and measured serif fallbacks in public headers. Why: readable if images fail.
 - Mobile filters reuse FilterSheet with existing URL state. Why: accessible controls without divergent browsing logic.

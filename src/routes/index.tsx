@@ -2,15 +2,15 @@ import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LaboratoryWordmark } from "@/components/site/LaboratoryWordmark";
 import { AtmosphericImage } from "@/components/site/AtmosphericImage";
-import { EcosystemGrid } from "@/components/site/EcosystemGrid";
-import { ecosystemGroupsQuery } from "@/lib/ecosystem.query";
+import { LivingCells } from "@/components/site/LivingCells";
+import { livingCellsQuery } from "@/lib/ecosystem.query";
 import { HeartbeatHero } from "@/components/site/HeartbeatHero";
 import { heartbeatQuery } from "@/lib/heartbeat.query";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => Promise.all([
     context.queryClient.ensureQueryData(heartbeatQuery),
-    context.queryClient.ensureQueryData(ecosystemGroupsQuery),
+    context.queryClient.ensureQueryData(livingCellsQuery),
   ]),
   head: () => ({
     links: [{ rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&display=swap" }],
@@ -47,7 +47,7 @@ function Index() {
         </div>
       </section>
       <HeartbeatHero />
-      <EcosystemGrid />
+      <LivingCells />
       <section className="nb-home-learn nb-container">
         <h2 className="nb-network-heading">Start with Learn</h2>
         <p>From your first idea to funding and validation. Guides and a glossary for building in health.</p>
