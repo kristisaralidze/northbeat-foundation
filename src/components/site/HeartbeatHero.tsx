@@ -19,7 +19,7 @@ function dateFor(day: number, long = false) {
 }
 /** One logo per item: the organiser's official logo, else the Brandfetch icon for the event's own website. */
 function itemLogo(item: HeartbeatItem) {
-  for (const o of item.orgs) { const src = (o.logo_choice==='upload'?o.logo_url:o.logo_resolved_url); if (src) return src; }
+  for (const o of item.orgs) { const src = (o.logo_choice==='upload'?o.logo_url:o.logo_resolved_url??brandfetchLogoUrl(o.website)); if (src) return src; }
   return null;
 }
 /** "17 Nov" or "17–18 Nov" for a merged beat. */
