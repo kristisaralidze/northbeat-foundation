@@ -62,31 +62,41 @@ export function enhancePageMotion(page: HTMLElement): () => void {
     });
   }
 
-  // Sections and cards: fade and slide in with a per-row stagger.
-  const revealables = [...page.querySelectorAll<HTMLElement>('section, .nb-card, [data-reveal]')];
+  // Sections and cards: CSS keeps them hidden (SSR-consistent class on the
+  // page root, so no hydration mismatch); we only add the revealed class.
+  const selector = 'section, .nb-card, [data-reveal]';
+  const revealables = [...page.querySelectorAll<HTMLElement>(selector)];
   const seen = new Map<HTMLElement, number>();
   for (const el of revealables) {
     if (el.closest('[data-native-scroll]') || el.closest('.nb-compact-bar')) continue;
     const parent = el.parentElement ?? page;
     const order = seen.get(parent) ?? 0;
     seen.set(parent, order + 1);
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(22px)';
+    el.style.setProperty('--reveal-delay', `${Math.min(order, 5) * 60}ms`);
     const stop = inView(
       el,
-      () => {
-        void animate(el, { opacity: 1, y: 0 }, { duration: 0.55, delay: Math.min(order, 5) * 0.06, ease: EASE }).then(() => {
-          el.style.transform = '';
-        });
-      },
+      () => el.classList.add('nb-revealed'),
       { margin: '0px 0px -10% 0px', once: true },
     );
     cleanups.push(() => {
       stop();
-      el.style.opacity = '';
-      el.style.transform = '';
+      el.classList.remove('nb-revealed');
+      el.style.removeProperty('--reveal-delay');
     });
   }
+  // Content added later (for example the past-events toggle) must stay visible.
+  const late = new MutationObserver(records => {
+    for (const record of records) {
+      record.addedNodes.forEach(node => {
+        if (node instanceof HTMLElement) {
+          if (node.matches(selector)) node.classList.add('nb-revealed');
+          node.querySelectorAll(selector).forEach(el => el.classList.add('nb-revealed'));
+        }
+      });
+    }
+  });
+  late.observe(page, { childList: true, subtree: true });
+  cleanups.push(() => late.disconnect());
 
   // Cover images: gentle parallax while they cross the viewport.
   const images = [...page.querySelectorAll<HTMLElement>('.nb-cover-banner img, .nb-cover-strip img, [data-parallax]')];

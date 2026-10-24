@@ -69,11 +69,19 @@ export function PublicScrollFrame({ children, pathname }: { children: ReactNode;
       void document.fonts.ready.then(() => { if (!disposed) ScrollTrigger.refresh(); });
     });
     const letters = [...page.querySelectorAll<HTMLElement>('[id^="letter-"]')];
-    // Wait for hydration to finish before touching the DOM, or React warns about mismatches.
+    // Run the enhancer only once hydration settles (quiet DOM for 350ms),
+    // so its class changes never race React's hydration pass.
     let motionCleanup = () => {};
-    void (document.readyState === 'complete' ? Promise.resolve() : new Promise<void>(resolve => window.addEventListener('load', () => resolve(), { once: true }))).then(() => {
-      requestAnimationFrame(() => requestAnimationFrame(() => { if (!disposed) motionCleanup = enhancePageMotion(page); }));
+    let quietTimer = 0;
+    const quiet = new MutationObserver(() => {
+      window.clearTimeout(quietTimer);
+      quietTimer = window.setTimeout(() => {
+        quiet.disconnect();
+        if (!disposed) motionCleanup = enhancePageMotion(page);
+      }, 350);
     });
+    quiet.observe(page, { childList: true, subtree: true, attributes: true });
+    quietTimer = window.setTimeout(() => { quiet.disconnect(); if (!disposed) motionCleanup = enhancePageMotion(page); }, 350);
     const updateLetters = () => {
       let current = letters[0]?.id;
       for (const letter of letters) if (letter.getBoundingClientRect().top <= 240) current = letter.id;
