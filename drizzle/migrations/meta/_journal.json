@@ -169,6 +169,13 @@
       "when": 1792880142031,
       "tag": "0023_public_read_functions_and_scoped_media",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792881672050,
+      "tag": "0024_logo_status_unchecked_default",
+      "breakpoints": true
     }
   ]
 }
