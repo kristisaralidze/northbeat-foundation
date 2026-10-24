@@ -101,6 +101,7 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
     {actions}
     {isOrg && detail && <OpenNow items={detail.coming} now={now} />}
     {!isOrg && steps.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">Who it is for</h2><ul className="nb-detail-chips">{steps.map(step => <li key={step.id} className="nb-reason-chip">{journeySentence(step.name).replace(/\.$/, '')}</li>)}</ul></section>}
+    {!isOrg && <EventProfile row={row} />}
     {isOrg && !detail?.coming.length && !connections.length && !detail?.guides.length && (description ?? profile.summary)
       ? <section className="nb-detail-section"><h2 className="nb-h2 mb-5">About</h2><p className="nb-body nb-detail-description whitespace-pre-line">{description ?? profile.summary}</p></section>
       : description && description !== profile.summary && <p className="nb-body nb-detail-description">{description}</p>}
@@ -119,4 +120,22 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
 function journeySentence(name: string) {
   const sentences: Record<string, string> = { funding: 'Looking for funding.', growth: 'Growing your venture.', validation: 'Validating your idea.', idea: 'Developing an idea.', research: 'Turning research into a venture.', team: 'Building your team.', launch: 'Preparing to launch.', regulation: 'Working through regulation.' };
   return sentences[name.toLowerCase()] ?? `Working on ${name.charAt(0).toLowerCase()}${name.slice(1)}.`;
+}
+type Fact = { value: string; label: string; year?: string; source_url?: string };
+const strings = (v: unknown) => Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && x.trim() !== '') : [];
+/** Editorial event profile: our take, numbers, story, who you'll meet, price, tips. Each part hides when empty. */
+function EventProfile({ row }: { row: PublicProfile['row'] }) {
+  const take = text(row, 'our_take'); const story = text(row, 'story'); const price = text(row, 'price_info'); const free = text(row, 'free_ways_in');
+  const facts = (Array.isArray(row['scale_facts']) ? row['scale_facts'] as unknown as Fact[] : []).filter(f => f && f.value && f.label);
+  const meet = strings(row['who_youll_meet']); const tips = strings(row['tips']); const sources = strings(row['profile_sources']).map(u => safeWebUrl(u)).filter((u): u is string => Boolean(u));
+  const since = row['founded_year'] ? String(row['founded_year']) : null;
+  return <>
+    {take && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">Our take</h2><p className="nb-lead max-w-2xl">{take}</p></section>}
+    {facts.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">In numbers</h2><dl className="nb-event-facts">{facts.map((f, i) => <div key={i}><dt className="nb-event-fact-value">{f.value}</dt><dd className="nb-small text-muted-foreground">{f.label}{f.year ? `, ${f.year}` : ''}{safeWebUrl(f.source_url ?? null) ? <> <a className="nb-link" href={safeWebUrl(f.source_url ?? null)!} target="_blank" rel="noopener noreferrer">Source</a></> : null}</dd></div>)}</dl></section>}
+    {(story || since) && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">The story</h2>{since && <p className="nb-small text-muted-foreground mb-3">First held in {since}</p>}{story && <p className="nb-body max-w-2xl">{story}</p>}</section>}
+    {meet.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">Who you'll meet</h2><ul className="nb-detail-chips">{meet.map(m => <li key={m} className="nb-reason-chip">{m}</li>)}</ul></section>}
+    {(price || free) && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">Price</h2>{price && <p className="nb-body max-w-2xl">{price}</p>}{free && <><h3 className="nb-h3 mt-6">Free ways in</h3><p className="nb-body mt-2 max-w-2xl">{free}</p></>}</section>}
+    {tips.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">Tips</h2><ul className="nb-check-list nb-body max-w-2xl">{tips.map(t => <li key={t}>{t}</li>)}</ul></section>}
+    {sources.length > 0 && <p className="nb-small text-muted-foreground">Sources: {sources.map((u, i) => <span key={u}>{i > 0 && ', '}<a className="nb-link" href={u} target="_blank" rel="noopener noreferrer">{new URL(u).hostname.replace(/^www\./, '')}</a></span>)}</p>}
+  </>;
 }

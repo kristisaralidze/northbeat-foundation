@@ -209,6 +209,8 @@ export type Database = {
           ends_at: string | null
           event_type: Database["public"]["Enums"]["event_type"]
           format: Database["public"]["Enums"]["event_format"] | null
+          founded_year: number | null
+          free_ways_in: string | null
           geocoded_at: string | null
           id: string
           image_source: string | null
@@ -221,20 +223,27 @@ export type Database = {
           logo_uploaded_by: string | null
           logo_url: string | null
           longitude: number | null
+          our_take: string | null
+          price_info: string | null
           price_note: string | null
+          profile_sources: string[]
           published_at: string | null
           registration_url: string | null
+          scale_facts: Json
           slug: string
           source_url: string | null
           starts_at: string | null
           status: Database["public"]["Enums"]["entry_status"]
+          story: string | null
           summary: string | null
           timezone: string | null
+          tips: string[]
           title: string
           updated_at: string
           venue: string | null
           video_source_url: string | null
           video_url: string | null
+          who_youll_meet: string[]
         }
         Insert: {
           apply_deadline_at?: string | null
@@ -250,6 +259,8 @@ export type Database = {
           ends_at?: string | null
           event_type: Database["public"]["Enums"]["event_type"]
           format?: Database["public"]["Enums"]["event_format"] | null
+          founded_year?: number | null
+          free_ways_in?: string | null
           geocoded_at?: string | null
           id?: string
           image_source?: string | null
@@ -262,20 +273,27 @@ export type Database = {
           logo_uploaded_by?: string | null
           logo_url?: string | null
           longitude?: number | null
+          our_take?: string | null
+          price_info?: string | null
           price_note?: string | null
+          profile_sources?: string[]
           published_at?: string | null
           registration_url?: string | null
+          scale_facts?: Json
           slug: string
           source_url?: string | null
           starts_at?: string | null
           status?: Database["public"]["Enums"]["entry_status"]
+          story?: string | null
           summary?: string | null
           timezone?: string | null
+          tips?: string[]
           title: string
           updated_at?: string
           venue?: string | null
           video_source_url?: string | null
           video_url?: string | null
+          who_youll_meet?: string[]
         }
         Update: {
           apply_deadline_at?: string | null
@@ -291,6 +309,8 @@ export type Database = {
           ends_at?: string | null
           event_type?: Database["public"]["Enums"]["event_type"]
           format?: Database["public"]["Enums"]["event_format"] | null
+          founded_year?: number | null
+          free_ways_in?: string | null
           geocoded_at?: string | null
           id?: string
           image_source?: string | null
@@ -303,20 +323,27 @@ export type Database = {
           logo_uploaded_by?: string | null
           logo_url?: string | null
           longitude?: number | null
+          our_take?: string | null
+          price_info?: string | null
           price_note?: string | null
+          profile_sources?: string[]
           published_at?: string | null
           registration_url?: string | null
+          scale_facts?: Json
           slug?: string
           source_url?: string | null
           starts_at?: string | null
           status?: Database["public"]["Enums"]["entry_status"]
+          story?: string | null
           summary?: string | null
           timezone?: string | null
+          tips?: string[]
           title?: string
           updated_at?: string
           venue?: string | null
           video_source_url?: string | null
           video_url?: string | null
+          who_youll_meet?: string[]
         }
         Relationships: []
       }

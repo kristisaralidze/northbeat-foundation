@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { siteInfoQuery } from "@/lib/site.query";
+import { EMPTY_SEARCH } from "@/lib/explore";
 
 export const Route = createFileRoute("/about")({
   loader: ({ context }) => context.queryClient.ensureQueryData(siteInfoQuery),
@@ -35,7 +36,7 @@ function AboutPage() {
       <section aria-labelledby="do-heading" className="nb-about-section">
         <h2 id="do-heading" className="nb-h2">What we do</h2>
         <ul className="nb-about-grid">
-          <li><Link to="/explore" className="nb-about-block"><h3 className="nb-h3">The map</h3><p className="nb-body">Every organisation, event and open call in Nordic health, connected, so you can see who works with whom.</p></Link></li>
+          <li><Link to="/explore" search={EMPTY_SEARCH} className="nb-about-block"><h3 className="nb-h3">The map</h3><p className="nb-body">Every organisation, event and open call in Nordic health, connected, so you can see who works with whom.</p></Link></li>
           <li><Link to="/newsletter" className="nb-about-block"><h3 className="nb-h3">The letter</h3><p className="nb-body">The innovations themselves, explained in plain words: what's new, why it matters, who is behind it. Plus the deadlines and events you shouldn't miss.</p></Link></li>
           <li><Link to="/podcast" className="nb-about-block"><h3 className="nb-h3">The podcast</h3><p className="nb-body">Conversations with the people building health in the Nordics. Starts December 2026.</p></Link></li>
           <li><button type="button" onClick={openSystole} className="nb-about-block"><h3 className="nb-h3">The hackathons</h3><p className="nb-body">AI in medicine, medtech, health. Something big is coming in spring 2027.</p></button></li>

@@ -41,7 +41,7 @@ function normalise(fields: FieldDef[], v: Values): Values {
     const raw = v[f.name];
     if (f.kind === "boolean") out[f.name] = Boolean(raw);
     else if (f.kind === "sources") out[f.name] = Array.isArray(raw) ? raw : [];
-    else if (f.kind === "multi") out[f.name] = Array.isArray(raw) ? raw : [];
+    else if (f.kind === "multi" || f.kind === "lines" || f.kind === "facts") out[f.name] = Array.isArray(raw) ? raw : [];
     else if (f.kind === "number") out[f.name] = raw === "" || raw == null ? null : Number(raw);
     else if (f.kind === "datetime") out[f.name] = raw ? new Date(String(raw)).toISOString() : null;
     else out[f.name] = raw === "" || raw == null ? null : raw;
@@ -224,7 +224,7 @@ function IncomingRelations({ orgId }: { orgId: string }) {
 }
 
 function FieldInput({ field: f, terms, value, onChange }: { field: FieldDef; terms: Term[]; value: unknown; onChange: (v: unknown) => void }) {
-  const wide = f.kind === "textarea" || f.kind === "multi" || f.kind === "sources";
+  const wide = f.kind === "textarea" || f.kind === "multi" || f.kind === "sources" || f.kind === "lines" || f.kind === "facts";
   const wrap = wide ? "space-y-1 sm:col-span-2" : "space-y-1";
   const label = `${f.label}${f.required ? " *" : ""}`;
 
@@ -239,6 +239,7 @@ function FieldInput({ field: f, terms, value, onChange }: { field: FieldDef; ter
       </div>
     );
   if (f.kind === "sources") return <SourcesField field={f} value={value} onChange={onChange} />;
+  if (f.kind === "lines" || f.kind === "facts") return <LinesField field={f} value={value} onChange={onChange} />;
 
   if (f.kind === "boolean")
     return (
@@ -421,5 +422,27 @@ function LinkPicker({ def, rows, onChange }: { def: LinkDef; rows: LinkRow[]; on
         {q.trim() && matches.length === 0 && opts.data && <p className="mt-1 text-sm text-muted-foreground">No matches.</p>}
       </div>
     </section>
+  );
+}
+
+type Fact = { value: string; label: string; year?: string; source_url?: string };
+const linesToText = (f: FieldDef, v: unknown) => !Array.isArray(v) ? "" : f.kind === "facts"
+  ? (v as Fact[]).map((x) => [x.value, x.label, x.year ?? "", x.source_url ?? ""].join(" | ").replace(/( \| )+$/, "")).join("\n")
+  : (v as string[]).join("\n");
+const textToLines = (f: FieldDef, t: string) => {
+  const rows = t.split("\n").map((l) => l.trim()).filter(Boolean);
+  if (f.kind !== "facts") return rows;
+  return rows.map((l) => { const [value = "", label = "", year = "", source_url = ""] = l.split("|").map((p) => p.trim()); return { value, label, ...(year ? { year } : {}), ...(source_url ? { source_url } : {}) }; }).filter((x) => x.value && x.label);
+};
+function LinesField({ field: f, value, onChange }: { field: FieldDef; value: unknown; onChange: (v: unknown) => void }) {
+  const [text, setText] = useState(() => linesToText(f, value));
+  const [seen, setSeen] = useState(value);
+  if (value !== seen && JSON.stringify(textToLines(f, text)) !== JSON.stringify(value)) { setSeen(value); setText(linesToText(f, value)); }
+  return (
+    <div className="space-y-1 sm:col-span-2">
+      <Label htmlFor={f.name}>{f.label}</Label>
+      <Textarea id={f.name} rows={4} value={text} onChange={(e) => { setText(e.target.value); const next = textToLines(f, e.target.value); setSeen(next); onChange(next); }} />
+      {f.help && <p className="text-xs text-muted-foreground">{f.help}</p>}
+    </div>
   );
 }
