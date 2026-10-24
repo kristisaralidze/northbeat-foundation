@@ -1308,9 +1308,16 @@ export type Database = {
           latitude: number | null
           linkedin_url: string | null
           logo_api_image_source_url: string | null
+          logo_check_error: string | null
+          logo_checked_at: string | null
           logo_choice: string
           logo_image_source: string | null
           logo_image_source_url: string | null
+          logo_manual_required: boolean
+          logo_resolved_url: string | null
+          logo_shared_from: string | null
+          logo_status: string
+          logo_tone: string
           logo_uploaded_by: string | null
           logo_url: string | null
           longitude: number | null
@@ -1378,9 +1385,16 @@ export type Database = {
           latitude?: number | null
           linkedin_url?: string | null
           logo_api_image_source_url?: string | null
+          logo_check_error?: string | null
+          logo_checked_at?: string | null
           logo_choice?: string
           logo_image_source?: string | null
           logo_image_source_url?: string | null
+          logo_manual_required?: boolean
+          logo_resolved_url?: string | null
+          logo_shared_from?: string | null
+          logo_status?: string
+          logo_tone?: string
           logo_uploaded_by?: string | null
           logo_url?: string | null
           longitude?: number | null
@@ -1448,9 +1462,16 @@ export type Database = {
           latitude?: number | null
           linkedin_url?: string | null
           logo_api_image_source_url?: string | null
+          logo_check_error?: string | null
+          logo_checked_at?: string | null
           logo_choice?: string
           logo_image_source?: string | null
           logo_image_source_url?: string | null
+          logo_manual_required?: boolean
+          logo_resolved_url?: string | null
+          logo_shared_from?: string | null
+          logo_status?: string
+          logo_tone?: string
           logo_uploaded_by?: string | null
           logo_url?: string | null
           longitude?: number | null
@@ -1485,7 +1506,15 @@ export type Database = {
           website_health_status?: string | null
           website_health_title?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "organisations_logo_shared_from_fkey"
+            columns: ["logo_shared_from"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       people: {
         Row: {
@@ -1956,7 +1985,12 @@ export type Database = {
         | "grant_call"
         | "competition"
         | "job"
-      org_relation: "invested_in" | "spun_out_of" | "acquired" | "partner_of"
+      org_relation:
+        | "invested_in"
+        | "spun_out_of"
+        | "acquired"
+        | "partner_of"
+        | "part_of"
       organisation_type:
         | "startup"
         | "investor"
@@ -2144,7 +2178,13 @@ export const Constants = {
         "competition",
         "job",
       ],
-      org_relation: ["invested_in", "spun_out_of", "acquired", "partner_of"],
+      org_relation: [
+        "invested_in",
+        "spun_out_of",
+        "acquired",
+        "partner_of",
+        "part_of",
+      ],
       organisation_type: [
         "startup",
         "investor",
