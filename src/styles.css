@@ -1404,3 +1404,8 @@ html, body { overflow-x: clip; }
   .theme-site .nb-heart-panel-line path { animation: none; stroke-dashoffset: 0; }
 }
 @media (max-width: 1023px) { .theme-site:has(.nb-action-bar) .nb-heart-button { bottom: 128px; } }
+
+.nb-about-grid { display: grid; gap: 16px; margin-top: 24px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 768px) { .nb-about-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; } }
+.theme-site .nb-about-block { display: flex; flex-direction: column; gap: 12px; height: 100%; width: 100%; padding: 24px; border: 1px solid var(--hairline); border-radius: 12px; text-align: left; transition: border-color 150ms ease; }
+.theme-site .nb-about-block:hover { border-color: var(--berry); }

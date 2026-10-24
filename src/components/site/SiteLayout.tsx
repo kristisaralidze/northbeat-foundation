@@ -93,8 +93,8 @@ function Footer({ hideSignup }: { hideSignup: boolean }) {
       {!hideSignup && <section className="nb-footer-signup" aria-labelledby="footer-newsletter-heading">
         <AtmosphericImage />
         <div className="nb-footer-signup-content">
-          <h2 id="footer-newsletter-heading" className="nb-h2">We track it so you don't miss it.</h2>
-          <p className="nb-body">Funding calls, programme intakes and events in Nordic health innovation, in one email.</p>
+          <h2 id="footer-newsletter-heading" className="nb-h2">Hear it here first.</h2>
+          <p className="nb-body">New Nordic health innovations, open calls and events. Once a week.</p>
           <NewsletterSignup source="footer" />
         </div>
       </section>}
