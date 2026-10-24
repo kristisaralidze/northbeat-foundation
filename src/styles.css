@@ -1076,22 +1076,35 @@ html.lenis, html.lenis body { height: auto; }
 @media (max-width: 639px) { .nb-heartbeat { height: 360vh; } }
 .nb-heartbeat-sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
 .nb-heartbeat-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
-.nb-heartbeat-head { position: absolute; top: 5.5rem; left: var(--gutter, 1.25rem); max-width: 34rem; pointer-events: none; color: var(--ink); }
-.nb-heartbeat-head h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3.75rem); line-height: 1.02; margin: .5rem 0 .75rem; font-weight: 400; }
-.nb-heartbeat-head p { color: var(--ink-soft); max-width: 28rem; }
-.nb-heartbeat-live { display: flex; align-items: center; gap: .5rem; font-size: .8125rem; color: var(--ink); }
-.nb-heartbeat-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--berry); display: inline-block; }
-.nb-heartbeat-passing { position: absolute; left: var(--gutter, 1.25rem); bottom: 2rem; color: var(--ink-soft); font-size: .875rem; pointer-events: none; }
-.nb-heartbeat-date { font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.75rem); color: var(--ink); line-height: 1.1; }
-.nb-heartbeat-hint { position: absolute; right: var(--gutter, 1.25rem); bottom: 2rem; text-align: right; font-size: .875rem; color: var(--ink-soft); transition: opacity .3s; }
-.nb-heartbeat-caption { position: absolute; left: 50%; bottom: 5.5rem; transform: translateX(-50%); width: max-content; max-width: 90vw; text-align: center; color: var(--ink); opacity: 0; pointer-events: none; }
-.nb-heartbeat-finale { position: absolute; left: 0; right: 0; top: 16%; text-align: center; opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 1.25rem; padding-inline: var(--gutter, 1.25rem); }
-.nb-heartbeat-finale h2 { font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 3rem); font-weight: 400; color: var(--ink); }
+.nb-heartbeat-date { position: absolute; left: var(--gutter, 1.25rem); bottom: 2rem; margin: 0; font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.75rem); color: var(--ink); line-height: 1.1; pointer-events: none; }
+.nb-heartbeat-caption { position: absolute; left: 50%; bottom: 2.25rem; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 2 * (var(--gutter, 1.25rem) + 9rem)); text-align: center; color: var(--ink); opacity: 0; pointer-events: none; }
+.nb-heartbeat-finale { position: absolute; left: 0; right: 0; top: 60%; text-align: center; opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 1.25rem; padding-inline: var(--gutter, 1.25rem); }
 .nb-heartbeat-card { position: absolute; transform: translate(-50%, calc(-100% - 2.5rem)); background: var(--card); color: var(--card-foreground); border: 1px solid var(--border); border-radius: .5rem; padding: .75rem 1rem; min-width: 12rem; max-width: 18rem; font-size: .875rem; z-index: 5; }
 .nb-heartbeat-card ul { display: grid; gap: .5rem; margin: .25rem 0; }
 .nb-heartbeat-card li { display: grid; }
 .nb-heartbeat-card-date, .nb-heartbeat-card-city { color: var(--ink-soft); font-size: .8125rem; }
-@media (max-width: 639px) {
-  .nb-heartbeat-head { top: 4.75rem; right: var(--gutter, 1.25rem); }
-  .nb-heartbeat-hint { bottom: 7rem; }
-}
+
+@media (max-width: 639px) { .nb-heartbeat-caption { bottom: 6rem; max-width: calc(100vw - 2 * var(--gutter, 1.25rem)); } }
+
+/* Home: small header logo appears only once the big wordmark has scrolled away. */
+.nb-home-shell .nb-home-header-logo { transition: opacity 200ms ease, transform 200ms ease; }
+.nb-home-shell[data-hero-visible='true'] .nb-home-header-logo { opacity: 0; transform: translateY(-6px); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .nb-home-shell .nb-home-header-logo { transition: none; } }
+
+/* Home ecosystem grid. */
+.nb-eco { padding-block: var(--space-16) var(--space-8); }
+.nb-eco-line { margin-top: var(--space-3); color: var(--ink-soft); max-width: 36rem; }
+.nb-eco-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); margin-top: var(--space-8); }
+@media (max-width: 1023px) { .nb-eco-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 639px) { .nb-eco-grid { grid-template-columns: minmax(0, 1fr); } }
+.nb-eco-grid > li { display: flex; }
+.nb-eco-card { display: flex; flex-direction: column; gap: var(--space-3); width: 100%; padding: var(--space-6); background: var(--card); border: 1px solid var(--hairline); border-radius: var(--radius); color: var(--ink); transition: transform 200ms ease, box-shadow 200ms ease; }
+.nb-eco-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+.nb-eco-card:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.nb-eco-card h3 { font-size: 1.25rem; font-weight: 500; line-height: 1.3; }
+.nb-eco-count { color: var(--ink-soft); font-size: .9375rem; }
+.nb-eco-logos { display: flex; flex-wrap: wrap; gap: .5rem; min-height: 2.5rem; }
+.nb-eco-logos .nb-org-logo { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: var(--snow); border: 1px solid var(--hairline); overflow: hidden; display: inline-flex; align-items: center; justify-content: center; padding: .375rem; }
+.nb-eco-logos .nb-org-logo img { width: 100%; height: 100%; object-fit: contain; }
+.nb-eco-more { margin-top: auto; padding-top: var(--space-2); text-decoration: underline; text-underline-offset: 3px; font-size: .9375rem; }
+@media (prefers-reduced-motion: reduce) { .nb-eco-card, .nb-eco-card:hover { transition: none; transform: none; } }

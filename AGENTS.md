@@ -10,12 +10,12 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
-- Home owns one Lenis/GSAP story; public pages use keyed PublicScrollFrame. Home overlays activate only after hiding the intro. Both clean up. Why: no duplicate tickers or pre-load text overlap.
+- Home uses native scrolling with no Lenis/GSAP; public pages use keyed PublicScrollFrame (the only Lenis/GSAP owner). Why: one scroll owner and no pinning on home.
 - Fabric is the static still image in every placement (arrival, Learn circle, footer band); no shader or animation. Why: the WebGL silk was explicitly removed.
 - Official covers require provenance and approval; failed logos hide. Brand imports are admin-only and quota-bounded; forms use uncached browser search copying only confirmed name/website. Why: authentic assets and search retention compliance.
 - Relationship maps use published links, network tokens and measured node lines; timelines use tested date helpers and URL filters. Why: preserve real connections across screen sizes.
-- The home ecosystem groups the paginated published reader into fixed group anchors and one cloud dot per entry; group links use Explore's canonical type search and separate conceptual edges. Why: group browsing stays distinct from individual database relationships.
-- The home Heartbeat hero draws one 2D canvas from pure, tested line maths in heartbeat.ts and reads scroll position itself inside a sticky section; GSAP only pins the ecosystem after it. Why: one shared line function for flight and flat views without a second scroll owner.
+- The home ecosystem is a static grid from buildGroups (organisations only, largest group first, most-connected logos first) linking to Explore's canonical type search. Why: clear group browsing without animation.
+- The home Heartbeat section follows the wordmark hero, draws one 2D canvas from pure, tested line maths in heartbeat.ts and reads scroll position itself inside a sticky section. Why: one shared line function for flight and flat views.
 - LaboratoryWordmark uses local assets and measured serif fallbacks in public headers. Why: readable if images fail.
 - Mobile filters reuse FilterSheet with existing URL state. Why: accessible controls without divergent browsing logic.
 - Use publicTitle for title punctuation and publicCopy for broad health-startup prose; preserve stored values, type names and URLs. Why: copy reviews never mutate editorial data.

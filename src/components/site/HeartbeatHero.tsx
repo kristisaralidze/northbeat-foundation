@@ -5,6 +5,7 @@ import { heartbeatQuery } from '@/lib/heartbeat.query';
 import { buildBeats, clamp01, heightAt, HORIZON, localKey, restingBeats, smoothstep, warpedDay, type Beat, type HeartbeatItem } from '@/lib/heartbeat';
 import { chosenLogoSrc } from '@/components/site/OrganisationLogo';
 import { publicTitle } from '@/lib/profiles';
+import { brandfetchLogoUrl } from '@/lib/organisation-logo';
 
 const FLIGHT_END = 0.68, UNROLL_END = 0.9;
 const OPENING_KEY = 'northbeat:heartbeat-opening';
@@ -16,8 +17,10 @@ function dateFor(day: number, long = false) {
   const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + Math.floor(day));
   return new Intl.DateTimeFormat('en-GB', long ? { day: 'numeric', month: 'long' } : { day: 'numeric', month: 'short' }).format(d);
 }
-function itemLogos(item: HeartbeatItem) {
-  return item.orgs.map(o => chosenLogoSrc(o.logo_choice, o.logo_url, o.website)).filter((s): s is string => Boolean(s));
+/** One logo per item: the organiser's official logo, else the Brandfetch icon for the event's own website. */
+function itemLogo(item: HeartbeatItem) {
+  for (const o of item.orgs) { const src = chosenLogoSrc(o.logo_choice, o.logo_url, o.website); if (src) return src; }
+  return brandfetchLogoUrl(item.website ?? null, 'icon');
 }
 function itemPath(item: HeartbeatItem) { return item.kind === 'event' ? `/event/${item.slug}` : `/opportunity/${item.slug}`; }
 
@@ -25,16 +28,13 @@ export function HeartbeatHero() {
   const { data } = useSuspenseQuery(heartbeatQuery);
   const section = useRef<HTMLElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
-  const liveDot = useRef<HTMLSpanElement>(null);
-  const headline = useRef<HTMLDivElement>(null);
   const finale = useRef<HTMLDivElement>(null);
-  const passing = useRef<HTMLDivElement>(null);
-  const hint = useRef<HTMLDivElement>(null);
+  const passing = useRef<HTMLParagraphElement>(null);
   const caption = useRef<HTMLParagraphElement>(null);
   const [beats, setBeats] = useState<Beat[]>([]);
   const [reduced, setReduced] = useState(false);
   const [card, setCard] = useState<Card | null>(null);
-  const [now, setNow] = useState({ date: '', ahead: 0 });
+  const [now, setNow] = useState('');
   const navigate = useNavigate();
   const hits = useRef<Hit[]>([]);
   const cardRef = useRef<Card | null>(null);
@@ -69,15 +69,13 @@ export function HeartbeatHero() {
       if (images.has(src)) { const img = images.get(src); return img && img.complete && img.naturalWidth ? img : null; }
       const img = new Image(); img.decoding = 'async'; img.onerror = () => images.set(src, null); img.src = src; images.set(src, img); return null;
     };
-    const beatLogos = new Map(beats.map(b => [b, b.items.flatMap(itemLogos)]));
+    const beatLogos = new Map(beats.map(b => [b, b.items.map(itemLogo)]));
 
-    let W = 0, H = 0, dpr = 1, phone = false; let headBox = { x: 0, y: 0, w: 0, h: 0 };
+    let W = 0, H = 0, dpr = 1, phone = false;
     const resize = () => {
       dpr = Math.min(2, window.devicePixelRatio || 1);
       W = el.clientWidth; H = el.clientHeight; phone = W < 640;
       el.width = Math.round(W * dpr); el.height = Math.round(H * dpr);
-      const hr = headline.current?.getBoundingClientRect(), cr = el.getBoundingClientRect();
-      if (hr) headBox = { x: 0, y: 0, w: hr.right - cr.left + 12, h: hr.bottom - cr.top + 12 };
     };
     resize();
     const ro = new ResizeObserver(resize); ro.observe(el);
@@ -107,7 +105,7 @@ export function HeartbeatHero() {
     const io = new IntersectionObserver(([entry]) => { visible = entry?.isIntersecting ?? false; });
     io.observe(host);
     let raf = 0, last = performance.now(), started = last;
-    let lastAhead = -1, lastDate = '';
+    let lastDate = '';
 
     const frame = (t: number) => {
       raf = requestAnimationFrame(frame);
@@ -142,7 +140,6 @@ export function HeartbeatHero() {
       if (!reduced && m === 0 && cur > prevCur) {
         for (const b of beats) if (b.day > prevCur && b.day <= cur) {
           const big = b.items.length >= 3; pulseScale = big ? 1.024 : 1.011; pulseLen = big ? 240 : 140; pulseUntil = t + pulseLen;
-          liveDot.current?.animate([{ transform: 'scale(1)' }, { transform: 'scale(2)' }, { transform: 'scale(1)' }], { duration: 500 });
           if (caption.current) caption.current.textContent = `${dateFor(b.day, true)}, ${publicTitle(b.items[0]?.title ?? "")}${b.items.length > 1 ? ` and ${b.items.length - 1} more` : ''}`;
           captionUntil = t + 2400;
         }
@@ -207,10 +204,12 @@ export function HeartbeatHero() {
       }
 
       // Logos and labels.
-      { const hr = headline.current?.getBoundingClientRect(), cr = el.getBoundingClientRect(); if (hr) headBox = { x: 0, y: 0, w: hr.right - cr.left + 12, h: hr.bottom - cr.top + 12 }; }
-      const nextHits: Hit[] = []; const labels: { x: number; y: number; w: number; h: number }[] = []; const flatDates: number[] = [];
+      type Box = { x: number; y: number; w: number; h: number };
+      const overlaps = (a: Box, list: Box[]) => list.some(l => a.x < l.x + l.w && a.x + a.w > l.x && a.y < l.y + l.h && a.y + a.h > l.y);
+      const nextHits: Hit[] = []; const logoBoxes: Box[] = []; const labels: Box[] = []; const flatDates: number[] = [];
       const visibleBeats = beats.filter(b => m > 0 || (b.day >= cur - 0.3 && b.day <= cur + 12)).slice(0, 40);
       const ordered = [...visibleBeats].sort((a, b) => a.day - b.day);
+      const placed: { b: Beat; peak: { x: number; y: number }; r: number; cy: number; alpha: number; mi: number; pp: ReturnType<typeof proj>; fp: { x: number; y: number } }[] = [];
       let drawnLogos = 0;
       for (const b of ordered) {
         const h = heightAt(b.day, allBeats);
@@ -218,7 +217,7 @@ export function HeartbeatHero() {
         const fp = { x: flatX(b.day), y: flatY(h) };
         const mi = m > 0 ? mixFor(b.day) : 0;
         if (!pp && mi <= 0) continue;
-        let r3 = pp ? Math.max(6, Math.min(28, F / pp.z * 0.36)) : 0;
+        const r3 = pp ? Math.max(6, Math.min(28, F / pp.z * 0.36)) : 0;
         let rf = phone ? 8 : 11;
         if (Math.abs(fp.x - sweepX) < 18) rf *= 1.15;
         const peak = pp && mi < 1 ? { x: pp.x + (fp.x - pp.x) * mi, y: pp.y + (fp.y - pp.y) * mi } : fp;
@@ -226,60 +225,65 @@ export function HeartbeatHero() {
         const fade = pp ? Math.max(0, 1 - (pp.z - 3.6) / 36) ** 1.25 : 1;
         const alpha = sceneAlpha * (pp ? (0.25 + 0.75 * fade) * (1 - mi) + mi : mi);
         if (peak.x < -60 || peak.x > W + 60 || peak.y < -60 || peak.y > H + 60) continue;
-        const logos = beatLogos.get(b) ?? [];
-        const count = Math.min(3, Math.max(1, b.items.length)); const extra = b.items.length - count;
-        const gap = r * 2.2; const total = count + (extra > 0 ? 1 : 0);
         const cy = peak.y - r - Math.max(10, r * 1.2);
+        placed.push({ b, peak, r, cy, alpha, mi, pp, fp });
+        // Only logos that actually loaded get a circle; failed or missing logos leave just the spike.
+        const srcs = beatLogos.get(b) ?? [];
+        const ready: HTMLImageElement[] = [];
+        for (const src of srcs) { if (ready.length >= 3) break; const img = src && drawnLogos < 60 ? image(src) : null; if (img) ready.push(img); }
+        if (!ready.length) { nextHits.push({ x: peak.x, y: peak.y, r: 14, beat: b }); continue; }
+        const extra = b.items.length - ready.length;
+        const total = ready.length + (extra > 0 ? 1 : 0);
+        const gap = r * 2 + 4;
         ctx.globalAlpha = alpha; ctx.strokeStyle = LINE; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(peak.x, peak.y - 2); ctx.lineTo(peak.x, cy + r); ctx.stroke();
         for (let k = 0; k < total; k++) {
           const x = peak.x + (k - (total - 1) / 2) * gap;
-          const src = k < count ? logos[k] : undefined;
-          const img = src && drawnLogos < 60 ? image(src) : null;
-          if (k >= count) {
-            circle(ctx, x, cy, r, TILE, LINE); ctx.fillStyle = INK; ctx.font = `${Math.max(9, r * 0.7)}px ${body}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(`+${extra}`, x, cy);
-          } else if (img) {
+          const img = ready[k];
+          if (img) {
             drawnLogos++; circle(ctx, x, cy, r, TILE, LINE);
             ctx.save(); ctx.beginPath(); ctx.arc(x, cy, r * 0.78, 0, Math.PI * 2); ctx.clip();
-            const s = r * 1.4; ctx.drawImage(img, x - s / 2, cy - s / 2, s, s); ctx.restore();
+            const sz = r * 1.4; ctx.drawImage(img, x - sz / 2, cy - sz / 2, sz, sz); ctx.restore();
           } else {
-            ctx.fillStyle = INK; ctx.beginPath(); ctx.arc(x, cy, Math.max(2.5, r * 0.22), 0, Math.PI * 2); ctx.fill();
+            circle(ctx, x, cy, r, TILE, LINE); ctx.fillStyle = INK; ctx.font = `${Math.max(9, r * 0.7)}px ${body}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(`+${extra}`, x, cy);
           }
         }
-        nextHits.push({ x: peak.x, y: cy, r: Math.max(r * total * 1.1, 14), beat: b });
-        // Labels.
-        ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-        if (m >= 0.6) {
-          if (!flatDates.some(x => Math.abs(x - fp.x) < 52)) {
-            flatDates.push(fp.x); ctx.globalAlpha = sceneAlpha * clamp01((m - 0.6) / 0.4); ctx.fillStyle = SOFT; ctx.font = `11px ${body}`;
-            ctx.fillText(dateFor(b.day), peak.x, cy - r - 6);
-          }
-        } else if (pp && mi < 0.3 && pp.z < 14 && !phone) {
-          const titleSize = Math.max(13, Math.min(22, F / pp.z * 0.22));
-          const title = publicTitle(b.items[0]?.title ?? "") + (b.items.length > 1 ? ` +${b.items.length - 1}` : '');
-          ctx.font = `${titleSize}px ${display}`; const tw = Math.min(ctx.measureText(title).width, W * 0.5);
-          const box = { x: peak.x - tw / 2, y: cy - r - titleSize - 26, w: tw, h: titleSize + 22 };
-          if (![headBox, ...labels].some(l => box.x < l.x + l.w && box.x + box.w > l.x && box.y < l.y + l.h && box.y + box.h > l.y)) {
-            labels.push(box); ctx.globalAlpha = alpha * (1 - mi / 0.3);
-            ctx.fillStyle = SOFT; ctx.font = `12px ${body}`; ctx.fillText(dateFor(b.day), peak.x, box.y + 10);
-            ctx.fillStyle = INK; ctx.font = `${titleSize}px ${display}`; ctx.fillText(title, peak.x, box.y + 12 + titleSize, W * 0.5);
-          }
-        }
+        const w = total * gap; logoBoxes.push({ x: peak.x - w / 2, y: cy - r - 2, w, h: r * 2 + 4 });
+        nextHits.push({ x: peak.x, y: cy, r: Math.max(w / 2, 14), beat: b });
       }
-      if (m > 0.6) {
-        ctx.globalAlpha = sceneAlpha * clamp01((m - 0.6) / 0.4); ctx.fillStyle = SOFT; ctx.font = `12px ${body}`; ctx.textBaseline = 'top';
-        const base = flatY(0) + 22; ctx.textAlign = 'left'; ctx.fillText('Today', pad, base); ctx.textAlign = 'right'; ctx.fillText('Next 35 days', W - pad, base);
+      // Labels: flat dates under the line; in flight, date and title for the two nearest beats only.
+      ctx.textAlign = 'center';
+      if (m >= 0.6) {
+        const dateY = flatY(0) + (phone ? 26 : 34);
+        ctx.textBaseline = 'top';
+        for (const q of placed) {
+          if (flatDates.some(x => Math.abs(x - q.fp.x) < 40)) continue;
+          flatDates.push(q.fp.x); ctx.globalAlpha = sceneAlpha * clamp01((m - 0.6) / 0.4); ctx.fillStyle = SOFT; ctx.font = `11px ${body}`;
+          ctx.fillText(dateFor(q.b.day), q.fp.x, dateY);
+        }
+      } else if (!phone) {
+        ctx.textBaseline = 'alphabetic';
+        const nearest = placed.filter(q => q.pp && q.mi < 0.3 && q.pp.z < 14 && q.b.day >= cur).sort((a, b) => (a.pp?.z ?? 0) - (b.pp?.z ?? 0)).slice(0, 2);
+        for (const q of nearest) {
+          const pp = q.pp!;
+          const titleSize = Math.max(13, Math.min(22, F / pp.z * 0.22));
+          const title = publicTitle(q.b.items[0]?.title ?? '') + (q.b.items.length > 1 ? ` +${q.b.items.length - 1}` : '');
+          ctx.font = `${titleSize}px ${display}`; const tw = Math.min(ctx.measureText(title).width, W * 0.5);
+          const box = { x: q.peak.x - tw / 2, y: q.cy - q.r - titleSize - 30, w: tw, h: titleSize + 22 };
+          if (box.y < 72 || overlaps(box, [...logoBoxes, ...labels])) continue;
+          labels.push(box); ctx.globalAlpha = q.alpha * (1 - q.mi / 0.3);
+          ctx.fillStyle = SOFT; ctx.font = `12px ${body}`; ctx.fillText(dateFor(q.b.day), q.peak.x, box.y + 10);
+          ctx.fillStyle = INK; ctx.font = `${titleSize}px ${display}`; ctx.fillText(title, q.peak.x, box.y + 12 + titleSize, W * 0.5);
+        }
       }
       ctx.globalAlpha = 1;
       hits.current = nextHits;
 
       // HTML overlays.
-      if (headline.current) headline.current.style.opacity = String(1 - clamp01(m * 1.5));
-      if (finale.current) { const f = reduced ? 1 : clamp01((p - 0.84) / 0.06); finale.current.style.opacity = String(f); finale.current.style.pointerEvents = f > 0.5 ? 'auto' : 'none'; }
+      if (finale.current) { const f = reduced ? 1 : clamp01((p - 0.84) / 0.06); finale.current.style.opacity = String(f); finale.current.style.pointerEvents = f > 0.5 ? 'auto' : 'none'; finale.current.style.top = `${flatY(0) + (phone ? 56 : 68)}px`; }
       if (passing.current) passing.current.style.opacity = String(1 - clamp01(m * 2));
-      if (hint.current) { const show = p < 0.02 && !reduced; hint.current.style.opacity = show ? '1' : '0'; hint.current.style.pointerEvents = show ? 'auto' : 'none'; }
-      const day = Math.max(0, cur); const date = dateFor(day, true); const ahead = beats.filter(b => b.day >= day).reduce((n, b) => n + b.items.length, 0);
-      if (date !== lastDate || ahead !== lastAhead) { lastDate = date; lastAhead = ahead; setNow({ date, ahead }); }
+      const date = dateFor(Math.max(0, cur));
+      if (date !== lastDate) { lastDate = date; setNow(date); }
     };
     raf = requestAnimationFrame(frame);
     return () => {
@@ -306,31 +310,13 @@ export function HeartbeatHero() {
     if (hit.beat.items.length === 1 && hit.beat.items[0]) { void navigate({ to: itemPath(hit.beat.items[0]) as '/' }); return; }
     setCard({ beat: hit.beat, x: hit.x, y: hit.y, pinned: true });
   };
-  const skip = () => {
-    const host = section.current; if (!host) return;
-    window.scrollTo({ top: host.offsetTop + host.offsetHeight - window.innerHeight, behavior: 'smooth' });
-  };
-
   return <section ref={section} className={`nb-heartbeat${reduced ? ' nb-heartbeat-reduced' : ''}`} aria-labelledby="heartbeat-heading">
     <div className="nb-heartbeat-sticky">
       <canvas ref={canvas} className="nb-heartbeat-canvas" aria-hidden="true" onPointerMove={onCanvasMove} onPointerLeave={() => !cardRef.current?.pinned && setCard(null)} onClick={onCanvasClick} />
-      <div ref={headline} className="nb-heartbeat-head">
-        <p className="nb-heartbeat-live"><span ref={liveDot} className="nb-heartbeat-dot" aria-hidden="true" />Live, next 35 days</p>
-        <h1 id="heartbeat-heading">Feel the pulse of Nordic health.</h1>
-        <p>Every organisation, open call and event in Nordic health innovation. One heartbeat.</p>
-      </div>
-      <div ref={passing} className="nb-heartbeat-passing" aria-live="off">
-        <p>Now passing</p>
-        <p className="nb-heartbeat-date">{now.date}</p>
-        <p>{now.ahead} {now.ahead === 1 ? 'event or deadline' : 'events and deadlines'} ahead</p>
-      </div>
-      <div ref={hint} className="nb-heartbeat-hint">
-        <p>Scroll to travel through time</p>
-        <button type="button" className="nb-link" onClick={skip}>Skip ahead</button>
-      </div>
+      <h2 id="heartbeat-heading" className="sr-only">Events and deadlines in the next 35 days</h2>
+      <p ref={passing} className="nb-heartbeat-date" aria-hidden="true">{now}</p>
       <p ref={caption} className="nb-heartbeat-caption" aria-hidden="true" />
       <div ref={finale} className="nb-heartbeat-finale">
-        <h2>The next 35 days in Nordic health.</h2>
         <Link to="/events" className="nb-btn nb-btn-primary">See all events and deadlines</Link>
       </div>
       {card && <div className="nb-heartbeat-card" style={{ left: card.x, top: card.y }} role={card.pinned ? 'dialog' : 'tooltip'}>

@@ -1,7 +1,8 @@
 import { createServerFn } from '@tanstack/react-start';
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '@/integrations/supabase/types';
-import { buildNetwork, nodeId, type NetworkEdge, type NetworkData } from './ecosystem';
+import { buildGroups, buildNetwork, nodeId, type NetworkEdge, type NetworkData } from './ecosystem';
+import { publicTitle } from './profiles';
 
 async function all<T>(page: (a: number, b: number) => PromiseLike<{ data: T[] | null; error: unknown }>): Promise<T[]> {
   const rows: T[] = [];
@@ -42,4 +43,23 @@ export const getEcosystem = createServerFn({ method: 'GET' }).handler(async (): 
     ...events.map(r => ({ ...r, name: r.title, type: r.event_type, kind: 'event' as const })),
     ...opps.map(r => ({ ...r, name: r.title, kind: 'opportunity' as const })),
   ], edges);
+});
+export const getEcosystemGroups = createServerFn({ method: 'GET' }).handler(async () => {
+  const url = process.env['SUPABASE_URL'], key = process.env['SUPABASE_PUBLISHABLE_KEY'];
+  if (!url || !key) throw new Error('The ecosystem is temporarily unavailable.');
+  const c = createClient<Database>(url, key, { auth: { persistSession: false, autoRefreshToken: false }, global: { fetch: (input, init) => {
+    const headers = new Headers(init?.headers);
+    if (key.startsWith('sb_') && headers.get('Authorization') === `Bearer ${key}`) headers.delete('Authorization');
+    headers.set('apikey', key); return fetch(input, { ...init, headers });
+  } } });
+  const [orgs, relations, orgEvents, orgOpps] = await Promise.all([
+    all((a, b) => c.from('organisations').select('id,slug,name,type,website,logo_url,logo_choice').eq('status', 'published').order('id').range(a, b)),
+    all((a, b) => c.from('organisation_relations').select('from_org_id,to_org_id').order('id').range(a, b)),
+    all((a, b) => c.from('organisation_events').select('organisation_id').order('id').range(a, b)),
+    all((a, b) => c.from('organisation_opportunities').select('organisation_id').order('id').range(a, b)),
+  ]);
+  const links = new Map<string, number>(); const bump = (id: string) => links.set(id, (links.get(id) ?? 0) + 1);
+  relations.forEach(r => { bump(r.from_org_id); bump(r.to_org_id); });
+  orgEvents.forEach(r => bump(r.organisation_id)); orgOpps.forEach(r => bump(r.organisation_id));
+  return buildGroups(orgs.map(o => ({ slug: o.slug, name: publicTitle(o.name), type: o.type, website: o.website, logo_url: o.logo_url, logo_choice: o.logo_choice, links: links.get(o.id) ?? 0 })));
 });
