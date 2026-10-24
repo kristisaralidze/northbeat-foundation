@@ -256,10 +256,8 @@ export function HeartbeatHero() {
         if (peak.x < -60 || peak.x > W + 60 || peak.y < -60 || peak.y > H + 60) continue;
         const cy = peak.y - r - Math.max(10, r * 1.2);
         placed.push({ b, peak, r, cy, alpha, mi, pp, fp });
-        // Only logos that actually loaded get a circle; failed or missing logos leave just the spike.
         const srcs = beatLogos.get(b) ?? [];
-        const ready: HTMLImageElement[] = [];
-        for (const src of srcs) { if (ready.length >= 3) break; const img = src && drawnLogos < 60 ? image(src) : null; if (img) ready.push(img); }
+        const ready = b.items.slice(0,3).map((item,i)=>({img:srcs[i]?image(srcs[i] as string):null,name:item.orgs[0]?.name??item.title,tone:item.orgs[0]?.logo_tone??'dark'}));
         const topLimit = (passing.current ? passing.current.offsetTop + passing.current.offsetHeight : 100) + 16;
         if (ready.length && cy - r < topLimit && m < 0.6) ready.length = 0;
         (placed[placed.length - 1] as { logos?: boolean }).logos = ready.length > 0;
@@ -272,11 +270,12 @@ export function HeartbeatHero() {
         ctx.globalAlpha = sceneAlpha; // logos are never greyed by distance
         for (let k = 0; k < total; k++) {
           const x = peak.x + (k - (total - 1) / 2) * gap;
-          const img = ready[k];
-          if (img) {
-            drawnLogos++; circle(ctx, x, cy, r, TILE, LINE);
-            ctx.save(); ctx.beginPath(); ctx.arc(x, cy, r * 0.78, 0, Math.PI * 2); ctx.clip();
-            const sz = r * 1.4; ctx.drawImage(img, x - sz / 2, cy - sz / 2, sz, sz); ctx.restore();
+          const logo = ready[k]; const img=logo?.img;
+          if (logo) {
+            drawnLogos++;const light=logo.tone==='light';ctx.fillStyle=light?INK:TILE;ctx.strokeStyle=LINE;
+            ctx.beginPath();ctx.roundRect(x-r,cy-r,r*2,r*2,Math.min(8,r*.3));ctx.fill();ctx.stroke();
+            if(img){const area=r*1.52;const ratio=img.naturalWidth/img.naturalHeight;const w=ratio>=1?area:area*ratio;const h=ratio>=1?area/ratio:area;ctx.drawImage(img,x-w/2,cy-h/2,w,h);}
+            else{ctx.fillStyle=light?TILE:INK;ctx.font=`${Math.max(7,r*.3)}px ${body}`;ctx.textAlign='center';ctx.textBaseline='middle';const words=logo.name.split(' ');ctx.fillText(words.slice(0,2).join(' '),x,cy-3,r*1.7);if(words.length>2)ctx.fillText(words.slice(2).join(' '),x,cy+7,r*1.7);}
           } else {
             circle(ctx, x, cy, r, TILE, LINE); ctx.fillStyle = INK; ctx.font = `${Math.max(9, r * 0.7)}px ${body}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(`+${extra}`, x, cy);
           }
