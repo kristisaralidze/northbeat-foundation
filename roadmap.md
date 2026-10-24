@@ -1,4 +1,5 @@
 # Current fixes (Oct 24)
+- [ ] Replace remaining list-page native menus, memoize filtering and list rows, refine facts; verify Events/Opportunities/Explore on phones and desktop.
 - [x] Replace Systole floating button/panel with edge tab, ECG-paper sheet, shared-link opening; verify signup and 390px/1440px.
 - [x] URGENT: restore Brandfetch icon logos everywhere; stored check only overrides when present (light=ink tile, missing=name tile); admin uploads win; check runs in browser only.
 - [x] Rich organisation fields: story, scale_facts, our_take, offer_chips, how_to_get_involved, founded_year; admin+CSV editable; page sections after header.
