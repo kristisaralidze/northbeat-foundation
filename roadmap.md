@@ -143,3 +143,9 @@
 - [x] PRH YTJ business ID: admin match, monthly refresh, facts strip line
 - [x] Nominatim geocoded maps on event and organisation pages, admin-correctable lat/lng
 - [x] News feed: news_feed_url, daily latest 3 headlines, "Latest from them" section
+
+# Trust pages and details
+- [x] About, Start pages, Systole, Podcast, Newsletter, Footer, link previews, 404, mobile menu
+- [ ] Close to them scoring (+100/+30/+20/+10/+5)
+- [ ] Learn guides on organisation pages
+- [ ] Registration closed button on events
