@@ -1,17 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { LaboratoryWordmark } from "@/components/site/LaboratoryWordmark";
-import { EMPTY_SEARCH } from "@/lib/explore";
 import { EcosystemNetwork } from "@/components/site/EcosystemNetwork";
 import { ecosystemQuery } from "@/lib/ecosystem.query";
-import { NordicGlobe } from "@/components/site/NordicGlobe";
 import { HomeScrollStory } from "@/components/site/HomeScrollStory";
 import { HomeHappening } from "@/components/site/HomeHappening";
+import { HeartbeatHero } from "@/components/site/HeartbeatHero";
+import { heartbeatQuery } from "@/lib/heartbeat.query";
 import { eventsQuery } from "@/lib/events.query";
 import { opportunitiesQuery } from "@/lib/opportunities.query";
-import { AtmosphericImage } from '@/components/site/AtmosphericImage';
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => Promise.all([
+    context.queryClient.ensureQueryData(heartbeatQuery),
     context.queryClient.ensureQueryData(ecosystemQuery),
     context.queryClient.ensureQueryData(eventsQuery),
     context.queryClient.ensureQueryData(opportunitiesQuery),
@@ -33,27 +32,9 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <HomeScrollStory>
-    <section className="nb-home-wordmark-section">
-      <div className="nb-arrival-atmosphere"><AtmosphericImage eager /></div>
-      <div className="nb-home-opening-content">
-        <div className="nb-home-wordmark-slot"><LaboratoryWordmark /></div>
-        <p className="nb-home-tagline">The heartbeat of Nordic health innovation.</p>
-      </div>
-    <section className="nb-home-intro-section">
-      <div className="nb-home-intro nb-container">
-        <p className="nb-home-intro-line" aria-label="The map of the Nordic health ecosystem: the companies, the capital, the science and the people behind them.">
-          {'The map of the Nordic health ecosystem: the companies, the capital, the science and the people behind them.'.split(' ').map((word, index) => <span key={index} className="nb-home-intro-word" aria-hidden="true">{word}{' '}</span>)}
-        </p>
-        <div className="nb-home-actions">
-          <Link to="/explore" search={EMPTY_SEARCH} className="nb-btn nb-btn-primary">Explore the hub</Link>
-          <Link to="/newsletter" className="nb-link">Get the newsletter</Link>
-        </div>
-      </div>
-    </section>
-    </section>
+    <HeartbeatHero />
     <div className="nb-home-world-scene">
       <EcosystemNetwork />
-      <div className="nb-home-globe-wrapper"><NordicGlobe /></div>
     </div>
     <HomeHappening />
     <section className="nb-home-learn nb-container">
