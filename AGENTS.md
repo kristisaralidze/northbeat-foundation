@@ -11,6 +11,7 @@
 
 ## Architecture rules
 - Home uses native scrolling with no Lenis/GSAP; public pages use keyed PublicScrollFrame (the only Lenis/GSAP owner). Why: one scroll owner and no pinning on home.
+- Public-page motion (page transitions, word reveals, staggered section/card reveals, image parallax) lives in src/components/site/motion.tsx using framer-motion, driven by enhancePageMotion inside PublicScrollFrame; all of it self-gates on prefers-reduced-motion and never touches the home route. Why: one motion entry point, no per-page wiring.
 - Fabric is the static still image in every placement (Learn circle, footer band; the home hero is plain paper); no shader or animation. Why: the WebGL silk was explicitly removed.
 - Official covers require provenance and approval. Admin canvas checks store resolved logos and tone; shared tiles and heartbeat use fitted images or names. Imports stay admin-only and quota-bounded. Why: reliable identity without per-view analysis.
 - Relationship maps use published links, network tokens and measured node lines; timelines use tested date helpers and URL filters. Why: preserve real connections across screen sizes.
