@@ -5,11 +5,7 @@ import { profileQuery } from '@/lib/profiles.query';
 import { profileHead } from '@/lib/profile-head';
 export const Route = createFileRoute('/event/$slug')({
   loader: ({ context, params }) => context.queryClient.ensureQueryData(profileQuery('events', params.slug)),
-  head: ({ loaderData, params }) => {
-    const head = profileHead(loaderData, `/event/${encodeURIComponent(params.slug)}`);
-    const image = loaderData?.row['cover_image_url'];
-    return typeof image === 'string' && image.startsWith('https://') ? { ...head, meta: [...head.meta, { property: 'og:image', content: image }, { name: 'twitter:image', content: image }] } : head;
-  },
+  head: ({ loaderData, params }) => profileHead(loaderData, `/event/${encodeURIComponent(params.slug)}`, { kind: 'event', slug: params.slug }),
   component: Profile,
   errorComponent: ProfileError,
   notFoundComponent: ProfileNotFound,

@@ -59,6 +59,7 @@ import { Route as AdminPeopleIdRouteImport } from './routes/admin.people.$id'
 import { Route as AdminSubmissionsIndexRouteImport } from './routes/admin.submissions.index'
 import { Route as AdminSubmissionsIdRouteImport } from './routes/admin.submissions.$id'
 import { Route as ApiPublicJobsEnrichRouteImport } from './routes/api/public/jobs/enrich'
+import { Route as ApiPublicOgKindSlugRouteImport } from './routes/api/public/og/$kind.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -310,6 +311,11 @@ const ApiPublicJobsEnrichRoute = ApiPublicJobsEnrichRouteImport.update({
   path: '/api/public/jobs/enrich',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicOgKindSlugRoute = ApiPublicOgKindSlugRouteImport.update({
+  id: '/api/public/og/$kind/$slug',
+  path: '/api/public/og/$kind/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -362,6 +368,7 @@ export interface FileRoutesByFullPath {
   '/admin/people/': typeof AdminPeopleIndexRoute
   '/admin/submissions/': typeof AdminSubmissionsIndexRoute
   '/api/public/jobs/enrich': typeof ApiPublicJobsEnrichRoute
+  '/api/public/og/$kind/$slug': typeof ApiPublicOgKindSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -412,6 +419,7 @@ export interface FileRoutesByTo {
   '/admin/people': typeof AdminPeopleIndexRoute
   '/admin/submissions': typeof AdminSubmissionsIndexRoute
   '/api/public/jobs/enrich': typeof ApiPublicJobsEnrichRoute
+  '/api/public/og/$kind/$slug': typeof ApiPublicOgKindSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -465,6 +473,7 @@ export interface FileRoutesById {
   '/admin/people/': typeof AdminPeopleIndexRoute
   '/admin/submissions/': typeof AdminSubmissionsIndexRoute
   '/api/public/jobs/enrich': typeof ApiPublicJobsEnrichRoute
+  '/api/public/og/$kind/$slug': typeof ApiPublicOgKindSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -519,6 +528,7 @@ export interface FileRouteTypes {
     | '/admin/people/'
     | '/admin/submissions/'
     | '/api/public/jobs/enrich'
+    | '/api/public/og/$kind/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -569,6 +579,7 @@ export interface FileRouteTypes {
     | '/admin/people'
     | '/admin/submissions'
     | '/api/public/jobs/enrich'
+    | '/api/public/og/$kind/$slug'
   id:
     | '__root__'
     | '/'
@@ -621,6 +632,7 @@ export interface FileRouteTypes {
     | '/admin/people/'
     | '/admin/submissions/'
     | '/api/public/jobs/enrich'
+    | '/api/public/og/$kind/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -648,6 +660,7 @@ export interface RootRouteChildren {
   StartAudienceRoute: typeof StartAudienceRoute
   LearnIndexRoute: typeof LearnIndexRoute
   ApiPublicJobsEnrichRoute: typeof ApiPublicJobsEnrichRoute
+  ApiPublicOgKindSlugRoute: typeof ApiPublicOgKindSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1002,6 +1015,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicJobsEnrichRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/og/$kind/$slug': {
+      id: '/api/public/og/$kind/$slug'
+      path: '/api/public/og/$kind/$slug'
+      fullPath: '/api/public/og/$kind/$slug'
+      preLoaderRoute: typeof ApiPublicOgKindSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1100,6 +1120,7 @@ const rootRouteChildren: RootRouteChildren = {
   StartAudienceRoute: StartAudienceRoute,
   LearnIndexRoute: LearnIndexRoute,
   ApiPublicJobsEnrichRoute: ApiPublicJobsEnrichRoute,
+  ApiPublicOgKindSlugRoute: ApiPublicOgKindSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

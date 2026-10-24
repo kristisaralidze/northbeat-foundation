@@ -5,7 +5,7 @@ import { profileQuery } from '@/lib/profiles.query';
 import { profileHead } from '@/lib/profile-head';
 export const Route = createFileRoute('/opportunity/$slug')({
   loader: ({ context, params }) => context.queryClient.ensureQueryData(profileQuery('opportunities', params.slug)),
-  head: ({ loaderData, params }) => profileHead(loaderData, `/opportunity/${encodeURIComponent(params.slug)}`),
+  head: ({ loaderData, params }) => profileHead(loaderData, `/opportunity/${encodeURIComponent(params.slug)}`, { kind: 'opportunity', slug: params.slug }),
   component: Profile,
   errorComponent: ProfileError,
   notFoundComponent: ProfileNotFound,
