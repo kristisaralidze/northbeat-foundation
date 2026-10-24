@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import { OPP_TYPES, humanize } from '@/lib/admin/entities';
 import { opportunitiesQuery } from '@/lib/opportunities.query';
 import { compactSearch } from '@/lib/search-params';
-import { amountLabel, deadlineLabel, filterOpportunities } from '@/lib/opportunities';
-import { publicTitle, publicCopy } from '@/lib/profiles';
-import { DateTimeline } from '@/components/site/DateTimeline';
-import { closingDays } from '@/lib/timeline';
+import { amountLabel, filterOpportunities, friendlyDate, isRolling, splitOpen, type OpportunityRow } from '@/lib/opportunities';
+import { publicTitle, publicCopy, safeWebUrl } from '@/lib/profiles';
+import { CardGrid, EntryCard } from '@/components/site/EntryCard';
+import { CalendarMenu } from '@/components/site/CalendarMenu';
+import { daysUntil, type CalendarEvent } from '@/lib/detail';
 
 const searchSchema = z.object({
   type: fallback(z.string(), '').default(''),
@@ -36,12 +37,25 @@ export const Route = createFileRoute('/opportunities')({
   notFoundComponent: () => <div className="nb-container nb-section"><h1 className="nb-h2">Opportunities not found</h1></div>,
 });
 
+function OpportunityCard({ opportunity: o, now }: { opportunity: OpportunityRow; now: string }) {
+  const amount = amountLabel(o); const days = o.deadline_at ? daysUntil(o.deadline_at, now) : null;
+  const apply = safeWebUrl(o.apply_url ?? null) ?? `https://nordic-heartbeat.lovable.app/opportunity/${encodeURIComponent(o.slug)}`;
+  const cal: CalendarEvent | null = o.deadline_at && days !== null && days >= 0 ? { id: o.id, title: `Deadline: ${publicTitle(o.title)}`, start: o.deadline_at, end: null, allDay: true, location: '', description: `Apply: ${apply}`, url: apply } : null;
+  const when = o.deadline_at ? (days !== null && days < 0 ? `Closed ${friendlyDate(o.deadline_at, now)}` : `Closes ${friendlyDate(o.deadline_at, now)}`) : isRolling(o) ? 'Open all year' : 'Next call to be announced';
+  return <EntryCard id={o.id} kind="opportunity" slug={o.slug} title={publicTitle(o.title)}
+    link={<Link to="/opportunity/$slug" params={{ slug: o.slug }} className="nb-org-link">{publicTitle(o.title)}</Link>}
+    line={o.summary ? publicCopy(o.summary) : null}
+    facts={[humanize(o.type), amount || (o.type === 'job' ? o.location : null), when]}
+    footer={(cal || (days !== null && days >= 0)) && <>{days !== null && days >= 0 && <span className={`nb-countdown${days < 14 ? ' nb-countdown-signal' : ''}`}>{days === 0 ? 'Closes today' : days === 1 ? 'Closes tomorrow' : `In ${days} days`}</span>}{cal && <CalendarMenu event={cal} slug={o.slug} label="Add deadline to calendar" compact />}</>} />;
+}
+
 function Opportunities() {
   const { data } = useSuspenseQuery(opportunitiesQuery);
   const search = Route.useSearch();
   const navigate = useNavigate({ from: '/opportunities' });
   const filters = { type: search.type, field: search.field, stage: search.stage, archive: search.archive };
   const opportunities = filterOpportunities(data, filters);
+  const open = splitOpen(opportunities);
   const has = (patch: Partial<typeof filters>) => filterOpportunities(data, { ...filters, ...patch }).length > 0;
   const types = OPP_TYPES.filter((type) => has({ type }));
   const fields = data.terms.filter((term) => term.kind === 'field' && has({ field: term.slug }));
@@ -58,19 +72,19 @@ function Opportunities() {
       </div>
     </header>
     <div className="flex flex-wrap items-end gap-4 border-b border-hairline pb-6">
-      <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">Type</span>
+      <label className="min-w-0 flex-1 basis-40"><span className="nb-small mb-2 block text-muted-foreground">Type</span>
         <select aria-label="Opportunity type" className="nb-input" value={search.type} onChange={(e) => update({ type: e.target.value })}>
           <option value="">All types</option>
           {types.map((type) => <option key={type} value={type}>{humanize(type)}</option>)}
           {search.type && !OPP_TYPES.some((type) => type === search.type) && <option value={search.type}>{humanize(search.type)}</option>}
         </select></label>
-      <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">Field</span>
+      <label className="min-w-0 flex-1 basis-40"><span className="nb-small mb-2 block text-muted-foreground">Field</span>
         <select aria-label="Field" className="nb-input" value={search.field} onChange={(e) => update({ field: e.target.value })}>
           <option value="">All fields</option>
           {fields.map((term) => <option key={term.id} value={term.slug}>{term.name}</option>)}
           {search.field && !fields.some((term) => term.slug === search.field) && <option value={search.field}>{humanize(search.field)}</option>}
         </select></label>
-      <label className="min-w-0 flex-1 basis-40"><span className="nb-eyebrow mb-2 block">Stage</span>
+      <label className="min-w-0 flex-1 basis-40"><span className="nb-small mb-2 block text-muted-foreground">Stage</span>
         <select aria-label="Stage" className="nb-input" value={search.stage} onChange={(e) => update({ stage: e.target.value })}>
           <option value="">All stages</option>
           {stages.map((term) => <option key={term.id} value={term.slug}>{term.name}</option>)}
@@ -78,26 +92,12 @@ function Opportunities() {
         </select></label>
       {hasFilters && <Button variant="ghost" className="nb-btn nb-btn-quiet" onClick={() => update({ type: '', field: '', stage: '' })}>Clear filters</Button>}
     </div>
-    <p className="nb-small my-6 text-muted-foreground" role="status">{opportunities.length} {search.archive ? 'closed' : 'open'} {opportunities.length === 1 ? 'opportunity' : 'opportunities'}{!search.archive && opportunities.length > 0 ? ' · nearest deadline first' : ''}</p>
-    {opportunities.length > 0 && <DateTimeline items={opportunities} date={opportunity => opportunity.deadline_at} now={data.now} earlier={search.archive} undatedHeading="Rolling and open now">
-      {(opportunity) => {
-        const amount = amountLabel(opportunity);
-        const job = opportunity.type === 'job';
-        return <article key={opportunity.id} className="py-6">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <p className="nb-eyebrow">{humanize(opportunity.type)}</p>
-            <p className={`nb-small ${closingDays(opportunity.deadline_at, data.now) !== null ? 'text-primary' : 'text-muted-foreground'}`}>{closingDays(opportunity.deadline_at, data.now) !== null ? `Closes in ${closingDays(opportunity.deadline_at, data.now)} days` : deadlineLabel(opportunity, data.now)}</p>
-          </div>
-          <h2 className="nb-h3 mt-2"><Link to="/opportunity/$slug" params={{ slug: opportunity.slug }} className="nb-org-link break-words">{publicTitle(opportunity.title)}</Link></h2>
-          {opportunity.summary && <p className="nb-body mt-2 text-muted-foreground">{publicCopy(opportunity.summary)}</p>}
-          <div className="mt-3 flex flex-wrap gap-2">
-            {amount && <span className="nb-chip">{amount}</span>}
-            {job && opportunity.location && <span className="nb-chip">{opportunity.location}{opportunity.remote_ok ? ' · remote OK' : ''}</span>}
-            {job && opportunity.employment_type && <span className="nb-chip">{humanize(opportunity.employment_type)}</span>}
-          </div>
-        </article>;
-      }}
-    </DateTimeline>}
+    <p className="nb-small my-6 text-muted-foreground" role="status">{opportunities.length} {search.archive ? 'closed' : 'open'} {opportunities.length === 1 ? 'opportunity' : 'opportunities'}</p>
+    {search.archive ? opportunities.length > 0 && <CardGrid>{opportunities.map(o => <OpportunityCard key={o.id} opportunity={o} now={data.now} />)}</CardGrid> : <>
+      {open.dated.length > 0 && <section className="mt-4" aria-labelledby="deadline-coming"><h2 id="deadline-coming" className="nb-h2 mb-6">Deadline coming</h2><CardGrid>{open.dated.map(o => <OpportunityCard key={o.id} opportunity={o} now={data.now} />)}</CardGrid></section>}
+      {open.rolling.length > 0 && <section className="mt-16" aria-labelledby="open-all-year"><h2 id="open-all-year" className="nb-h2 mb-6">Open all year</h2><CardGrid>{open.rolling.map(o => <OpportunityCard key={o.id} opportunity={o} now={data.now} />)}</CardGrid></section>}
+      {open.announced.length > 0 && <section className="mt-16" aria-labelledby="next-call"><h2 id="next-call" className="nb-h2 mb-6">Next call to be announced</h2><CardGrid>{open.announced.map(o => <OpportunityCard key={o.id} opportunity={o} now={data.now} />)}</CardGrid></section>}
+    </>}
     {opportunities.length === 0 && <div className="py-12">
       <h2 className="nb-h3">{search.archive ? 'No closed opportunities found' : 'No open opportunities found'}</h2>
       <p className="nb-body mt-3 text-muted-foreground">{hasFilters ? 'No opportunities match these filters.' : 'We’re adding opportunities. Check back soon.'}</p>

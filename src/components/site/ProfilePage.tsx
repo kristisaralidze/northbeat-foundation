@@ -1,3 +1,4 @@
+import { SaveButton } from './SaveButton';
 import { Link, useRouter } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
@@ -82,7 +83,7 @@ function StandardProfilePage({ profile }: { profile: PublicProfile }) {
     <header data-profile-identity data-profile-detail={isOrg ? [label, text(row, 'city')].filter(Boolean).join(', ') : undefined} className="pb-10">
       <div className={isOrg ? 'flex items-start gap-4' : 'flex flex-col gap-6 sm:flex-row sm:items-start'}>
         {isOrg ? <OrganisationLogo name={profile.title} slug={profile.row.slug} uploaded={profile.image} website={text(row, 'website')} eager /> : (isPerson || (profile.image && kind !== 'episodes')) && <ProfileImage image={profile.image} name={profile.title} kind={kind} />}
-        <div className="min-w-0 flex-1"><h1 data-page-title className="nb-h1 break-words">{profile.title}</h1><p className="nb-small mt-3 text-muted-foreground">{label}</p>{profile.summary && kind !== 'episodes' && <p className="nb-lead mt-4 break-words">{profile.summary}</p>}</div>
+        <div className="min-w-0 flex-1"><div className="flex items-start justify-between gap-4"><h1 data-page-title className="nb-h1 break-words">{profile.title}</h1>{kind === 'opportunities' && <SaveButton kind="opportunity" slug={profile.row.slug} title={profile.title} />}</div><p className="nb-small mt-3 text-muted-foreground">{label}</p>{profile.summary && kind !== 'episodes' && <p className="nb-lead mt-4 break-words">{profile.summary}</p>}</div>
       </div>
       {compactDetails && <div className="mt-6">{details}</div>}
       {tags.length > 0 && <div className="mt-6 flex flex-wrap gap-2" aria-label="Tags">{tags.map((term) => <span key={term.id} className="nb-chip max-w-full"><span className="truncate">{term.name}</span></span>)}</div>}

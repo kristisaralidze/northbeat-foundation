@@ -11,14 +11,18 @@ export function nearbyFirst<T extends { id: string; city: string | null; country
   const rank = (row: T) => city && row.city === city ? 0 : row.countryIds.some(id => countryIds.includes(id)) ? 1 : 2;
   return [...rows].sort((a, b) => rank(a) - rank(b) || a.title.localeCompare(b.title)).slice(0, 4);
 }
-export type CalendarEvent = { id: string; title: string; start: string; end: string | null; location: string; description: string; url: string };
+export type CalendarEvent = { id: string; title: string; start: string; end: string | null; location: string; description: string; url: string; allDay?: boolean };
+const ymd = (iso: string) => dayKey(iso).replace(/-/g, '');
+const nextYmd = (iso: string) => { const d = new Date(`${dayKey(iso)}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + 1); return d.toISOString().slice(0, 10).replace(/-/g, ''); };
 const stamp = (value: string) => new Date(value).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 const escape = (value: string) => value.replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;');
 export function eventCalendar(event: CalendarEvent) {
+  if (event.allDay) return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Northbeat//Events//EN', 'BEGIN:VEVENT', `UID:${event.id}@northbeat`, `DTSTAMP:${stamp(event.start)}`, `DTSTART;VALUE=DATE:${ymd(event.start)}`, `DTEND;VALUE=DATE:${nextYmd(event.start)}`, `SUMMARY:${escape(event.title)}`, `DESCRIPTION:${escape(event.description)}`, `URL:${event.url}`, 'END:VEVENT', 'END:VCALENDAR', ''].join('\r\n');
   const end = event.end && Date.parse(event.end) > Date.parse(event.start) ? event.end : new Date(Date.parse(event.start) + 3600000).toISOString();
   return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Northbeat//Events//EN', 'BEGIN:VEVENT', `UID:${event.id}@northbeat`, `DTSTAMP:${stamp(event.start)}`, `DTSTART:${stamp(event.start)}`, `DTEND:${stamp(end)}`, `SUMMARY:${escape(event.title)}`, `LOCATION:${escape(event.location)}`, `DESCRIPTION:${escape(event.description)}`, `URL:${event.url}`, 'END:VEVENT', 'END:VCALENDAR', ''].join('\r\n');
 }
 export function googleCalendar(event: CalendarEvent) {
+  if (event.allDay) return `https://calendar.google.com/calendar/render?${new URLSearchParams({ action: 'TEMPLATE', text: event.title, dates: `${ymd(event.start)}/${nextYmd(event.start)}`, details: `${event.description}\n${event.url}` })}`;
   const end = event.end && Date.parse(event.end) > Date.parse(event.start) ? event.end : new Date(Date.parse(event.start) + 3600000).toISOString();
   const params = new URLSearchParams({ action: 'TEMPLATE', text: event.title, dates: `${stamp(event.start)}/${stamp(end)}`, details: `${event.description}\n${event.url}`, location: event.location });
   return `https://calendar.google.com/calendar/render?${params}`;
@@ -60,6 +64,7 @@ export function closeToThem<T extends CloseCandidate>(rows: T[], self: { id: str
 /** Short reason chip for a relationship group label. */
 export const RELATION_REASON: Record<string, string> = { 'Invested in': 'Invested in', 'Backed by': 'Backer', 'Spun out of': 'Parent', Spinouts: 'Spinout', 'Acquired by': 'Acquirer', Acquired: 'Acquired', Partners: 'Partner' };
 export function outlookCalendar(event: CalendarEvent) {
+  if (event.allDay) return `https://outlook.live.com/calendar/0/action/compose?${new URLSearchParams({ path: '/calendar/action/compose', rru: 'addevent', subject: event.title, startdt: dayKey(event.start), enddt: `${nextYmd(event.start).slice(0, 4)}-${nextYmd(event.start).slice(4, 6)}-${nextYmd(event.start).slice(6)}`, allday: 'true', body: `${event.description}\n${event.url}` })}`;
   const end = event.end && Date.parse(event.end) > Date.parse(event.start) ? event.end : new Date(Date.parse(event.start) + 3600000).toISOString();
   const params = new URLSearchParams({ path: '/calendar/action/compose', rru: 'addevent', subject: event.title, startdt: new Date(event.start).toISOString(), enddt: new Date(end).toISOString(), body: `${event.description}\n${event.url}`, location: event.location });
   return `https://outlook.live.com/calendar/0/action/compose?${params}`;

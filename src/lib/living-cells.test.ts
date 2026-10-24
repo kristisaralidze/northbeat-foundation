@@ -21,7 +21,7 @@ describe('living cells data', () => {
     expect(safeCellData({ organisations: [org('a'), org('b', 'investor')], relations: [] }).relations).toEqual([]);
   });
   it('links combined groups to the canonical Explore type filter', () => {
-    expect(cellHref(3)).toBe('/explore?type=%5B%22incubator%22%2C%22accelerator%22%5D');
+    expect(cellHref(3)).toBe('/explore?group=incubators-and-accelerators');
   });
   it('uses directional real relation sentences', () => {
     const r = { from_org_id: 'company', to_org_id: 'uni', relation: 'spun_out_of' };

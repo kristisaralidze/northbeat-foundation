@@ -38,7 +38,7 @@ describe('filterOpportunities', () => {
 
 describe('amountLabel', () => {
   it('formats ranges, one-sided amounts and empty amounts', () => {
-    expect(amountLabel(row({ amount_min_eur: 10000, amount_max_eur: 50000 }))).toBe('€10,000–€50,000');
+    expect(amountLabel(row({ amount_min_eur: 10000, amount_max_eur: 50000 }))).toBe('€10,000 to €50,000');
     expect(amountLabel(row({ amount_min_eur: 25000, amount_max_eur: 25000 }))).toBe('€25,000');
     expect(amountLabel(row({ amount_max_eur: 5000 }))).toBe('Up to €5,000');
     expect(amountLabel(row({}))).toBe('');
@@ -48,7 +48,7 @@ describe('amountLabel', () => {
 describe('deadlineLabel', () => {
   it('counts down days and marks closed deadlines', () => {
     expect(deadlineLabel(row({ deadline_at: '2026-10-19T12:00:00Z' }), NOW)).toBe('Closes today');
-    expect(deadlineLabel(row({ deadline_at: '2026-10-25T00:00:00Z' }), NOW)).toBe('25 Oct 2026 · 6 days left');
+    expect(deadlineLabel(row({ deadline_at: '2026-10-25T00:00:00Z' }), NOW)).toBe('25 Oct 2026, 6 days left');
     expect(deadlineLabel(row({ deadline_at: '2026-10-01T00:00:00Z' }), NOW)).toBe('Closed 1 Oct 2026');
   });
   it('recognises continuous calls and rolling programmes from existing timing notes', () => {
@@ -56,5 +56,22 @@ describe('deadlineLabel', () => {
     expect(isRolling(row({ type: 'programme_intake', description: 'Rolling applications accepted year-round.' }))).toBe(true);
     expect(isRolling(row({ type: 'programme_intake', description: 'Intake dates not yet announced.' }))).toBe(false);
     expect(isRolling(row({ type: 'programme_intake' }))).toBe(false);
+  });
+});
+import { euro, friendlyDate, splitOpen } from './opportunities';
+describe('opportunity list formatting', () => {
+  it('shows amounts in full', () => {
+    expect(euro(75000)).toBe('€75,000');
+    expect(amountLabel(row({ amount_min_eur: 500, amount_max_eur: 5000 }))).toBe('€500 to €5,000');
+    expect(amountLabel(row({ amount_max_eur: 2500000 }))).toBe('Up to €2.5M');
+  });
+  it('never shows raw dates', () => {
+    expect(friendlyDate('2026-10-24T20:00:00Z', '2026-10-24T08:00:00Z')).toBe('Today, 24 Oct');
+    expect(friendlyDate('2027-01-14T10:00:00Z', '2026-10-24T08:00:00Z')).toBe('14 Jan 2027');
+  });
+  it('separates dated deadlines from rolling calls', () => {
+    const out = splitOpen([row({ id: 'b', deadline_at: '2026-12-01T00:00:00Z' }), row({ id: 'a', deadline_at: '2026-11-01T00:00:00Z' }), row({ id: 'r', type: 'job' })]);
+    expect(out.dated.map(r => r.id)).toEqual(['a', 'b']);
+    expect(out.rolling.map(r => r.id)).toEqual(['r']);
   });
 });

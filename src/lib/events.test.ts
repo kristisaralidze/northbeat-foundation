@@ -26,3 +26,19 @@ describe('events and deadlines', () => {
  it('includes multi-day events in every month they span', () => { expect(inMonth(event({ starts_at: '2026-10-31T12:00:00Z', ends_at: '2026-11-02T12:00:00Z' }), '2026-11')).toBe(true); });
  it('builds full Monday-first calendar weeks', () => { const days = calendarDays('2026-10'); expect(days[0]).toBe('2026-09-28'); expect(days.at(-1)).toBe('2026-11-01'); expect(days.length).toBe(35); });
 });
+import { describe as d3, it as i3, expect as e3 } from 'vitest';
+import { isThisWeek, matchesListFilters } from './events';
+d3('events list rules', () => {
+  i3('this week runs Monday to Sunday', () => {
+    // Sat 24 Oct 2026
+    e3(isThisWeek('2026-10-25T10:00:00Z', '2026-10-24T08:00:00Z')).toBe(true);
+    e3(isThisWeek('2026-10-26T10:00:00Z', '2026-10-24T08:00:00Z')).toBe(false);
+    e3(isThisWeek('2026-10-19T10:00:00Z', '2026-10-24T08:00:00Z')).toBe(true);
+  });
+  i3('online filter keeps online and hybrid events', () => {
+    const base = { id: '1', slug: 's', title: 't', event_type: 'meetup', summary: null, starts_at: null, ends_at: null, apply_deadline_at: null, timezone: null, city: 'Oulu', venue: null };
+    const f = { type: '', city: '', online: true, field: '' };
+    e3(matchesListFilters({ ...base, format: 'hybrid' }, f)).toBe(true);
+    e3(matchesListFilters({ ...base, format: 'in_person' }, f)).toBe(false);
+  });
+});

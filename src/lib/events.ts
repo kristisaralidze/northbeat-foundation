@@ -1,6 +1,6 @@
-export type EventRow = { id: string; slug: string; title: string; event_type: string; summary: string | null; starts_at: string | null; ends_at: string | null; apply_deadline_at: string | null; timezone: string | null; city: string | null; venue: string | null; format: string | null };
+export type EventRow = { id: string; slug: string; title: string; event_type: string; summary: string | null; starts_at: string | null; ends_at: string | null; apply_deadline_at: string | null; timezone: string | null; city: string | null; venue: string | null; format: string | null; termIds?: string[] };
 export type OpportunityDeadline = { id: string; slug: string; title: string; deadline_at: string | null };
-export type EventsData = { events: EventRow[]; opportunities: OpportunityDeadline[]; now: string };
+export type EventsData = { events: EventRow[]; opportunities: OpportunityDeadline[]; now: string; fields?: { id: string; name: string; slug: string }[] };
 export type EventFilters = { type: string; city: string; month: string; archive: boolean };
 export function dayKey(value: string, timezone = 'Europe/Helsinki'): string {
   const parsed = new Date(value); if (!Number.isFinite(parsed.getTime())) return '';
@@ -55,4 +55,28 @@ export function eventMonths(events: EventRow[]) {
     for (let m = start.slice(0, 7); m <= end.slice(0, 7); m = shiftMonth(m, 1)) months.add(m);
   }
   return [...months].sort();
+}
+
+/** Same Monday to Sunday week as now, in Helsinki time. */
+export function isThisWeek(value: string | null, now: string, timezone = 'Europe/Helsinki') {
+  if (!value) return false;
+  const day = (v: string) => Date.parse(`${dayKey(v, timezone)}T12:00:00Z`);
+  const today = day(now); const weekday = (new Date(today).getUTCDay() + 6) % 7;
+  const monday = today - weekday * 86400000; const d = day(value);
+  return d >= monday && d < monday + 7 * 86400000;
+}
+export type ListFilters = { type: string; city: string; online: boolean; field: string };
+/** List filters: type, city, online only, field. */
+export function matchesListFilters(event: EventRow, f: ListFilters, fields: { id: string; slug: string }[] = []) {
+  if (f.type && event.event_type !== f.type) return false;
+  if (f.city && event.city !== f.city) return false;
+  if (f.online && !(event.format === 'online' || event.format === 'hybrid')) return false;
+  if (f.field) { const id = fields.find(x => x.slug === f.field)?.id; if (!id || !(event.termIds ?? []).includes(id)) return false; }
+  return true;
+}
+/** Group dated events by YYYY-MM in order. */
+export function groupByMonth(events: EventRow[]) {
+  const groups: { month: string; events: EventRow[] }[] = [];
+  for (const e of events) { const m = e.starts_at ? dayKey(e.starts_at, e.timezone ?? undefined).slice(0, 7) : ''; const last = groups.at(-1); if (last?.month === m) last.events.push(e); else groups.push({ month: m, events: [e] }); }
+  return groups;
 }
