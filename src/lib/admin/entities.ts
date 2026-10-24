@@ -11,7 +11,9 @@ export type FieldKind =
   | "multi"
   | "image"
   | "term"
-  | "sources";
+  | "sources"
+  | "lines"
+  | "facts";
 
 export type FieldDef = {
   name: string;
@@ -160,6 +162,15 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
       { name: "longitude", label: "Map longitude", kind: "number" },
       { name: "registration_url", label: "Registration URL", kind: "url" },
       { name: "price_note", label: "Price note", kind: "text" },
+      { name: "founded_year", label: "First held (year)", kind: "number" },
+      { name: "story", label: "The story", kind: "textarea" },
+      { name: "scale_facts", label: "In numbers", kind: "facts", help: "One per line: 13,000+ | attendees | 2025 | https://source" },
+      { name: "our_take", label: "Our take", kind: "textarea" },
+      { name: "who_youll_meet", label: "Who you'll meet", kind: "lines", help: "One per line" },
+      { name: "price_info", label: "Price", kind: "textarea" },
+      { name: "free_ways_in", label: "Free ways in", kind: "textarea" },
+      { name: "tips", label: "Tips", kind: "lines", help: "One per line" },
+      { name: "profile_sources", label: "Profile sources", kind: "lines", help: "One link per line" },
     ],
     links: [
       L("organisation_events", "event_id", "organisation_id", "organisations", "Organisations"),

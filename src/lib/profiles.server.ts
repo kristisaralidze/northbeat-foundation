@@ -5,7 +5,7 @@ import { approvedCover } from './organisation-cover';
 import { detailContext } from './detail.server';
 const COLUMNS: Record<EntityKey, string> = {
   organisations: '', people: '',
-  events: 'id,slug,status,title,event_type,summary,description,starts_at,ends_at,apply_deadline_at,timezone,format,venue,city,registration_url,price_note,source_url,last_checked',
+  events: 'id,slug,status,title,event_type,summary,description,starts_at,ends_at,apply_deadline_at,timezone,format,venue,city,registration_url,price_note,source_url,last_checked,founded_year,story,scale_facts,our_take,who_youll_meet,price_info,free_ways_in,tips,profile_sources',
   opportunities: 'id,slug,status,title,type,summary,description,opens_at,deadline_at,amount_min_eur,amount_max_eur,apply_url,location,employment_type,remote_ok,source_url,last_checked',
   episodes: 'id,slug,status,title,episode_number,season,summary,show_notes,transcript,audio_url,embed_url,duration_seconds,published_on,cover_url,source_url,last_checked',
   guides: '', glossary: '',
