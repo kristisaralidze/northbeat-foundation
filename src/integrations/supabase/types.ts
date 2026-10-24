@@ -1951,6 +1951,15 @@ export type Database = {
           updated_at: string
         }[]
       }
+      public_site_settings: {
+        Args: never
+        Returns: {
+          contact_email: string
+          instagram_url: string
+          linkedin_url: string
+          podcast_themes: string[]
+        }[]
+      }
     }
     Enums: {
       app_role: "admin"
