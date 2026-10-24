@@ -34,10 +34,10 @@ describe('action-first detail rules', () => {
     expect(closeToThem(rows,{id:'self',slug:'self',city:'Oulu',type:'investor',fieldNames:{med:'Medtech'},relations:{}})).toHaveLength(0);
   });
   it('never puts universities next to startups without a direct relation', () => {
-    const rows=[{id:'u',title:'Uni',city:'Oulu',type:'university',fieldIds:['med']},{id:'s',title:'Startup',city:'Oulu',type:'startup',fieldIds:['med']}];
+    const rows=[{id:'u',title:'Uni',city:'Oulu',type:'university',fieldIds:['med']},{id:'s',title:'Startup',city:'Oulu',type:'startup',fieldIds:['med']},{id:'s2',title:'Startup 2',city:'Oulu',type:'startup',fieldIds:['med']}];
     const self={id:'self',slug:'self',city:'Oulu',type:'startup',fieldNames:{med:'Medtech'},relations:{}};
-    expect(closeToThem(rows,self).map(o=>o.id)).toEqual(['s']);
-    expect(closeToThem(rows,{...self,relations:{u:'Partner'}}).map(o=>o.id)).toEqual(['u','s']);
+    expect(closeToThem(rows,self).map(o=>o.id)).toEqual(['s','s2']);
+    expect(closeToThem(rows,{...self,relations:{u:'Partner'}}).map(o=>o.id)).toEqual(['u','s','s2']);
   });
 });
 import {urgencyLevel,offerChips} from './detail';
