@@ -2,8 +2,8 @@ import { officialLogo, brandColour } from '@/lib/brand';
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { countdownLabel, daysUntil, eventCalendar, googleCalendar, googleMapsUrl, outlookCalendar, registrationClosed, type CalendarEvent } from '@/lib/detail';
+import { CalendarMenu } from './CalendarMenu';
+import { countdownLabel, daysUntil, googleMapsUrl, registrationClosed, type CalendarEvent } from '@/lib/detail';
 import { dateLabel, dayKey } from '@/lib/events';
 import { humanize } from '@/lib/admin/entities';
 import { EMPTY_SEARCH } from '@/lib/explore';
@@ -25,18 +25,6 @@ function DetailLink({ item, children }: { item: RelatedEntry & { kind: string };
   return <Link to="/person/$slug" params={{ slug: item.slug }} className="nb-link">{children}</Link>;
 }
 const itemPath = (item: DetailItem) => `${SITE}/${item.kind === 'events' ? 'event' : 'opportunity'}/${encodeURIComponent(item.slug)}`;
-function download(value: CalendarEvent, slug: string) {
-  const url = URL.createObjectURL(new Blob([eventCalendar(value)], { type: 'text/calendar;charset=utf-8' }));
-  const a = document.createElement('a'); a.href = url; a.download = `${slug}.ics`; a.click(); URL.revokeObjectURL(url);
-}
-function CalendarMenu({ event, slug, label = 'Add to calendar' }: { event: CalendarEvent; slug: string; label?: string }) {
-  return <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" className="nb-btn nb-btn-secondary">{label}</Button></DropdownMenuTrigger><DropdownMenuContent align="start">
-    <DropdownMenuItem onSelect={() => window.open(googleCalendar(event), '_blank', 'noopener,noreferrer')}>Google</DropdownMenuItem>
-    <DropdownMenuItem onSelect={() => download(event, slug)}>Apple (.ics)</DropdownMenuItem>
-    <DropdownMenuItem onSelect={() => download(event, slug)}>Outlook (.ics)</DropdownMenuItem>
-    <DropdownMenuItem onSelect={() => window.open(outlookCalendar(event), '_blank', 'noopener,noreferrer')}>Outlook on the web</DropdownMenuItem>
-  </DropdownMenuContent></DropdownMenu>;
-}
 function SaveShare({ kind, slug, title }: { kind: 'organisation' | 'event'; slug: string; title: string }) {
   const { saved, toggle } = useSaved(kind, slug, title); const [message, setMessage] = useState('');
   return <><Button variant="ghost" className="nb-btn nb-btn-secondary" aria-pressed={saved} onClick={toggle}>{saved ? 'Saved' : 'Save'}</Button>
@@ -51,7 +39,7 @@ function Countdown({ date, now, timezone }: { date: string | null; now: string; 
 function OpenNow({ items, now }: { items: DetailItem[]; now: string }) {
   if (!items.length) return null;
   return <section className="nb-detail-section"><h2 className="nb-h2 mb-6">Open now</h2><ul className="nb-detail-list">{items.map(item => {
-    const cal: CalendarEvent | null = item.date ? { id: item.id, title: item.kind === 'opportunities' ? `Deadline: ${item.title}` : item.title, start: item.date, end: item.kind === 'events' ? item.end : null, location: item.city ?? '', description: item.summary ?? '', url: itemPath(item) } : null;
+    const cal: CalendarEvent | null = item.date ? { id: item.id, title: item.kind === 'opportunities' ? `Deadline: ${item.title}` : item.title, start: item.date, end: item.kind === 'events' ? item.end : null, allDay: item.kind === 'opportunities', location: item.city ?? '', description: item.summary ?? '', url: itemPath(item) } : null;
     return <li key={`${item.kind}:${item.id}`}><div className="min-w-0"><p className="nb-small text-muted-foreground">{item.date ? `${item.kind === 'opportunities' ? 'Closes ' : ''}${dateLabel(item.date)}` : 'Rolling, apply any time'}{item.type ? `, ${humanize(item.type)}` : ''}</p><h3 className="nb-h3 mt-2"><DetailLink item={item}>{item.title}</DetailLink></h3></div>
       <div className="flex flex-wrap items-center gap-3"><Countdown date={item.date} now={now} />{cal && <CalendarMenu event={cal} slug={item.slug} />}</div></li>;
   })}</ul></section>;

@@ -1245,3 +1245,42 @@ html, body { overflow-x: clip; }
   .nb-detail-actions.nb-action-bar { gap: 8px; overflow: visible; flex-wrap: wrap; }
   .nb-detail-actions.nb-action-bar .nb-btn { flex: 1 1 auto; padding-left: 12px; padding-right: 12px; white-space: nowrap; }
 }
+
+/* One card style for list pages */
+.nb-card-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+@media (min-width: 640px) { .nb-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .nb-card-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.nb-entry-card { display: flex; flex-direction: column; gap: 12px; min-width: 0; height: 100%; padding: 24px; background: var(--card); border: 1px solid var(--hairline); border-radius: 12px; transition: border-color 150ms ease; }
+.nb-entry-card:hover { border-color: var(--primary); }
+.nb-entry-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; min-height: 48px; }
+.nb-entry-card .nb-org-logo { width: 48px; height: 48px; border-radius: 8px; background: var(--snow); }
+.nb-entry-card-title { font-family: var(--font-display); font-size: 22px; line-height: 1.25; overflow-wrap: anywhere; }
+.nb-entry-card-line { font-size: 15px; color: var(--muted-foreground); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.nb-entry-card-facts { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; padding-top: 8px; }
+.nb-entry-card-facts li { font-size: 13px; padding: 4px 10px; border-radius: 999px; background: var(--muted); color: var(--foreground); white-space: nowrap; }
+.nb-entry-card-footer { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.nb-save-icon { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin: -8px -8px 0 0; border-radius: 999px; color: var(--muted-foreground); transition: color 150ms ease, background-color 150ms ease; flex-shrink: 0; }
+.nb-save-icon:hover { background: var(--muted); color: var(--foreground); }
+.nb-save-icon[aria-pressed="true"] { color: var(--primary); }
+.nb-btn-compact { min-height: 44px; padding: 0 14px; font-size: 14px; }
+.nb-filter-chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.nb-filter-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--hairline); background: var(--card); font-size: 15px; transition: border-color 150ms ease; }
+.nb-filter-chip:hover, .nb-filter-chip[data-active="true"] { border-color: var(--primary); }
+.nb-filter-chip[data-active="true"] { color: var(--primary); }
+.nb-filter-pop { max-height: 360px; overflow-y: auto; }
+.nb-month-heading { font-family: var(--font-display); font-size: 24px; padding: 32px 0 12px; border-bottom: 1px solid var(--hairline); }
+.nb-event-row { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: 16px 24px; align-items: center; padding: 20px 12px; border-bottom: 1px solid var(--hairline); }
+.nb-event-row[data-this-week="true"] { background: var(--berry-soft); }
+.nb-event-date { text-align: center; color: var(--berry); }
+.nb-event-date strong { display: block; font-family: var(--font-display); font-size: 32px; line-height: 1; font-weight: 400; }
+.nb-event-date span { font-size: 13px; }
+.nb-event-meta { font-size: 14px; color: var(--muted-foreground); margin-top: 4px; }
+.nb-event-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 640px) { .nb-event-row { grid-template-columns: 56px minmax(0, 1fr); padding: 16px 8px; } .nb-event-actions { grid-column: 1 / -1; justify-content: flex-start; } }
+.nb-header-icon { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; border-radius: 999px; color: var(--foreground); transition: background-color 150ms ease; }
+.nb-header-icon:hover { background: var(--muted); }
+.nb-header-count { position: absolute; top: 4px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--primary); color: var(--primary-foreground); font-size: 11px; line-height: 18px; text-align: center; }
+.nb-search-results { max-height: min(60vh, 520px); overflow-y: auto; }
+.nb-search-result { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; min-height: 44px; }
+.nb-search-result[data-active="true"] { background: var(--muted); }
+.nb-search-result .nb-org-logo { width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0; background: var(--snow); }
