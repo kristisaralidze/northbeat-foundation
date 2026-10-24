@@ -11,6 +11,7 @@ import { AtmosphericImage } from './AtmosphericImage';
 import { SiteSearch } from './SiteSearch';
 import { SavedLink } from './SavedLink';
 import { SystoleHeart } from './SystoleHeart';
+import { PageTransition } from './motion';
 
 const NAV = [
   { to: "/explore", label: "Explore" },
@@ -138,7 +139,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         Skip to content
       </a>
       <Header isHome={isHome} pathname={pathname} />
-      <main id="main" className="flex-1">{isHome ? children : <PublicScrollFrame key={pathname} pathname={pathname}>{children}</PublicScrollFrame>}</main>
+      <main id="main" className="flex-1">{isHome ? <PageTransition pathname={pathname}>{children}</PageTransition> : <PublicScrollFrame key={pathname} pathname={pathname}>{children}</PublicScrollFrame>}</main>
       <SystoleHeart pathname={pathname} />
       <Footer hideSignup={pathname === '/newsletter' || pathname === '/newsletter/'} />
     </div>
