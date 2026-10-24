@@ -42,7 +42,7 @@ export function LaboratoryWordmark({ compact = false }: { compact?: boolean }) {
         <filter id="nb-wet-ink" x="-5%" y="-20%" width="110%" height="140%">
           <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" result="noise" />
           <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G">
-            <animate attributeName="scale" from="5" to="0" dur="3.4s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0 0 0.25 1" />
+            <animate attributeName="scale" from="5" to="0" dur="5s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0 0 0.25 1" />
           </feDisplacementMap>
         </filter>
       </defs>

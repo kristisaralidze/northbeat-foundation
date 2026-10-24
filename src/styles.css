@@ -348,8 +348,8 @@ html.lenis, html.lenis body { height: auto; }
   stroke-dasharray: 1400;
   stroke-dashoffset: 1400;
   animation:
-    nb-letter-draw 1.6s cubic-bezier(.45,.05,.25,1) calc(var(--i) * 0.12s) both,
-    nb-letter-fill 1.4s ease calc(var(--i) * 0.12s + 1s) both;
+    nb-letter-draw 2.2s cubic-bezier(.45,.05,.25,1) calc(var(--i) * 0.18s) both,
+    nb-letter-fill 1.6s ease calc(var(--i) * 0.18s + 1.4s) both;
 }
 @keyframes nb-letter-draw {
   from { stroke-dashoffset: 1400; }
@@ -363,7 +363,7 @@ html.lenis, html.lenis body { height: auto; }
   transform: scale(0);
   transform-box: fill-box;
   transform-origin: center;
-  animation: nb-dot-pop 0.6s cubic-bezier(.34,1.56,.64,1) 3.2s both;
+  animation: nb-dot-pop 0.6s cubic-bezier(.34,1.56,.64,1) 4.2s both;
 }
 @keyframes nb-dot-pop {
   from { transform: scale(0); }
@@ -371,7 +371,7 @@ html.lenis, html.lenis body { height: auto; }
 }
 .nb-wordmark-animated .nb-home-tagline {
   clip-path: inset(0 100% 0 0);
-  animation: nb-tagline-write 1.6s ease 2.4s both;
+  animation: nb-tagline-write 2s ease 3.8s both;
 }
 @keyframes nb-tagline-write {
   from { clip-path: inset(0 100% 0 0); }
@@ -1202,8 +1202,8 @@ html.lenis, html.lenis body { height: auto; }
 .nb-home-wordmark-slot svg { transform-origin: 0 0; will-change: transform; }
 .nb-home-shell .nb-home-header-logo { transition: none; }
 .nb-home-shell[data-hero-visible='true'] .nb-home-header-logo { transform: none; }
-.nb-heartbeat-now { position: absolute; left: var(--gutter, 1.25rem); top: 5rem; margin: 0; font-size: .875rem; color: var(--ink-soft); pointer-events: none; }
-.nb-heartbeat-next { position: absolute; left: 50%; bottom: 1.5rem; transform: translateX(-50%); display: flex; align-items: center; gap: .75rem; max-width: min(24rem, calc(100vw - 2 * var(--gutter, 1.25rem))); padding: .625rem .875rem; background: var(--card); color: var(--card-foreground); border: 1px solid var(--border); border-radius: .5rem; text-align: left; cursor: pointer; animation: nb-next-in 260ms ease both; z-index: 4; }
+.nb-heartbeat-now { position: absolute; left: calc(max(0px, (100% - 76rem) / 2) + var(--gutter, 1.25rem)); top: 5rem; margin: 0; font-size: .875rem; color: var(--ink-soft); pointer-events: none; }
+.nb-heartbeat-next { position: absolute; left: 50%; bottom: 1.5rem; transform: translateX(-50%); display: flex; align-items: center; gap: .75rem; max-width: min(24rem, calc(100vw - 2 * var(--gutter, 1.25rem))); padding: .625rem .875rem; background: var(--card); color: var(--card-foreground); border: 1px solid var(--border); border-radius: .5rem; text-align: left; cursor: pointer; animation: nb-next-in 260ms ease backwards; z-index: 4; }
 .nb-heartbeat-next:hover { box-shadow: var(--shadow-hover); }
 .nb-heartbeat-next:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 .nb-heartbeat-next img { width: 32px; height: 32px; object-fit: contain; flex: none; }
@@ -1218,3 +1218,11 @@ html.lenis, html.lenis body { height: auto; }
 .nb-heartbeat-next-text { flex: 1; }
 @media (max-width: 639px) { .nb-heartbeat-next { width: calc(100vw - 2 * var(--gutter, 1.25rem)); bottom: 1rem; } .nb-heartbeat-next-org { max-width: 5rem; } }
 .nb-heartbeat-next { width: max-content; } @media (max-width: 639px) { .theme-site .nb-heartbeat-next { width: calc(100vw - 2.5rem); } }
+
+/* No sideways scroll anywhere. */
+html, body { overflow-x: clip; }
+.nb-heartbeat, .nb-heartbeat-sticky, .nb-home-wordmark-section { max-width: 100%; overflow-x: clip; }
+/* Home type system: Bodoni Moda for the wordmark, headings and event titles; the body font for everything else. */
+.nb-home-shell { --font-display: "Bodoni Moda", ui-serif, Georgia, serif; --cell-mono: var(--font-body); }
+.nb-home-shell :is(h1, h2, h3), .nb-home-shell .nb-network-heading { font-family: var(--font-display); font-weight: 400; }
+.nb-home-shell .nb-network-heading { font-size: 1.75rem; line-height: 1.2; }
