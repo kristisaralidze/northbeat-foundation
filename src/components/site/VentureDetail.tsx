@@ -99,14 +99,11 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
       </div>
     </header>
     {isOrg && row['logo_shared_from'] && profile.related.some(g=>g.label==='Part of') && <p className="nb-small">Part of {profile.related.filter(g=>g.label==='Part of').flatMap(g=>g.entries).filter(e=>e.id===row['logo_shared_from']).map(e=><DetailLink key={e.id} item={{...e,kind:'organisations'}}>{e.title}</DetailLink>)}</p>}
-    {isOrg && <OrgProfile row={row} />}
+    {isOrg && <OrgProfile row={row} aboutFallback={(description ?? profile.summary) ?? ''} />}
     {actions}
     {isOrg && detail && <OpenNow items={detail.coming} now={now} />}
     {!isOrg && steps.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">Who it is for</h2><ul className="nb-detail-chips">{steps.map(step => <li key={step.id} className="nb-reason-chip">{journeySentence(step.name).replace(/\.$/, '')}</li>)}</ul></section>}
     {!isOrg && <EventProfile row={row} />}
-    {isOrg && !detail?.coming.length && !connections.length && (description ?? profile.summary)
-      ? <section className="nb-detail-section"><h2 className="nb-h2 mb-5">About</h2><p className="nb-body nb-detail-description whitespace-pre-line">{description ?? profile.summary}</p></section>
-      : description && description !== profile.summary && <p className="nb-body nb-detail-description">{description}</p>}
     {isOrg && connections.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2">Connections</h2><RelationshipMap profile={connectionProfile} link={(kind, entry) => <DetailLink item={{ ...entry, kind }}>{entry.title}</DetailLink>} /><div className="nb-connection-lists">{connections.map(group => <div key={group.label}><h3 className="nb-h3 mb-4">{group.label === 'Partners' ? 'Partners' : group.label}</h3><ul className="space-y-3">{group.entries.map(entry => <li key={entry.id} className="flex items-center gap-3"><OrganisationLogo name={entry.title} slug={entry.slug} /><DetailLink item={{ ...entry, kind: group.kind }}>{entry.title}</DetailLink></li>)}</ul></div>)}</div></section>}
     {isOrg && Boolean(detail?.similar.length) && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">Close to them</h2><div className="nb-close-grid">{detail?.similar.map(entry => <article key={entry.id} className="nb-card"><OrganisationLogo name={entry.title} slug={entry.slug} /><h3 className="nb-h3 mt-4"><DetailLink item={{ ...entry, kind: 'organisations' }}>{entry.title}</DetailLink></h3>{entry.roles[0] && <p className="mt-3"><span className="nb-reason-chip">{entry.roles[0]}</span></p>}</article>)}</div></section>}
     {!isOrg && Boolean(detail?.guides.length) && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">{isOrg ? 'Learn' : 'Prepare'}</h2><ul className="space-y-5">{detail?.guides.map(guide => <li key={guide.slug}><h3 className="nb-h3"><Link to="/learn/$slug" params={{ slug: guide.slug }} className="nb-link">{guide.title}</Link></h3>{guide.summary && <p className="nb-small mt-2">{guide.summary}</p>}</li>)}</ul></section>}
@@ -125,18 +122,21 @@ function journeySentence(name: string) {
 }
 type Fact = { value: string; label: string; year?: string; source_url?: string };
 const strings = (v: unknown) => Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && x.trim() !== '') : [];
-/** Editorial organisation profile after the header: story, numbers, our take, offer chips, get involved. Each part hides when empty. */
-function OrgProfile({ row }: { row: PublicProfile['row'] }) {
+/** Editorial organisation profile after the header: about, numbers, our take, offer chips, get involved, sources. Each part hides when empty. */
+function OrgProfile({ row, aboutFallback }: { row: PublicProfile['row']; aboutFallback: string }) {
   const story = text(row, 'story'); const take = text(row, 'our_take');
+  const about = story ?? (aboutFallback || null);
   const facts = (Array.isArray(row['scale_facts']) ? row['scale_facts'] as unknown as Fact[] : []).filter(f => f && f.value && f.label);
   const chips = offerChips(text(row, 'type') ?? '', row['offer_chips']);
   const involved = strings(row['how_to_get_involved']);
+  const sources = strings(row['sources']).map(u => safeWebUrl(u)).filter((u): u is string => Boolean(u));
   return <>
-    {story && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">The story</h2><p className="nb-body max-w-2xl whitespace-pre-line">{story}</p></section>}
+    {about && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">About</h2><p className="nb-body max-w-2xl whitespace-pre-line">{about}</p></section>}
     {facts.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">In numbers</h2><dl className="nb-event-facts">{facts.map((f, i) => <div key={i}><dt className="nb-event-fact-value">{f.value}</dt><dd className="nb-small text-muted-foreground">{f.label}{f.year ? `, ${f.year}` : ''}{safeWebUrl(f.source_url ?? null) ? <> <a className="nb-link" href={safeWebUrl(f.source_url ?? null)!} target="_blank" rel="noopener noreferrer">Source</a></> : null}</dd></div>)}</dl></section>}
     {take && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">Our take</h2><p className="nb-lead max-w-2xl">{take}</p></section>}
     {chips.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">How they can help you</h2><ul className="nb-detail-chips">{chips.map(chip => <li key={chip} className="nb-reason-chip">{chip}</li>)}</ul></section>}
-    {involved.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">How to get involved</h2><ul className="nb-check-list nb-body max-w-2xl">{involved.map(s => <li key={s}>{s}</li>)}</ul></section>}
+    {involved.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">How to get involved</h2><ol className="nb-body max-w-2xl list-decimal space-y-2 pl-6">{involved.map(s => <li key={s}>{s}</li>)}</ol></section>}
+    {sources.length > 0 && <p className="nb-small text-muted-foreground">Sources: {sources.map((u, i) => <span key={u}>{i > 0 && ', '}<a className="nb-link" href={u} target="_blank" rel="noopener noreferrer">{new URL(u).hostname.replace(/^www\./, '')}</a></span>)}</p>}
   </>;
 }
 /** Editorial event profile: our take, numbers, story, who you'll meet, price, tips. Each part hides when empty. */
