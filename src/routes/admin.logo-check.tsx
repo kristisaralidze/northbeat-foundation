@@ -1,42 +1,27 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { OrganisationLogo, logoSource } from '@/components/site/OrganisationLogo';
-import { organisationDomain } from '@/lib/organisation-logo';
-
-export const Route = createFileRoute('/admin/logo-check')({
-  head: () => ({ meta: [{ title: 'Logo check | Northbeat admin' }, { name: 'description', content: 'Every organisation with its website domain, the logo shown and its source.' }, { property: 'og:title', content: 'Logo check | Northbeat admin' }, { property: 'og:description', content: 'Every organisation with its website domain, the logo shown and its source.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary' }] }),
-  component: LogoCheck,
-});
-
-type Row = { id: string; name: string; status: string; website: string | null; logo_url: string | null; logo_choice: string };
-
-function LogoCheck() {
-  const [filter, setFilter] = useState('');
-  const q = useQuery({ queryKey: ['admin-logo-check'], queryFn: async () => {
-    const rows: Row[] = [];
-    for (let from = 0; ; from += 1000) {
-      const { data, error } = await supabase.from('organisations').select('id,name,status,website,logo_url,logo_choice').order('name').range(from, from + 999);
-      if (error) throw error; rows.push(...data); if (data.length < 1000) return rows;
-    }
-  } });
-  const rows = (q.data ?? []).filter(o => !filter || `${o.name} ${o.website ?? ''}`.toLowerCase().includes(filter.toLowerCase()));
-  return <section className="space-y-6">
-    <h1 className="text-2xl font-semibold">Logo check</h1>
-    <p className="text-muted-foreground">Logos show only from the organisation's own website domain (Brandfetch for that exact domain) or an admin upload. No website means the name shows instead. An empty logo cell means nothing loaded. Click a name to fix it.</p>
-    <input className="h-10 w-full max-w-sm rounded-md border border-border px-3" placeholder="Filter by name or domain" value={filter} onChange={e => setFilter(e.target.value)} aria-label="Filter organisations" />
-    {q.isPending ? <p>Loading…</p> : q.error ? <p role="alert">Could not load organisations.</p> : <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead><tr className="border-b border-border text-left"><th className="py-2 pr-4">Organisation</th><th className="py-2 pr-4">Website domain</th><th className="py-2 pr-4">Logo shown</th><th className="py-2 pr-4">Source</th><th className="py-2">Status</th></tr></thead>
-        <tbody>{rows.map(o => <tr key={o.id} className="border-b border-border align-middle">
-          <td className="py-2 pr-4"><Link to="/admin/organisations/$id" params={{ id: o.id }} className="underline">{o.name}</Link></td>
-          <td className="py-2 pr-4">{organisationDomain(o.website) ?? <span className="text-muted-foreground">None</span>}</td>
-          <td className="py-2 pr-4"><span className="flex h-14 w-14 items-center"><OrganisationLogo name={o.name} website={o.website ?? null} uploaded={o.logo_url} choice={o.logo_choice} /></span></td>
-          <td className="py-2 pr-4">{logoSource(o.logo_choice, o.logo_url, o.website)}</td>
-          <td className="py-2">{o.status}</td>
-        </tr>)}</tbody>
-      </table>
-    </div>}
-  </section>;
+import {createFileRoute,Link} from '@tanstack/react-router';
+import {useQuery,useQueryClient} from '@tanstack/react-query';
+import {useState,useRef} from 'react';
+import {supabase} from '@/integrations/supabase/client';
+import {Button} from '@/components/ui/button';
+import {OrganisationLogo} from '@/components/site/OrganisationLogo';
+import {resolveOrganisationLogo,checkLogoUrl} from '@/lib/logo-check';
+import {uploadImage} from '@/components/admin/ImageField';
+import {organisationDomain} from '@/lib/organisation-logo';
+export const Route=createFileRoute('/admin/logo-check')({head:()=>({meta:[{title:'Logo check: Northbeat admin'},{name:'description',content:'Stored logo checks, light logos, missing assets and shared parent logos.'},{property:'og:title',content:'Logo check: Northbeat admin'},{property:'og:description',content:'Stored logo checks, light logos, missing assets and shared parent logos.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary'}]}),component:LogoCheck});
+function LogoCheck(){
+ const qc=useQueryClient();const [filter,setFilter]=useState('');const [query,setQuery]=useState('');const [busy,setBusy]=useState(false);const [progress,setProgress]=useState('');const target=useRef<string|null>(null);const input=useRef<HTMLInputElement>(null);
+ const q=useQuery({queryKey:['admin-logo-check'],queryFn:async()=>{const out=[];for(let from=0;;from+=1000){const {data,error}=await supabase.from('organisations').select('id,name,slug,status,website,logo_url,logo_choice,logo_image_source,logo_resolved_url,logo_tone,logo_status,logo_shared_from,logo_checked_at,logo_check_error,logo_manual_required').order('name').range(from,from+999);if(error)throw error;out.push(...data);if(data.length<1000)return out;}}});
+ const check=async()=>{if(busy)return;setBusy(true);let count=0;try{const resolved=new Map<string,Awaited<ReturnType<typeof resolveOrganisationLogo>>>();const rows=q.data??[];
+ for(let i=0;i<rows.length;i+=6){await Promise.all(rows.slice(i,i+6).map(async row=>{const result=await resolveOrganisationLogo(row);const {error}=await supabase.from('organisations').update({...result,logo_shared_from:null,logo_checked_at:new Date().toISOString()}).eq('id',row.id);if(error)throw error;resolved.set(row.id,result);count++;setProgress(`Checking ${count} of ${rows.length}`);}));}
+ const {data:parents,error}=await supabase.from('organisation_relations').select('from_org_id,to_org_id,relation').eq('relation','part_of');if(error)throw error;
+ for(const rel of parents??[]){const child=rows.find(o=>o.id===rel.from_org_id),parent=rows.find(o=>o.id===rel.to_org_id);const own=resolved.get(rel.from_org_id),shared=resolved.get(rel.to_org_id);if(!child||!parent||parent.status!=='published'||child.logo_choice==='upload'||child.logo_manual_required||own?.logo_status!=='missing'||!shared?.logo_resolved_url)continue;const {error}=await supabase.from('organisations').update({...shared,logo_shared_from:parent.id,logo_checked_at:new Date().toISOString()}).eq('id',child.id);if(error)throw error;}
+ setProgress(`Checked ${count} organisations.`);await q.refetch();await qc.invalidateQueries({queryKey:['public-directory']});
+ }catch(e){setProgress(e instanceof Error?e.message:'Check failed.');}finally{setBusy(false);}};
+ const upload=async(file?:File)=>{const id=target.current;if(!file||!id)return;setBusy(true);try{const url=await uploadImage(file,'logos');const result=await checkLogoUrl(url);const {error}=await supabase.from('organisations').update({logo_url:url,logo_choice:'upload',logo_image_source:'admin_upload',logo_image_source_url:url,...result,logo_resolved_url:url,logo_shared_from:null,logo_manual_required:false,logo_checked_at:new Date().toISOString()}).eq('id',id);if(error)throw error;await qc.invalidateQueries();}catch(e){setProgress(e instanceof Error?e.message:'Upload failed');}finally{setBusy(false);}};
+ const all=q.data??[];const rows=all.filter(o=>(!filter||(filter==='shared'?Boolean(o.logo_shared_from):o.logo_status===filter))&&`${o.name} ${o.website??''}`.toLowerCase().includes(query.toLowerCase()));
+ return <section className="space-y-6"><h1 className="text-2xl font-semibold">Logo check</h1><div className="flex flex-wrap items-center gap-4"><Button onClick={check} disabled={busy||!q.data}>{busy?'Checking…':'Re-run check'}</Button><p role="status" className="text-sm">{progress}</p></div>
+ <p data-logo-counts className="text-sm">{all.filter(o=>o.logo_status==='ok').length} ok, {all.filter(o=>o.logo_status==='light').length} light, {all.filter(o=>o.logo_status==='missing').length} missing</p>
+ <div className="flex flex-wrap gap-3"><input aria-label="Filter organisations" className="min-w-0 rounded-md border border-border p-2" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Name or domain"/><select aria-label="Logo status" className="rounded-md border border-border p-2" value={filter} onChange={e=>setFilter(e.target.value)}><option value="">All</option><option value="light">Light</option><option value="missing">Missing</option><option value="shared">Shared</option></select></div>
+ <input ref={input} type="file" accept="image/png,image/svg+xml,image/webp" className="hidden" onChange={e=>{void upload(e.target.files?.[0]);e.target.value='';}}/>
+ {q.isPending?<p>Loading…</p>:q.error?<p role="alert">Could not load organisations.</p>:<div className="theme-site grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">{rows.map(o=><article key={o.id} className="nb-card min-w-0"><OrganisationLogo name={o.name} uploaded={o.logo_url} choice={o.logo_choice} resolved={o.logo_resolved_url} tone={o.logo_tone} status={o.logo_status}/><h2 className="nb-h3 mt-4"><Link to="/admin/organisations/$id" params={{id:o.id}} className="nb-link">{o.name}</Link></h2><p className="nb-small break-words text-muted-foreground">{organisationDomain(o.website)}<br/>{o.logo_status}{o.logo_shared_from?', shared':''}</p>{o.logo_check_error&&<p className="nb-small mt-2">{o.logo_check_error}</p>}<Button variant="outline" className="mt-4" disabled={busy} onClick={()=>{target.current=o.id;input.current?.click();}} aria-label={`Upload logo for ${o.name}`}>Upload</Button></article>)}</div>}</section>;
 }
