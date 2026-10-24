@@ -1362,5 +1362,5 @@ html, body { overflow-x: clip; }
 .theme-site a.nb-learn-step:hover { border-color: var(--primary); }
 .theme-site .nb-learn-step[data-current="true"] { border-color: var(--primary); background: color-mix(in oklab, var(--primary) 8%, var(--background)); }
 .theme-site .nb-learn-step[data-disabled="true"] { opacity: 0.55; }
-.theme-site .nb-learn-step-number { font-family: var(--font-display); font-size: 48px; line-height: 1; color: var(--primary); }
-.theme-site .nb-learn-step-name { font-family: var(--font-display); font-size: 20px; line-height: 1.2; color: var(--ink); }
+.theme-site .nb-learn-step-number { font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-size: 48px; line-height: 1; color: var(--berry); }
+.theme-site .nb-learn-step-name { font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-size: 20px; line-height: 1.2; color: var(--ink); }
