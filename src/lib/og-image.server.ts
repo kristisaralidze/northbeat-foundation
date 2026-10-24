@@ -79,8 +79,8 @@ export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
   ctx.fillStyle = COLOURS.paper; ctx.fillRect(0, 0, W, H);
   const pad = 80;
   // Flat heartbeat line along the bottom, one beat in plum.
-  ctx.strokeStyle = COLOURS.ink; ctx.lineWidth = 3 * S; ctx.beginPath(); ctx.moveTo(0, 540); ctx.lineTo(880, 540); ctx.lineTo(905, 500); ctx.lineTo(930, 580); ctx.lineTo(955, 540); ctx.lineTo(W, 540); ctx.stroke();
-  ctx.fillStyle = COLOURS.plum; ctx.beginPath(); ctx.arc(905, 500, 8, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = COLOURS.ink; ctx.lineWidth = 3 * S; ctx.beginPath(); ctx.moveTo(0, 580); ctx.lineTo(880, 580); ctx.lineTo(905, 546); ctx.lineTo(930, 612); ctx.lineTo(955, 580); ctx.lineTo(W, 580); ctx.stroke();
+  ctx.fillStyle = COLOURS.plum; ctx.beginPath(); ctx.arc(905, 546, 8, 0, Math.PI * 2); ctx.fill();
   if (input.home) {
     ctx.fillStyle = COLOURS.ink; ctx.font = '150pt Bodoni';
     const word = 'NORTHBEAT'; const w = ctx.measureText(word).width; serif(ctx, word, (W - w) / 2, 300, COLOURS.ink);
@@ -90,16 +90,16 @@ export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
   let textX = pad;
   const logo = input.logoUrl ? await decodeLogo(input.logoUrl) : null;
   if (logo) {
-    ctx.fillStyle = COLOURS.hairline; roundRect(ctx, pad - 2, pad - 2, 164, 164, 26);
-    ctx.fillStyle = COLOURS.white; roundRect(ctx, pad, pad, 160, 160, 24);
-    drawLogo(img, logo, (pad + 20) * S, (pad + 20) * S, 120 * S);
+    ctx.fillStyle = COLOURS.hairline; roundRect(ctx, pad - 2, pad - 2, 124, 124, 22);
+    ctx.fillStyle = COLOURS.white; roundRect(ctx, pad, pad, 120, 120, 20);
+    drawLogo(img, logo, (pad + 16) * S, (pad + 16) * S, 88 * S);
   }
-  const top = logo ? pad + 160 + 64 : pad + 40;
+  const top = logo ? pad + 120 + 60 : pad + 60;
   ctx.fillStyle = COLOURS.plum; ctx.font = '30pt Body'; ctx.fillText(input.eyebrow, textX, top);
   ctx.fillStyle = COLOURS.ink; ctx.font = '64pt Bodoni';
   const lines = wrap(ctx, input.title, W - pad * 2, logo ? 2 : 3);
   lines.forEach((line, i) => serif(ctx, line, textX, top + 84 + i * 80, COLOURS.ink));
-  if (input.subtitle) { ctx.font = '30pt Body'; ctx.fillStyle = COLOURS.muted; const sub = wrap(ctx, input.subtitle, W - pad * 2, 1)[0]!; ctx.fillText(sub, textX, top + 84 + lines.length * 80 + 10); }
+  if (input.subtitle) { ctx.font = '30pt Body'; ctx.fillStyle = COLOURS.muted; const sub = wrap(ctx, input.subtitle, W - pad * 2, 1)[0]!; ctx.fillText(sub, textX, top + 84 + lines.length * 80 + 4); }
   ctx.font = '30pt Bodoni'; ctx.fillStyle = COLOURS.ink; serif(ctx, 'NORTHBEAT', W - pad - ctx.measureText('NORTHBEAT').width, pad + 30, COLOURS.ink);
   return encode(img);
 }
