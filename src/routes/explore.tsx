@@ -1,14 +1,14 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OrganisationCard } from "@/components/site/OrganisationCard";
-import { DirectoryFilters } from "@/components/site/DirectoryFilters";
+import { FilterChipRow, FilterStack } from "@/components/site/ExploreFilters";
+import { CardGrid } from "@/components/site/EntryCard";
 import { directoryQuery } from '@/lib/directory.query';
-import { EMPTY_SEARCH, FACETS, cleanExploreSearch, filterOrganisations, parseExploreSearch, type ExploreSearch, type Facet } from "@/lib/explore";
+import { EMPTY_SEARCH, FACETS, GROUP_OPTIONS, cleanExploreSearch, filterOrganisations, parseExploreSearch, sortOrganisations, type ExploreSearch, type Facet } from "@/lib/explore";
 import { humanize } from "@/lib/admin/entities";
-import { LayoutResults } from '@/components/site/LayoutResults';
 import { FilterSheet } from '@/components/site/FilterSheet';
 
 
@@ -42,37 +42,40 @@ function Explore() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const results = filterOrganisations(data, search);
-  const selected = FACETS.flatMap((facet) => search[facet].map((value) => ({ facet, value, label: facet === "type" ? humanize(value) : data.terms.find((term) => term.kind === facet && term.slug === value)?.name ?? humanize(value) })));
+  const results = sortOrganisations(filterOrganisations(data, search), search.sort);
+  const label = (facet: Facet, value: string) => facet === "group" ? GROUP_OPTIONS.find(g => g.value === value)?.label ?? humanize(value) : facet === "type" ? humanize(value) : data.terms.find((term) => term.kind === facet && term.slug === value)?.name ?? humanize(value);
+  const selected = FACETS.flatMap((facet) => search[facet].map((value) => ({ facet, value, label: label(facet, value) })));
   const toggle = (facet: Facet, value: string) => { void navigate({ search: (prev) => ({ ...prev, [facet]: prev[facet].includes(value) ? prev[facet].filter((v) => v !== value) : [...prev[facet], value] }), resetScroll: false }); };
-  const clear = () => { void navigate({ search: EMPTY_SEARCH, resetScroll: false }); };
+  const clear = () => { void navigate({ search: { ...EMPTY_SEARCH, sort: search.sort }, resetScroll: false }); };
+  const filtered = selected.length > 0 || Boolean(search.q);
   return <div className="nb-container py-12 md:py-16">
-    <div data-explore-bar className="nb-explore-bar">
-      <div><h1 className="nb-h1">Explore</h1></div>
-      <div className="relative min-w-0 flex-1">
+    <header className="mb-8 flex flex-col gap-6">
+      <h1 className="nb-h1">Explore</h1>
+      <div className="relative min-w-0">
         <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
-        <input type="search" aria-label="Search organisations" placeholder="Search organisations…" value={search.q} onChange={(event) => { void navigate({ search: (prev) => ({ ...prev, q: event.target.value }), replace: true, resetScroll: false }); }} className="nb-input pl-12" />
+        <input type="search" aria-label="Search organisations" placeholder="Search organisations" value={search.q} onChange={(event) => { void navigate({ search: (prev) => ({ ...prev, q: event.target.value }), replace: true, resetScroll: false }); }} className="nb-input pl-12" />
       </div>
-      <p className="nb-small text-muted-foreground" aria-live="polite">{results.length} {results.length === 1 ? 'organisation' : 'organisations'}</p>
-      <Button variant="ghost" title="Filters" aria-label="Filters" className="lg:hidden" onClick={() => setFiltersOpen(true)}><SlidersHorizontal />Filters</Button>
-    </div>
-    <div className="nb-directory-layout">
-      <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen}><DirectoryFilters data={data} search={search} onToggle={toggle} /></FilterSheet>
-      <aside aria-label="Organisation filters" data-native-scroll className="nb-sticky-filters hidden lg:block lg:col-start-1">
-        <div className="mb-6 hidden items-center justify-between gap-3 lg:flex">
-          <h2 className="nb-h3">Filters</h2>
-          {(selected.length > 0 || search.q) && <Button variant="ghost" size="sm" onClick={clear} className="text-primary">Clear all</Button>}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="hidden md:block"><FilterChipRow data={data} search={search} onToggle={toggle} /></div>
+        <Button variant="ghost" className="nb-filter-chip md:hidden" onClick={() => setFiltersOpen(true)}><SlidersHorizontal className="h-4 w-4" />Filters{selected.length ? ` (${selected.length})` : ''}</Button>
+        <label className="ml-auto flex items-center gap-2 nb-small"><span className="text-muted-foreground">Sort</span>
+          <select className="nb-input h-11 w-auto py-0" value={search.sort} onChange={(e) => { void navigate({ search: (prev) => ({ ...prev, sort: e.target.value === 'recent' ? 'recent' : 'az' }), resetScroll: false }); }}><option value="az">A to Z</option><option value="recent">Recently added</option></select></label>
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <p className="nb-small mr-2" aria-live="polite"><strong className="font-medium">{results.length}</strong> {results.length === 1 ? 'organisation' : 'organisations'}</p>
+        {selected.map(({ facet, value, label }) => <Button key={`${facet}-${value}`} variant="ghost" size="sm" className="nb-chip" data-active="true" onClick={() => toggle(facet, value)} aria-label={`Remove ${label} filter`}>{label}<X className="h-3 w-3" aria-hidden /></Button>)}
+        {filtered && <Button variant="ghost" size="sm" onClick={clear} className="text-primary">Clear filters</Button>}
+      </div>
+    </header>
+    <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen}><FilterStack data={data} search={search} onToggle={toggle} /></FilterSheet>
+    <section aria-label="Organisations" className="min-w-0">
+      {results.length ? <CardGrid>{results.map((org) => <OrganisationCard key={org.id} organisation={org} terms={data.terms} />)}</CardGrid> : <div className="py-16">
+        <h2 className="nb-h2">Nothing matches these filters.</h2>
+        <div className="mt-6 flex flex-wrap gap-3">
+          {filtered && <Button variant="ghost" onClick={clear} className="nb-btn nb-btn-secondary">Clear filters</Button>}
+          <Button asChild variant="ghost" className="nb-btn nb-btn-primary"><Link to="/submit" search={{ tab: 'company' }}>Suggest an organisation</Link></Button>
         </div>
-        <div id="directory-filters" className="block"><DirectoryFilters data={data} search={search} onToggle={toggle} /></div>
-      </aside>
-      <section aria-label="Organisations" className="min-w-0 lg:col-start-2">
-        {selected.length > 0 && <div className="flex flex-wrap gap-2">{selected.map(({ facet, value, label }) => <Button key={`${facet}-${value}`} variant="ghost" size="sm" className="nb-chip" data-active="true" onClick={() => toggle(facet, value)} aria-label={`Remove ${label} filter`}>{label}<X className="h-3 w-3" aria-hidden /></Button>)}</div>}
-        {results.length ? <LayoutResults signature={results.map(org => org.id).join(',')}>{results.map((org) => <OrganisationCard key={org.id} organisation={org} terms={data.terms} />)}</LayoutResults> : <div className="py-16">
-          <h2 className="nb-h2">{data.organisations.length ? "No matching organisations" : "No organisations yet"}</h2>
-          <p className="nb-body mt-4 text-muted-foreground">{data.organisations.length ? "Try a different search or fewer filters." : "We’re adding organisations to the directory."}</p>
-          {(selected.length > 0 || search.q) && <Button variant="ghost" onClick={clear} className="nb-btn nb-btn-secondary mt-6">Clear search and filters</Button>}
-        </div>}
-      </section>
-    </div>
+      </div>}
+    </section>
   </div>;
 }
