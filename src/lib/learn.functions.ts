@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import type { Database } from '@/integrations/supabase/types';
 import { publicTitle } from './profiles';
-import { areaNeighbours, orderGuides, parseSources, rankHub, type GlossaryEntry, type GuideCard, type GuidePage, type HubItem, type LearnHub, type LearnTerm } from './learn';
+import { areaNeighbours, orderGuides, parseSources, rankHub, type GlossaryEntry, type GuideCard, type GuidePage, type HubItem, type LearnHub, type LearnTerm, type StepPage } from './learn';
 
 type Client = SupabaseClient<Database>;
 function publicClient(): Client {
