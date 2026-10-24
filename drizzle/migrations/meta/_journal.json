@@ -141,6 +141,13 @@
       "when": 1792876121575,
       "tag": "0019_event_rich_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1792877728358,
+      "tag": "0020_editorial_value_fields",
+      "breakpoints": true
     }
   ]
 }

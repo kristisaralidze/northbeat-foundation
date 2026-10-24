@@ -550,6 +550,72 @@ export type Database = {
           },
         ]
       }
+      guide_opportunities: {
+        Row: {
+          guide_id: string
+          id: string
+          opportunity_id: string
+        }
+        Insert: {
+          guide_id: string
+          id?: string
+          opportunity_id: string
+        }
+        Update: {
+          guide_id?: string
+          id?: string
+          opportunity_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_opportunities_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guide_opportunities_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guide_organisations: {
+        Row: {
+          guide_id: string
+          id: string
+          organisation_id: string
+        }
+        Insert: {
+          guide_id: string
+          id?: string
+          organisation_id: string
+        }
+        Update: {
+          guide_id?: string
+          id?: string
+          organisation_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guide_organisations_guide_id_fkey"
+            columns: ["guide_id"]
+            isOneToOne: false
+            referencedRelation: "guides"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guide_organisations_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guide_terms: {
         Row: {
           guide_id: string
@@ -832,6 +898,7 @@ export type Database = {
           deadline_at: string | null
           description: string | null
           employment_type: string | null
+          how_to_apply_steps: string[]
           id: string
           last_checked: string | null
           location: string | null
@@ -842,9 +909,12 @@ export type Database = {
           source_url: string | null
           status: Database["public"]["Enums"]["entry_status"]
           summary: string | null
+          tips: string[]
           title: string
           type: Database["public"]["Enums"]["opportunity_type"]
           updated_at: string
+          what_you_get: string | null
+          who_can_apply: string[]
         }
         Insert: {
           amount_max_eur?: number | null
@@ -855,6 +925,7 @@ export type Database = {
           deadline_at?: string | null
           description?: string | null
           employment_type?: string | null
+          how_to_apply_steps?: string[]
           id?: string
           last_checked?: string | null
           location?: string | null
@@ -865,9 +936,12 @@ export type Database = {
           source_url?: string | null
           status?: Database["public"]["Enums"]["entry_status"]
           summary?: string | null
+          tips?: string[]
           title: string
           type: Database["public"]["Enums"]["opportunity_type"]
           updated_at?: string
+          what_you_get?: string | null
+          who_can_apply?: string[]
         }
         Update: {
           amount_max_eur?: number | null
@@ -878,6 +952,7 @@ export type Database = {
           deadline_at?: string | null
           description?: string | null
           employment_type?: string | null
+          how_to_apply_steps?: string[]
           id?: string
           last_checked?: string | null
           location?: string | null
@@ -888,9 +963,12 @@ export type Database = {
           source_url?: string | null
           status?: Database["public"]["Enums"]["entry_status"]
           summary?: string | null
+          tips?: string[]
           title?: string
           type?: Database["public"]["Enums"]["opportunity_type"]
           updated_at?: string
+          what_you_get?: string | null
+          who_can_apply?: string[]
         }
         Relationships: []
       }
@@ -1241,6 +1319,7 @@ export type Database = {
           news_feed_url: string | null
           news_fetched_at: string | null
           news_items: Json | null
+          offer_chips: string[]
           openalex_id: string | null
           openalex_name: string | null
           prominence: number
@@ -1310,6 +1389,7 @@ export type Database = {
           news_feed_url?: string | null
           news_fetched_at?: string | null
           news_items?: Json | null
+          offer_chips?: string[]
           openalex_id?: string | null
           openalex_name?: string | null
           prominence?: number
@@ -1379,6 +1459,7 @@ export type Database = {
           news_feed_url?: string | null
           news_fetched_at?: string | null
           news_items?: Json | null
+          offer_chips?: string[]
           openalex_id?: string | null
           openalex_name?: string | null
           prominence?: number
@@ -1613,6 +1694,7 @@ export type Database = {
           id: number
           instagram_url: string | null
           linkedin_url: string | null
+          podcast_themes: string[]
           updated_at: string
         }
         Insert: {
@@ -1620,6 +1702,7 @@ export type Database = {
           id?: number
           instagram_url?: string | null
           linkedin_url?: string | null
+          podcast_themes?: string[]
           updated_at?: string
         }
         Update: {
@@ -1627,6 +1710,7 @@ export type Database = {
           id?: number
           instagram_url?: string | null
           linkedin_url?: string | null
+          podcast_themes?: string[]
           updated_at?: string
         }
         Relationships: []

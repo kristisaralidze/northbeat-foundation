@@ -1,0 +1,26 @@
+ALTER TABLE public.organisations ADD COLUMN offer_chips text[] NOT NULL DEFAULT '{}';
+GRANT SELECT (offer_chips) ON public.organisations TO anon;
+ALTER TABLE public.opportunities ADD COLUMN who_can_apply text[] NOT NULL DEFAULT '{}', ADD COLUMN what_you_get text, ADD COLUMN how_to_apply_steps text[] NOT NULL DEFAULT '{}', ADD COLUMN tips text[] NOT NULL DEFAULT '{}';
+ALTER TABLE public.opportunities ADD CONSTRAINT opportunity_tips_limit CHECK (cardinality(tips) <= 3);
+ALTER TABLE public.site_settings ADD COLUMN podcast_themes text[] NOT NULL DEFAULT '{}';
+ALTER TABLE public.site_settings ADD CONSTRAINT podcast_theme_limit CHECK (cardinality(podcast_themes) <= 3);
+CREATE TABLE public.guide_organisations (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), guide_id uuid NOT NULL REFERENCES public.guides(id) ON DELETE CASCADE, organisation_id uuid NOT NULL REFERENCES public.organisations(id) ON DELETE CASCADE, UNIQUE(guide_id, organisation_id));
+GRANT SELECT ON public.guide_organisations TO anon;
+GRANT SELECT,INSERT,UPDATE,DELETE ON public.guide_organisations TO authenticated;
+GRANT ALL ON public.guide_organisations TO service_role;
+ALTER TABLE public.guide_organisations ENABLE ROW LEVEL SECURITY;
+CREATE POLICY published_read ON public.guide_organisations FOR SELECT TO anon,authenticated USING (EXISTS(SELECT 1 FROM public.guides g WHERE g.id=guide_id AND g.status='published') AND EXISTS(SELECT 1 FROM public.organisations o WHERE o.id=organisation_id AND o.status='published'));
+CREATE POLICY admin_write ON public.guide_organisations FOR ALL TO authenticated USING(public.has_role(auth.uid(),'admin')) WITH CHECK(public.has_role(auth.uid(),'admin'));
+CREATE TABLE public.guide_opportunities (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), guide_id uuid NOT NULL REFERENCES public.guides(id) ON DELETE CASCADE, opportunity_id uuid NOT NULL REFERENCES public.opportunities(id) ON DELETE CASCADE, UNIQUE(guide_id, opportunity_id));
+GRANT SELECT ON public.guide_opportunities TO anon;
+GRANT SELECT,INSERT,UPDATE,DELETE ON public.guide_opportunities TO authenticated;
+GRANT ALL ON public.guide_opportunities TO service_role;
+ALTER TABLE public.guide_opportunities ENABLE ROW LEVEL SECURITY;
+CREATE POLICY published_read ON public.guide_opportunities FOR SELECT TO anon,authenticated USING (EXISTS(SELECT 1 FROM public.guides g WHERE g.id=guide_id AND g.status='published') AND EXISTS(SELECT 1 FROM public.opportunities o WHERE o.id=opportunity_id AND o.status='published'));
+CREATE POLICY admin_write ON public.guide_opportunities FOR ALL TO authenticated USING(public.has_role(auth.uid(),'admin')) WITH CHECK(public.has_role(auth.uid(),'admin'));
+CREATE FUNCTION public.limit_guide_picks() RETURNS trigger LANGUAGE plpgsql SET search_path=public AS $$ BEGIN
+PERFORM 1 FROM public.guides WHERE id=NEW.guide_id FOR UPDATE;
+IF (SELECT count(*) FROM public.guide_organisations WHERE guide_id=NEW.guide_id AND id<>NEW.id)+(SELECT count(*) FROM public.guide_opportunities WHERE guide_id=NEW.guide_id AND id<>NEW.id)>=3 THEN RAISE EXCEPTION 'Pick at most three hub entries per guide'; END IF;
+RETURN NEW; END; $$;
+CREATE TRIGGER guide_organisations_limit BEFORE INSERT OR UPDATE ON public.guide_organisations FOR EACH ROW EXECUTE FUNCTION public.limit_guide_picks();
+CREATE TRIGGER guide_opportunities_limit BEFORE INSERT OR UPDATE ON public.guide_opportunities FOR EACH ROW EXECUTE FUNCTION public.limit_guide_picks();
