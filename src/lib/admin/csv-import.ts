@@ -1,6 +1,11 @@
 import Papa from 'papaparse';
 import { z } from 'zod';
 import { ENTITIES, EVENT_FORMATS, slugify } from './entities';
+import { parsePasteValue } from './paste';
+
+/** Rich organisation profile columns, parsed into typed values and safe to fill on update. */
+const RICH_COLUMNS = new Set(['story', 'scale_facts', 'our_take', 'offer_chips', 'how_to_get_involved', 'sources']);
+const ORG_UPDATE_COLUMNS = ['founded_year', 'story', 'scale_facts', 'our_take', 'offer_chips', 'how_to_get_involved', 'sources'];
 
 export const importEntitySchema = z.enum(['organisations', 'events', 'opportunities']);
 export type ImportEntity = z.infer<typeof importEntitySchema>;
@@ -53,8 +58,24 @@ export function prepareRow(entity: ImportEntity, row: CsvRow, snapshot: Snapshot
   const errors: string[] = [];
   const warnings: string[] = [];
   const name = row[cfg.titleField]?.trim() ?? '';
+  // Organisation rows whose slug matches an existing entry update its rich
+  // profile fields instead of inserting; empty cells never overwrite.
+  const slugValue = row['slug']?.trim() ?? '';
+  const existing = entity === 'organisations' && slugValue ? snapshot.entries.find(e => e.slug === slugValue) : undefined;
+  if (existing) {
+    const updates: Record<string, unknown> = {};
+    for (const column of ORG_UPDATE_COLUMNS) {
+      const raw = row[column]?.trim() ?? '';
+      if (!raw) continue;
+      const parsed = parsePasteValue(entity, column, raw);
+      if (parsed.error) errors.push(parsed.error);
+      else if (parsed.value !== undefined) updates[column] = parsed.value;
+    }
+    const noChanges = Object.keys(updates).length === 0;
+    return { name: existing.name, values: {}, tags: [], organisationId: null, duplicate: noChanges && !errors.length, update: noChanges ? undefined : { id: existing.id, values: updates }, errors, warnings };
+  }
   const duplicate = snapshot.entries.some(e => normalize(e.name) === normalize(name) || (entity === 'organisations' && websiteDomain(row['website'] ?? '') !== '' && websiteDomain(e.website ?? '') === websiteDomain(row['website'] ?? '')));
-  const values: Record<string, string | number | boolean | null> = { status: 'draft', last_checked: today, slug: slugify(name), [cfg.titleField]: name };
+  const values: Record<string, string | number | boolean | null | string[] | Record<string, string>[]> = { status: 'draft', last_checked: today, slug: slugify(slugValue || name), [cfg.titleField]: name };
   if (!name) errors.push(`${cfg.titleField} is required`);
   const tags: { kind: string; name: string; create: boolean; parent_id?: string }[] = [];
   for (const column of CSV_COLUMNS[entity]) {
