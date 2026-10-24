@@ -1227,7 +1227,7 @@ html, body { overflow-x: clip; }
 
 /* Detail pages: action-first layout */
 .nb-detail-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
-.nb-countdown.nb-countdown-signal { color: var(--background); background: var(--signal); }
+.nb-countdown.nb-countdown-signal { color: var(--berry); background: transparent; border-color: var(--berry); }
 .nb-detail-actions .nb-btn { min-height: 44px; }
 .nb-detail-organiser { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
 .nb-detail-organiser .nb-org-logo { width: 40px; height: 40px; }
