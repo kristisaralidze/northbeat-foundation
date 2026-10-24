@@ -69,3 +69,29 @@ export function warpedDay(f: number, from: number, to: number, beats: { day: num
   const seg = cost[i + 1]! - cost[i]!;
   return from + (i + (seg > 0 ? (goal - cost[i]!) / seg : 0)) * step;
 }
+
+/** Spike height by meaning: one event 3, one deadline 4, two items 4.5, three or more 5.5. */
+export const REST_HEIGHT = 0.5;
+export function beatHeight(items: Pick<HeartbeatItem, 'kind'>[]) {
+  if (!items.length) return REST_HEIGHT;
+  if (items.length >= 3) return 5.5;
+  if (items.length === 2) return 4.5;
+  return items[0]?.kind === 'opportunity' ? 4 : 3;
+}
+/** Scroll stops: start, one per beat at day - 0.8, then the end. Each stop gets an equal share. */
+export function buildStops(beats: { day: number }[], start: number, end: number) {
+  const stops = [start, ...beats.map(b => b.day - 0.8).filter(d => d > start && d < end), end];
+  return stops.filter((d, i) => i === 0 || d > stops[i - 1]!);
+}
+export function dayAtProgress(f: number, stops: number[]) {
+  if (stops.length < 2) return stops[0] ?? 0;
+  const x = clamp01(f) * (stops.length - 1); const i = Math.min(stops.length - 2, Math.floor(x));
+  return stops[i]! + (stops[i + 1]! - stops[i]!) * smoothstep(x - i);
+}
+/** Section height in vh: 100 + 70 per beat, between 300 and 650. */
+export const sectionHeightVh = (beats: number) => Math.max(300, Math.min(650, 100 + 70 * beats));
+/** Scale so the tallest spike, resting `ahead` days in front of the camera, uses at most `share` of the screen. */
+export function heightScale(maxH: number, H: number, F: number, zAt: number, share = 0.4) {
+  if (maxH <= 0) return 1;
+  return Math.min(1, (share * H * zAt) / (F * maxH));
+}
