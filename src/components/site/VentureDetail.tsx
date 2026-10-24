@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { CalendarMenu } from './CalendarMenu';
-import { countdownLabel, daysUntil, googleMapsUrl, registrationClosed, type CalendarEvent } from '@/lib/detail';
+import { countdownLabel, countdownClass, offerChips, daysUntil, googleMapsUrl, registrationClosed, type CalendarEvent } from '@/lib/detail';
 import { dateLabel, dayKey } from '@/lib/events';
 import { humanize } from '@/lib/admin/entities';
 import { EMPTY_SEARCH } from '@/lib/explore';
@@ -34,7 +34,7 @@ function SaveShare({ kind, slug, title }: { kind: 'organisation' | 'event'; slug
 function Countdown({ date, now, timezone }: { date: string | null; now: string; timezone?: string | undefined }) {
   const label = countdownLabel(date, now, timezone); const days = daysUntil(date, now, timezone);
   if (!label) return null;
-  return <span className={`nb-countdown${days !== null && days < 14 ? ' nb-countdown-signal' : ''}`}>{label}</span>;
+  return <span className={countdownClass(days)}>{label}</span>;
 }
 function OpenNow({ items, now }: { items: DetailItem[]; now: string }) {
   if (!items.length) return null;
@@ -81,7 +81,7 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
 
   const actions = isOrg
     ? <div className="nb-detail-actions nb-action-bar">{website && <Button asChild variant="ghost" className="nb-btn nb-btn-primary"><a href={website} target="_blank" rel="noopener noreferrer">Visit website</a></Button>}<SaveShare kind="organisation" slug={row.slug} title={profile.title} /></div>
-    : <div className="nb-detail-actions nb-action-bar">{closed ? <Button variant="ghost" className="nb-btn nb-btn-secondary" disabled>Registration closed</Button> : (register ?? eventSite) && <Button asChild variant="ghost" className="nb-btn nb-btn-primary"><a href={(register ?? eventSite)!} target="_blank" rel="noopener noreferrer">{register ? 'Register' : 'Event website'}</a></Button>}{calendar && !closed && <CalendarMenu event={calendar} slug={row.slug} />}<SaveShare kind="event" slug={row.slug} title={profile.title} /></div>;
+    : <div className="nb-detail-actions nb-action-bar">{closed ? <Button variant="ghost" className="nb-btn nb-btn-secondary" disabled>Registration closed</Button> : (register ?? eventSite) && <Button asChild variant="ghost" className="nb-btn nb-btn-primary"><a href={register ?? eventSite ?? undefined} target="_blank" rel="noopener noreferrer">{register ? 'Register' : 'Event website'}</a></Button>}{calendar && !closed && <CalendarMenu event={calendar} slug={row.slug} />}<SaveShare kind="event" slug={row.slug} title={profile.title} /></div>;
 
   return <article className="nb-container nb-section nb-venture-detail" style={accent ? { '--official-brand-accent': accent } as React.CSSProperties : undefined}>
     <OrganisationCover image={text(row, 'cover_image_url')} website={text(row, 'image_source_url') ?? text(row, isOrg ? 'website' : 'registration_url') ?? text(row, 'source_url')} name={profile.title} />
@@ -98,16 +98,18 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
         {businessId && <p className="nb-registry-note">Verified in the Finnish Trade Register. <a className="nb-link" href={ytjRecordUrl(businessId)} target="_blank" rel="noopener noreferrer">View the official YTJ record</a></p>}
       </div>
     </header>
+    {isOrg && profile.related.some(g=>g.label==='Part of') && <p className="nb-small">Part of {profile.related.filter(g=>g.label==='Part of').flatMap(g=>g.entries).map(e=><DetailLink key={e.id} item={{...e,kind:'organisations'}}>{e.title}</DetailLink>)}</p>}
+    {isOrg && offerChips(text(row,'type') ?? '',row['offer_chips']).length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">How they can help you</h2><ul className="nb-detail-chips">{offerChips(text(row,'type') ?? '',row['offer_chips']).map(chip=><li key={chip} className="nb-reason-chip">{chip}</li>)}</ul></section>}
     {actions}
     {isOrg && detail && <OpenNow items={detail.coming} now={now} />}
     {!isOrg && steps.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">Who it is for</h2><ul className="nb-detail-chips">{steps.map(step => <li key={step.id} className="nb-reason-chip">{journeySentence(step.name).replace(/\.$/, '')}</li>)}</ul></section>}
     {!isOrg && <EventProfile row={row} />}
-    {isOrg && !detail?.coming.length && !connections.length && !detail?.guides.length && (description ?? profile.summary)
+    {isOrg && !detail?.coming.length && !connections.length && (description ?? profile.summary)
       ? <section className="nb-detail-section"><h2 className="nb-h2 mb-5">About</h2><p className="nb-body nb-detail-description whitespace-pre-line">{description ?? profile.summary}</p></section>
       : description && description !== profile.summary && <p className="nb-body nb-detail-description">{description}</p>}
     {isOrg && connections.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2">Connections</h2><RelationshipMap profile={connectionProfile} link={(kind, entry) => <DetailLink item={{ ...entry, kind }}>{entry.title}</DetailLink>} /><div className="nb-connection-lists">{connections.map(group => <div key={group.label}><h3 className="nb-h3 mb-4">{group.label === 'Partners' ? 'Partners' : group.label}</h3><ul className="space-y-3">{group.entries.map(entry => <li key={entry.id} className="flex items-center gap-3"><OrganisationLogo name={entry.title} slug={entry.slug} /><DetailLink item={{ ...entry, kind: group.kind }}>{entry.title}</DetailLink></li>)}</ul></div>)}</div></section>}
     {isOrg && Boolean(detail?.similar.length) && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">Close to them</h2><div className="nb-close-grid">{detail?.similar.map(entry => <article key={entry.id} className="nb-card"><OrganisationLogo name={entry.title} slug={entry.slug} /><h3 className="nb-h3 mt-4"><DetailLink item={{ ...entry, kind: 'organisations' }}>{entry.title}</DetailLink></h3>{entry.roles[0] && <p className="mt-3"><span className="nb-reason-chip">{entry.roles[0]}</span></p>}</article>)}</div></section>}
-    {Boolean(detail?.guides.length) && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">{isOrg ? 'Learn' : 'Prepare'}</h2><ul className="space-y-5">{detail?.guides.map(guide => <li key={guide.slug}><h3 className="nb-h3"><Link to="/learn/$slug" params={{ slug: guide.slug }} className="nb-link">{guide.title}</Link></h3>{guide.summary && <p className="nb-small mt-2">{guide.summary}</p>}</li>)}</ul></section>}
+    {!isOrg && Boolean(detail?.guides.length) && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">{isOrg ? 'Learn' : 'Prepare'}</h2><ul className="space-y-5">{detail?.guides.map(guide => <li key={guide.slug}><h3 className="nb-h3"><Link to="/learn/$slug" params={{ slug: guide.slug }} className="nb-link">{guide.title}</Link></h3>{guide.summary && <p className="nb-small mt-2">{guide.summary}</p>}</li>)}</ul></section>}
     {!isOrg && Boolean(detail?.sameWeek.length) && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">Same week</h2><ul className="nb-compact-list">{detail?.sameWeek.map(item => <li key={item.id}><span className="nb-small text-muted-foreground">{item.date ? dateLabel(item.date) : ''}</span><span><DetailLink item={item}>{item.title}</DetailLink>{item.type ? <span className="nb-small text-muted-foreground">, {humanize(item.type)}</span> : null}</span></li>)}</ul></section>}
     {video && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">Watch</h2><VideoEmbed video={video} title={profile.title} channel={text(row, 'video_source_url')} /></section>}
     {research && <ResearchSection research={research} />}

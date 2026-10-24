@@ -33,7 +33,7 @@ export function countdownLabel(value: string | null, now: string, timezone = 'Eu
   if (days === null || days < 0) return null;
   if (days === 0) return 'Today';
   const weekday = (iso: string) => (new Date(`${dayKey(iso, timezone)}T12:00:00Z`).getUTCDay() + 6) % 7; // Mon=0
-  const start = weekday(value!); const today = weekday(now);
+  const start = weekday(value ?? now); const today = weekday(now);
   if (days <= 6 && start >= 5 && today < 5 && today + days <= 6) return 'This weekend';
   if (days === 1) return 'Tomorrow';
   return `In ${days} days`;
@@ -51,26 +51,39 @@ export function registrationClosed(applyBy: string | null, start: string | null,
 }
 export type CloseCandidate = { id: string; title: string; city: string | null; type?: string | null; fieldIds: string[]; countryIds?: string[] };
 const typeLabel = (type: string) => { const word = type.replace(/_/g, ' '); return `Also ${/^[aeiou]/i.test(word) ? 'an' : 'a'} ${word}`; };
-/** Top 6 by score: direct relation +100, same city +30, same type +20, each shared field +10, same country +5. The chip names the strongest match. */
-export function closeToThem<T extends CloseCandidate>(rows: T[], self: { id: string; city: string | null; type?: string | null; fieldNames: Record<string, string>; countryNames?: Record<string, string>; relations: Record<string, string> }, limit = 6) {
-  const picked: (T & { reason: string; score: number })[] = [];
-  for (const row of rows) {
-    if (row.id === self.id) continue;
+/** At most four, prioritising relations and fields; city is the final fallback, once. */
+export function closeToThem<T extends CloseCandidate>(rows: T[], self: { id: string; city: string | null; type?: string | null; fieldNames: Record<string, string>; countryNames?: Record<string, string>; relations: Record<string, string> }, limit = 4) {
+  const candidates = rows.filter(row => row.id !== self.id).map(row => {
     const fields = row.fieldIds.filter(id => self.fieldNames[id]);
     const country = (row.countryIds ?? []).find(id => self.countryNames?.[id]);
-    const parts: [number, string][] = [];
-    if (self.relations[row.id]) parts.push([100, self.relations[row.id]!]);
-    if (self.city && row.city && row.city.toLowerCase() === self.city.toLowerCase()) parts.push([30, `Also in ${row.city}`]);
-    if (self.type && row.type === self.type) parts.push([20, typeLabel(row.type)]);
-    if (fields.length) parts.push([10 * fields.length, `Same field: ${self.fieldNames[fields[0]!]}`]);
-    if (country) parts.push([5, `Also in ${self.countryNames![country]}`]);
-    if (!parts.length) continue;
-    const score = parts.reduce((sum, [n]) => sum + n, 0);
-    const strongest = [...parts].sort((x, y) => y[0] - x[0])[0]!;
-    picked.push({ ...row, reason: strongest[1], score });
+    const reasons: [number, string][] = [];
+    const relation = self.relations[row.id]; if (relation) reasons.push([100, relation]);
+    for (const field of fields) reasons.push([80, `Same field: ${self.fieldNames[field]}`]);
+    if (self.type && row.type === self.type) reasons.push([60, typeLabel(row.type)]);
+    if (country) reasons.push([40, `Also in ${self.countryNames?.[country]}`]);
+    if (self.city && row.city?.toLowerCase() === self.city.toLowerCase()) reasons.push([10, `Also in ${row.city}`]);
+    return { row, reasons };
+  }).filter(c => c.reasons.length).sort((a,b) => (b.reasons[0]?.[0] ?? 0) - (a.reasons[0]?.[0] ?? 0) || a.row.title.localeCompare(b.row.title));
+  const picked: (T & { reason: string; score: number })[] = []; const used = new Set<string>(); let cityUsed = false;
+  for (const varied of [true, false]) for (const c of candidates) {
+    if (picked.length >= Math.min(limit,4) || picked.some(p => p.id === c.row.id)) continue;
+    const reason = c.reasons.find(([,r]) => (!r.startsWith('Also in ') || r !== `Also in ${c.row.city}` || !cityUsed) && (!varied || !used.has(r)));
+    if (!reason) continue;
+    const [score,label] = reason; picked.push({...c.row, reason:label, score}); used.add(label);
+    if (label === `Also in ${c.row.city}`) cityUsed = true;
   }
-  return picked.sort((a, b) => b.score - a.score || a.title.localeCompare(b.title)).slice(0, limit);
+  return picked;
 }
+export function urgencyLevel(days: number | null): 'filled' | 'outline' | 'plain' {
+  if (days === null || days < 0 || days > 14) return 'plain';
+  return days <= 7 ? 'filled' : 'outline';
+}
+export const countdownClass = (days: number | null) => `nb-countdown nb-countdown-${urgencyLevel(days)}`;
+export const offerChips = (type: string, custom: unknown): string[] => {
+  const values = Array.isArray(custom) ? custom.filter((v): v is string => typeof v === 'string' && Boolean(v.trim())) : [];
+  const defaults: Record<string,string[]> = { incubator:['Workspace','Coaching','Investor intros'], accelerator:['Coaching','Growth support','Investor intros'], investor:['Investment','Investor network'], funder:['Funding','Application support'], university:['Research expertise','Research collaboration'], research_group:['Research expertise','Research collaboration'], lab:['Testing','Research expertise'], hospital_innovation_unit:['Clinical insight','Validation support'], service_provider:['Specialist support','Expert advice'], public_agency:['Public guidance','Funding information'], patient_organisation:['Patient perspectives','Community connections'], community:['Peer connections','Events'], care_provider:['Clinical insight','Care expertise'] };
+  return (values.length ? values : defaults[type] ?? []).slice(0,4);
+};
 /** Short reason chip for a relationship group label. */
 export const RELATION_REASON: Record<string, string> = { 'Invested in': 'Invested in', 'Backed by': 'Backer', 'Spun out of': 'Parent', Spinouts: 'Spinout', 'Acquired by': 'Acquirer', Acquired: 'Acquired', Partners: 'Partner' };
 export function outlookCalendar(event: CalendarEvent) {

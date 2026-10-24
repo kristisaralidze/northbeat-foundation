@@ -1,16 +1,17 @@
 import { Link } from "@tanstack/react-router";
-import { cardTags, type DirectoryOrganisation, type DirectoryTerm } from "@/lib/explore";
+import { type DirectoryOrganisation, type DirectoryTerm } from "@/lib/explore";
 import { humanize } from "@/lib/admin/entities";
 import { OrganisationLogo } from './OrganisationLogo';
 import { publicCopy } from '@/lib/profiles';
-import { EntryCard } from './EntryCard';
-
+import { SaveButton } from './SaveButton';
 export function OrganisationCard({ organisation: org, terms }: { organisation: DirectoryOrganisation; terms: DirectoryTerm[] }) {
-  const { shown } = cardTags(org, terms);
-  const field = shown.find(t => t.kind !== 'stage');
-  return <EntryCard id={org.id} kind="organisation" slug={org.slug} title={org.name}
-    media={<OrganisationLogo name={org.name} slug={org.slug} uploaded={org.logo_url} website={org.website} choice={org.logo_choice ?? null} />}
-    link={<Link to="/org/$slug" params={{ slug: org.slug }} className="nb-org-link">{org.name}</Link>}
-    line={org.short_description ? publicCopy(org.short_description) : null}
-    facts={[humanize(org.type), org.city, field?.name]} />;
+  const country = terms.filter(t => t.kind === 'country' && org.termIds.includes(t.id)).map(t => t.name).join(', ');
+  return <article data-result-id={org.id} className="nb-directory-row">
+    <OrganisationLogo name={org.name} slug={org.slug} uploaded={org.logo_url} website={org.website} choice={org.logo_choice ?? null} />
+    <div className="min-w-0"><h2 className="nb-h3"><Link to="/org/$slug" params={{slug:org.slug}} className="nb-org-link">{org.name}</Link></h2>
+      <p className="nb-small text-muted-foreground">{humanize(org.type)} · {[org.city,country].filter(Boolean).join(', ')}</p>
+      {org.parent_name && <p className="nb-small text-muted-foreground">Part of {org.parent_name}</p>}
+      {org.short_description && <p className="nb-directory-description">{publicCopy(org.short_description)}</p>}
+    </div><SaveButton kind="organisation" slug={org.slug} title={org.name} />
+  </article>;
 }

@@ -34,7 +34,7 @@ export async function detailContext(client: SupabaseClient, kind: 'organisations
     similar = ranked.map(org => ({ ...publicEntry('organisations', org), roles: [org.reason] }));
   }
   // Organisations and events share one guide match: journey step first, then a shared field.
-  if ((kind === 'organisations' || kind === 'events') && (steps.length || fields.length)) {
+  if ((kind === 'events') && (steps.length || fields.length)) {
     const [entries, tags] = await Promise.all([all(client, 'guides', 'id,slug,title,one_sentence,journey_step_id,status'), all(client, 'guide_terms', 'guide_id,term_id', false)]);
     const score = (guide: ProfileRow) => (steps.includes(String(guide['journey_step_id'])) ? 10 : 0) + (tags.some(tag => tag['guide_id'] === guide.id && fields.includes(String(tag['term_id']))) ? 1 : 0);
     guides = entries.filter(guide => score(guide) > 0).sort((a, b) => score(b) - score(a) || String(a['title']).localeCompare(String(b['title']))).slice(0, 2).map(guide => ({ slug: guide.slug, title: publicTitle(String(guide['title'])), summary: text(guide, 'one_sentence') }));

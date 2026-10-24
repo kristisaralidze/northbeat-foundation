@@ -1,4 +1,4 @@
-export type EventRow = { id: string; slug: string; title: string; event_type: string; summary: string | null; starts_at: string | null; ends_at: string | null; apply_deadline_at: string | null; timezone: string | null; city: string | null; venue: string | null; format: string | null; termIds?: string[] };
+export type EventRow = { id: string; slug: string; title: string; event_type: string; summary: string | null; starts_at: string | null; ends_at: string | null; apply_deadline_at: string | null; timezone: string | null; city: string | null; venue: string | null; format: string | null; organiser?: { name: string; slug: string }; termIds?: string[] };
 export type OpportunityDeadline = { id: string; slug: string; title: string; deadline_at: string | null };
 export type EventsData = { events: EventRow[]; opportunities: OpportunityDeadline[]; now: string; fields?: { id: string; name: string; slug: string }[] };
 export type EventFilters = { type: string; city: string; month: string; archive: boolean };

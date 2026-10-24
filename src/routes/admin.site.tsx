@@ -13,24 +13,24 @@ export const Route = createFileRoute('/admin/site')({
   component: SiteAdmin,
 });
 
-type Settings = { contact_email: string; linkedin_url: string; instagram_url: string };
+type Settings = { podcast_themes: string[]; contact_email: string; linkedin_url: string; instagram_url: string };
 type Founder = { id?: string; name: string; one_line: string; photo_url: string; linkedin_url: string; sort_order: number };
 const blankFounder = (n: number): Founder => ({ name: '', one_line: '', photo_url: '', linkedin_url: '', sort_order: n });
 const httpsOrEmpty = (v: string) => !v.trim() || /^https:\/\/\S+$/i.test(v.trim());
 
 function SiteAdmin() {
-  const [settings, setSettings] = useState<Settings>({ contact_email: '', linkedin_url: '', instagram_url: '' });
+  const [settings, setSettings] = useState<Settings>({ podcast_themes: [], contact_email: '', linkedin_url: '', instagram_url: '' });
   const [founders, setFounders] = useState<Founder[]>([]);
   const [waitlist, setWaitlist] = useState<number | null>(null);
   const [busy, setBusy] = useState(false);
 
   const load = async () => {
     const [s, f, w] = await Promise.all([
-      db.from('site_settings').select('contact_email,linkedin_url,instagram_url').eq('id', 1).maybeSingle(),
+      db.from('site_settings').select('contact_email,linkedin_url,instagram_url,podcast_themes').eq('id', 1).maybeSingle(),
       db.from('founders').select('id,name,one_line,photo_url,linkedin_url,sort_order').order('sort_order'),
       db.from('systole_waitlist').select('id', { count: 'exact', head: true }),
     ]);
-    if (s.data) setSettings({ contact_email: s.data.contact_email ?? '', linkedin_url: s.data.linkedin_url ?? '', instagram_url: s.data.instagram_url ?? '' });
+    if (s.data) setSettings({ podcast_themes: s.data.podcast_themes ?? [], contact_email: s.data.contact_email ?? '', linkedin_url: s.data.linkedin_url ?? '', instagram_url: s.data.instagram_url ?? '' });
     setFounders(((f.data ?? []) as Founder[]).map(x => ({ ...x, one_line: x.one_line ?? '', photo_url: x.photo_url ?? '', linkedin_url: x.linkedin_url ?? '' })));
     setWaitlist(w.count ?? 0);
   };
@@ -39,9 +39,10 @@ function SiteAdmin() {
   const saveSettings = async () => {
     if (settings.contact_email && !/^\S+@\S+\.\S+$/.test(settings.contact_email)) { toast.error('Check the contact email.'); return; }
     if (!httpsOrEmpty(settings.linkedin_url) || !httpsOrEmpty(settings.instagram_url)) { toast.error('Links must start with https://'); return; }
+    if (settings.podcast_themes.length > 3) { toast.error("Add at most three themes."); return; }
     setBusy(true);
     const clean = (v: string) => v.trim() || null;
-    const { error } = await db.from('site_settings').upsert({ id: 1, contact_email: clean(settings.contact_email), linkedin_url: clean(settings.linkedin_url), instagram_url: clean(settings.instagram_url), updated_at: new Date().toISOString() });
+    const { error } = await db.from('site_settings').upsert({ id: 1, podcast_themes: settings.podcast_themes, contact_email: clean(settings.contact_email), linkedin_url: clean(settings.linkedin_url), instagram_url: clean(settings.instagram_url), updated_at: new Date().toISOString() });
     setBusy(false);
     if (error) toast.error(error.message); else toast.success('Saved');
   };
@@ -83,6 +84,7 @@ function SiteAdmin() {
       <div className="space-y-2"><Label htmlFor="s-email">Contact email</Label><Input id="s-email" type="email" value={settings.contact_email} onChange={e => setSettings({ ...settings, contact_email: e.target.value })} /></div>
       <div className="space-y-2"><Label htmlFor="s-li">LinkedIn page</Label><Input id="s-li" type="url" placeholder="https://www.linkedin.com/company/..." value={settings.linkedin_url} onChange={e => setSettings({ ...settings, linkedin_url: e.target.value })} /></div>
       <div className="space-y-2"><Label htmlFor="s-ig">Instagram</Label><Input id="s-ig" type="url" placeholder="https://www.instagram.com/..." value={settings.instagram_url} onChange={e => setSettings({ ...settings, instagram_url: e.target.value })} /></div>
+      <div className="space-y-2"><Label htmlFor="podcast-themes">Podcast themes (up to 3, one per line)</Label><textarea id="podcast-themes" className="w-full rounded-md border border-border p-3" value={settings.podcast_themes.join("\n")} onChange={e=>setSettings({...settings,podcast_themes:e.target.value.split("\n").filter(Boolean)})} /></div>
       <Button onClick={saveSettings} disabled={busy}>Save</Button>
     </section>
 

@@ -32,7 +32,7 @@ const guides = (c: Client) => all<GuideCard>((a, b) => c.from('guides').select(G
 type Kind = 'organisations' | 'opportunities' | 'events';
 const LINK: Record<Kind, { table: 'organisation_terms' | 'opportunity_terms' | 'event_terms'; fk: string; cols: string; title: string; summary: string }> = {
   organisations: { table: 'organisation_terms', fk: 'organisation_id', cols: 'id,slug,name,short_description', title: 'name', summary: 'short_description' },
-  opportunities: { table: 'opportunity_terms', fk: 'opportunity_id', cols: 'id,slug,title,summary', title: 'title', summary: 'summary' },
+  opportunities: { table: 'opportunity_terms', fk: 'opportunity_id', cols: 'id,slug,title,summary,deadline_at', title: 'title', summary: 'summary' },
   events: { table: 'event_terms', fk: 'event_id', cols: 'id,slug,title,summary,starts_at,ends_at', title: 'title', summary: 'summary' },
 };
 /** Published entries of one kind tagged with any of the given terms, with each entry's full tag list. */
@@ -48,6 +48,7 @@ async function tagged(c: Client, kind: Kind, termIds: string[], includePastEvent
     const rows = await all<Record<string, string | null>>((a, b) => c.from(kind).select(cfg.cols).eq('status', 'published').in('id', chunk).order('id').range(a, b) as never);
     const links = await all<Record<string, string>>((a, b) => c.from(cfg.table).select(`${cfg.fk},term_id`).in(cfg.fk, chunk).order(cfg.fk).order('term_id').range(a, b) as never);
     for (const r of rows) {
+      if (kind === 'opportunities' && r['deadline_at'] && Date.parse(r['deadline_at']) < now) continue;
       if (kind === 'events' && !includePastEvents) { const end = r['ends_at'] ?? r['starts_at']; if (end && new Date(end).getTime() < now) continue; }
       const id = r['id']; const slug = r['slug'];
       if (!id || !slug) continue;
@@ -86,15 +87,19 @@ export const getGuide = createServerFn({ method: 'GET' }).inputValidator(z.objec
   const matchTerms = [...fields, ...(row.journey_step_id ? [row.journey_step_id] : [])];
   const steps = list.filter((t) => t.kind === 'journey_step');
   const stepOrder = new Map(steps.map((t, i) => [t.id, i]));
-  const [orgs, opps, events] = await Promise.all([tagged(c, 'organisations', matchTerms), tagged(c, 'opportunities', matchTerms), tagged(c, 'events', matchTerms, true)]);
-  const ranked = rankHub([...orgs.map(o => ({ ...o, kind: 'organisations' })), ...opps.map(o => ({ ...o, kind: 'opportunities' })), ...events.map(o => ({ ...o, kind: 'events' }))], row.journey_step_id, fields);
+  const [orgPicks, oppPicks] = await Promise.all([c.from('guide_organisations').select('organisation_id').eq('guide_id',row.id).order('id'), c.from('guide_opportunities').select('opportunity_id').eq('guide_id',row.id).order('id')]);
+  if (orgPicks.error || oppPicks.error) throw new Error('Guide selections could not be loaded.');
+  const orgIds = (orgPicks.data ?? []).map(p=>p.organisation_id); const oppIds = (oppPicks.data ?? []).map(p=>p.opportunity_id);
+  const [orgEntries, oppEntries] = await Promise.all([orgIds.length ? c.from('organisations').select('slug,name,short_description').eq('status','published').in('id',orgIds) : Promise.resolve({data:[],error:null}), oppIds.length ? c.from('opportunities').select('slug,title,summary,deadline_at').eq('status','published').in('id',oppIds) : Promise.resolve({data:[],error:null})]);
+  if (orgEntries.error || oppEntries.error) throw new Error('Guide selections could not be loaded.');
+  const selected = [...(orgEntries.data ?? []).map(o=>({kind:'organisations',slug:o.slug,title:o.name,summary:o.short_description})), ...(oppEntries.data ?? []).filter(o=>!o.deadline_at || Date.parse(o.deadline_at)>=Date.now()).map(o=>({kind:'opportunities',slug:o.slug,title:o.title,summary:o.summary}))].slice(0,3);
   const term = (id: string | null) => { const t = list.find((x) => x.id === id); return t ? { id: t.id, name: t.name, slug: t.slug, sort_order: t.sort_order } : null; };
   const { sources, ...guide } = row;
   return {
     guide: cleanGuide(guide), area: term(row.area_id), step: term(row.journey_step_id), sources: parseSources(sources),
-    organisations: ranked.filter(o => o.kind === 'organisations').map(strip),
-    opportunities: ranked.filter(o => o.kind === 'opportunities').map(strip),
-    events: ranked.filter(o => o.kind === 'events').map(strip),
+    organisations: selected.filter(o => o.kind === 'organisations').map(strip),
+    opportunities: selected.filter(o => o.kind === 'opportunities').map(strip),
+    events: selected.filter(o => o.kind === 'events').map(strip),
     ...areaNeighbours(guideRows, row.id, stepOrder),
   };
 });

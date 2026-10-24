@@ -71,6 +71,6 @@ export function cleanExploreSearch(search: ExploreSearch): Partial<ExploreSearch
 
 /** Featured: prominence first, then most connections, then A to Z. */
 export function sortOrganisations(rows: DirectoryOrganisation[], sort: ExploreSort) {
-  if (sort === "featured") return [...rows].sort((a, b) => (b.prominence ?? 0) - (a.prominence ?? 0) || (b.connections ?? 0) - (a.connections ?? 0) || a.name.localeCompare(b.name));
+  if (sort === "featured") { const rank = (v?: number) => v && v > 0 ? v : Infinity; return [...rows].sort((a,b) => rank(a.prominence) - rank(b.prominence) || a.name.localeCompare(b.name)); }
   return [...rows].sort(sort === "recent" ? (a, b) => (Date.parse(b.published_at ?? "") || 0) - (Date.parse(a.published_at ?? "") || 0) || a.name.localeCompare(b.name) : (a, b) => a.name.localeCompare(b.name));
 }
