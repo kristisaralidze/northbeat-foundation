@@ -38,7 +38,7 @@ describe('action-first detail rules', () => {
     ];
     const out = closeToThem(rows, self);
     expect(out).toHaveLength(6);
-    expect(out.map(o => [o.id, o.score])).toEqual([['r', 100], ['cf', 40], ['c', 30], ['t', 20], ['f2', 20], ['country', 5]]);
-    expect(out.map(o => o.reason)).toEqual(['Partner', 'Also in Oulu', 'Also in Oulu', 'Also an investor', 'Same field: Medtech', 'Also in Finland']);
+    expect(out.map(o => [o.id, o.score])).toEqual([['r', 100], ['cf', 40], ['c', 30], ['f2', 20], ['t', 20], ['country', 5]]);
+    expect(out.map(o => o.reason)).toEqual(['Partner', 'Also in Oulu', 'Also in Oulu', 'Same field: Medtech', 'Also an investor', 'Also in Finland']);
   });
 });
