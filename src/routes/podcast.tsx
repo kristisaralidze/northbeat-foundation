@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { podcastQuery } from '@/lib/podcast.query';
 import { durationLabel, episodeLabel, sortEpisodes } from '@/lib/podcast';
 import { dateLabel } from '@/lib/events';
+import { NewsletterSignup } from '@/components/site/NewsletterSignup';
 
 export const Route = createFileRoute('/podcast')({
   loader: ({ context }) => context.queryClient.ensureQueryData(podcastQuery),
@@ -15,10 +16,10 @@ export const Route = createFileRoute('/podcast')({
       { property: 'og:title', content: 'Podcast: Northbeat' },
       { property: 'og:description', content: 'Conversations with the people building health innovation in the Nordics.' },
       { property: 'og:type', content: 'website' },
-      { property: 'og:url', content: '/podcast' },
+      { property: 'og:url', content: 'https://nordic-heartbeat.lovable.app/podcast' },
       { name: 'twitter:card', content: 'summary' },
     ],
-    links: [{ rel: 'canonical', href: '/podcast' }],
+    links: [{ rel: 'canonical', href: 'https://nordic-heartbeat.lovable.app/podcast' }],
   }),
   component: Podcast,
   errorComponent: ({ reset }) => { const client = useQueryClient(); return <div className="nb-container nb-section"><h1 className="nb-h2">The podcast couldn’t be loaded</h1><p className="nb-body mt-4 text-danger" role="alert">Please try again in a moment.</p><Button variant="ghost" className="nb-btn nb-btn-primary mt-6" onClick={async () => { await client.resetQueries({ queryKey: ['public-podcast'] }); reset(); }}>Try again</Button></div>; },
@@ -45,6 +46,11 @@ function Podcast() {
         </li>;
       })}
     </ul>}
-    {episodes.length === 0 && <div className="py-8"><p className="nb-body text-muted-foreground">First episodes are being recorded.</p><Link to="/submit" search={{ tab: 'guest' }} className="nb-link mt-4 inline-block">Suggest a guest</Link></div>}
+    {episodes.length === 0 && <p className="nb-body mb-8">First episodes in December 2026.</p>}
+    <section aria-labelledby="podcast-signup" className="nb-card mt-10 max-w-xl">
+      <h2 id="podcast-signup" className="nb-h3">Get the first episode in your inbox</h2>
+      <NewsletterSignup source="podcast" tag="podcast" consentLabel="Yes, email me when the first episode is out. Unsubscribe any time." doneMessage="You're on the list. We'll email you when the first episode is out." />
+    </section>
+    <p className="nb-body mt-8"><Link to="/submit" search={{ tab: 'guest' }} className="nb-link">Suggest a guest</Link></p>
   </div>;
 }

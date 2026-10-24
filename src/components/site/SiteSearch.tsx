@@ -9,14 +9,16 @@ import { humanize } from '@/lib/admin/entities';
 import { OrganisationLogo } from './OrganisationLogo';
 
 /** Navbar search icon plus Cmd/Ctrl+K: one search across the hub. */
-export function SiteSearch() {
+export function SiteSearch({ variant = 'icon' }: { variant?: 'icon' | 'field' }) {
   const [open, setOpen] = useState(false);
   useEffect(() => {
+    if (variant === 'field') return; // the header icon owns the keyboard shortcut
     const onKey = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setOpen(o => !o); } };
     document.addEventListener('keydown', onKey); return () => document.removeEventListener('keydown', onKey);
-  }, []);
+  }, [variant]);
   return <>
-    <button type="button" className="nb-header-icon" aria-label="Search everything" title="Search (Ctrl K)" onClick={() => setOpen(true)}><Search className="h-5 w-5" aria-hidden /></button>
+    {variant === 'field' ? <button type="button" className="nb-menu-search" onClick={() => setOpen(true)}><Search className="h-5 w-5" aria-hidden /><span>Search everything</span></button> :
+    <button type="button" className="nb-header-icon" aria-label="Search everything" title="Search (Ctrl K)" onClick={() => setOpen(true)}><Search className="h-5 w-5" aria-hidden /></button>}
     {open && <SearchDialog onClose={() => setOpen(false)} />}
   </>;
 }

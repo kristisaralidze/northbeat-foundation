@@ -1284,3 +1284,73 @@ html, body { overflow-x: clip; }
 .nb-search-result { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; min-height: 44px; }
 .nb-search-result[data-active="true"] { background: var(--muted); }
 .nb-search-result .nb-org-logo { width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0; background: var(--snow); }
+
+/* Trust pages and details */
+.nb-bodoni { font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-weight: 400; }
+.nb-about-section { margin-top: var(--space-16); }
+.nb-about-promise { font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-size: 1.5rem; line-height: 1.3; color: var(--ink); }
+.nb-founders { display: grid; gap: 24px; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 24px; }
+.nb-founder { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.nb-founder-photo { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 16px; background: var(--hairline); margin-bottom: 8px; }
+@media (max-width: 900px) { .nb-founders { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .nb-founders { grid-template-columns: minmax(0, 1fr); } }
+.nb-check-list { display: grid; gap: 12px; margin-top: 16px; }
+.nb-check-list li { position: relative; padding-left: 24px; }
+.nb-check-list li::before { content: ''; position: absolute; left: 0; top: .7em; width: 8px; height: 8px; border-radius: 50%; background: var(--berry); }
+
+/* Footer main */
+.nb-footer-main { display: grid; gap: 16px; padding-block: 40px; border-top: 1px solid var(--hairline); }
+.nb-footer-links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.nb-footer-links a, .nb-footer-meta a { display: inline-flex; align-items: center; min-height: 44px; }
+.nb-footer-promise { color: var(--ink); }
+.nb-footer-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0 24px; }
+
+/* Full-screen mobile menu */
+.nb-mobile-menu { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; overflow-y: auto; background: var(--background); }
+.nb-menu-search { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 0 16px; border: 1px solid var(--hairline); border-radius: 999px; background: var(--card, var(--background)); color: var(--ink-soft); text-align: left; transition: border-color 150ms ease; }
+.nb-menu-search:hover { border-color: var(--ink); }
+.nb-mobile-menu-list { padding-block: 24px; }
+.nb-mobile-menu-link { display: block; padding-block: 10px; font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-weight: 400; font-size: 2.25rem; line-height: 1.2; color: var(--ink); transition: color 150ms ease; }
+.nb-mobile-menu-link:hover, .nb-mobile-menu-link[data-status="active"] { color: var(--berry); }
+
+/* Where do you start? */
+.nb-start-section { padding-block: var(--space-12); }
+.nb-start-cards { display: grid; gap: 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 24px; }
+.nb-start-card { position: relative; display: flex; flex-direction: column; gap: 8px; height: 100%; min-height: 160px; padding: 24px; border: 1px solid var(--hairline); border-radius: 16px; background: var(--card, var(--background)); color: var(--ink); transition: border-color 150ms ease; }
+.nb-start-card:hover { border-color: var(--berry); }
+.nb-start-card p { color: var(--ink-soft); padding-right: 32px; }
+.nb-start-card-arrow { position: absolute; right: 24px; bottom: 24px; color: var(--berry); }
+@media (max-width: 900px) { .nb-start-cards { grid-template-columns: minmax(0, 1fr); } .nb-start-card { min-height: 0; } }
+.nb-start-page-section { margin-top: 48px; }
+.nb-start-page-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; margin-bottom: 24px; }
+.nb-start-steps { display: grid; gap: 8px; }
+.nb-start-step { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 16px; min-height: 56px; padding: 8px 16px; border: 1px solid var(--hairline); border-radius: 12px; color: var(--ink); transition: border-color 150ms ease; }
+.nb-start-step:hover { border-color: var(--berry); }
+.nb-start-step-n { font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-size: 1.5rem; color: var(--berry); }
+
+/* Systole teaser */
+.nb-systole { background: var(--ink); color: var(--background); padding-block: 96px; opacity: 0; transition: opacity 600ms ease; overflow: hidden; }
+.nb-systole[data-shown="true"] { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .nb-systole { opacity: 1; transition: none; } }
+.nb-systole-inner { display: grid; gap: 24px; }
+.theme-site .nb-systole-word { font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-weight: 400; font-size: clamp(3.5rem, 17vw, 13rem); line-height: .9; letter-spacing: .02em; color: var(--background); overflow-wrap: anywhere; }
+.nb-systole-line { font-size: 1.25rem; line-height: 1.5; max-width: 36rem; }
+.nb-systole-form { display: grid; gap: 12px; max-width: 32rem; margin-top: 16px; }
+.nb-systole-label { font-size: 1rem; }
+.nb-systole-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.nb-systole-input { flex: 1 1 14rem; min-width: 0; min-height: 48px; padding: 0 16px; border-radius: 999px; border: 1px solid color-mix(in oklab, var(--background) 40%, transparent); background: transparent; color: var(--background); }
+.nb-systole-input::placeholder { color: color-mix(in oklab, var(--background) 60%, transparent); }
+.nb-systole-input:focus-visible { outline: 2px solid var(--background); outline-offset: 2px; }
+.nb-systole-button { min-height: 48px; padding: 0 24px; border-radius: 999px; background: var(--background); color: var(--ink); font-weight: 500; transition: opacity 150ms ease; }
+.nb-systole-button:hover { opacity: .85; }
+.nb-systole-thanks { font-size: 1.125rem; }
+.nb-systole-error { min-height: 1.25rem; font-size: .875rem; }
+.nb-home-shell .nb-systole + * { margin-top: 0; }
+
+/* 404 */
+.nb-404 { min-height: 60vh; display: flex; flex-direction: column; justify-content: center; gap: 48px; padding-block: 96px; overflow: hidden; }
+.nb-404-line { height: 2px; width: 100%; background: var(--ink); }
+.nb-404-content { display: grid; gap: 16px; }
+.nb-404-content h1 { font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-weight: 400; }
+.nb-404-links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+.nb-404-links a { display: inline-flex; align-items: center; min-height: 44px; }

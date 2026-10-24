@@ -28,6 +28,7 @@ import { Route as AdminCoverImagesRouteImport } from './routes/admin.cover-image
 import { Route as AdminLogoCheckRouteImport } from './routes/admin.logo-check'
 import { Route as AdminMissingAssetsRouteImport } from './routes/admin.missing-assets'
 import { Route as AdminNewsletterRouteImport } from './routes/admin.newsletter'
+import { Route as AdminSiteRouteImport } from './routes/admin.site'
 import { Route as AdminTagsRouteImport } from './routes/admin.tags'
 import { Route as AdminWebsiteHealthRouteImport } from './routes/admin.website-health'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
@@ -41,6 +42,7 @@ import { Route as OpportunitySlugRouteImport } from './routes/opportunity.$slug'
 import { Route as OrgSlugRouteImport } from './routes/org.$slug'
 import { Route as PersonSlugRouteImport } from './routes/person.$slug'
 import { Route as PodcastSlugRouteImport } from './routes/podcast_.$slug'
+import { Route as StartAudienceRouteImport } from './routes/start.$audience'
 import { Route as AdminEpisodesIndexRouteImport } from './routes/admin.episodes.index'
 import { Route as AdminEpisodesIdRouteImport } from './routes/admin.episodes.$id'
 import { Route as AdminEventsIndexRouteImport } from './routes/admin.events.index'
@@ -58,6 +60,7 @@ import { Route as AdminPeopleIdRouteImport } from './routes/admin.people.$id'
 import { Route as AdminSubmissionsIndexRouteImport } from './routes/admin.submissions.index'
 import { Route as AdminSubmissionsIdRouteImport } from './routes/admin.submissions.$id'
 import { Route as ApiPublicJobsEnrichRouteImport } from './routes/api/public/jobs/enrich'
+import { Route as ApiPublicOgKindSlugRouteImport } from './routes/api/public/og/$kind.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -154,6 +157,11 @@ const AdminNewsletterRoute = AdminNewsletterRouteImport.update({
   path: '/newsletter',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSiteRoute = AdminSiteRouteImport.update({
+  id: '/site',
+  path: '/site',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminTagsRoute = AdminTagsRouteImport.update({
   id: '/tags',
   path: '/tags',
@@ -217,6 +225,11 @@ const PersonSlugRoute = PersonSlugRouteImport.update({
 const PodcastSlugRoute = PodcastSlugRouteImport.update({
   id: '/podcast_/$slug',
   path: '/podcast/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StartAudienceRoute = StartAudienceRouteImport.update({
+  id: '/start/$audience',
+  path: '/start/$audience',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminEpisodesIndexRoute = AdminEpisodesIndexRouteImport.update({
@@ -304,6 +317,11 @@ const ApiPublicJobsEnrichRoute = ApiPublicJobsEnrichRouteImport.update({
   path: '/api/public/jobs/enrich',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicOgKindSlugRoute = ApiPublicOgKindSlugRouteImport.update({
+  id: '/api/public/og/$kind/$slug',
+  path: '/api/public/og/$kind/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -324,6 +342,7 @@ export interface FileRoutesByFullPath {
   '/admin/logo-check': typeof AdminLogoCheckRoute
   '/admin/missing-assets': typeof AdminMissingAssetsRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
+  '/admin/site': typeof AdminSiteRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/website-health': typeof AdminWebsiteHealthRoute
   '/admin/login': typeof AdminLoginRoute
@@ -335,6 +354,7 @@ export interface FileRoutesByFullPath {
   '/org/$slug': typeof OrgSlugRoute
   '/person/$slug': typeof PersonSlugRoute
   '/podcast/$slug': typeof PodcastSlugRoute
+  '/start/$audience': typeof StartAudienceRoute
   '/admin/': typeof AdminIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/newsletter/': typeof NewsletterIndexRoute
@@ -355,6 +375,7 @@ export interface FileRoutesByFullPath {
   '/admin/people/': typeof AdminPeopleIndexRoute
   '/admin/submissions/': typeof AdminSubmissionsIndexRoute
   '/api/public/jobs/enrich': typeof ApiPublicJobsEnrichRoute
+  '/api/public/og/$kind/$slug': typeof ApiPublicOgKindSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -373,6 +394,7 @@ export interface FileRoutesByTo {
   '/admin/logo-check': typeof AdminLogoCheckRoute
   '/admin/missing-assets': typeof AdminMissingAssetsRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
+  '/admin/site': typeof AdminSiteRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/website-health': typeof AdminWebsiteHealthRoute
   '/admin/login': typeof AdminLoginRoute
@@ -384,6 +406,7 @@ export interface FileRoutesByTo {
   '/org/$slug': typeof OrgSlugRoute
   '/person/$slug': typeof PersonSlugRoute
   '/podcast/$slug': typeof PodcastSlugRoute
+  '/start/$audience': typeof StartAudienceRoute
   '/admin': typeof AdminIndexRoute
   '/learn': typeof LearnIndexRoute
   '/newsletter': typeof NewsletterIndexRoute
@@ -404,6 +427,7 @@ export interface FileRoutesByTo {
   '/admin/people': typeof AdminPeopleIndexRoute
   '/admin/submissions': typeof AdminSubmissionsIndexRoute
   '/api/public/jobs/enrich': typeof ApiPublicJobsEnrichRoute
+  '/api/public/og/$kind/$slug': typeof ApiPublicOgKindSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -425,6 +449,7 @@ export interface FileRoutesById {
   '/admin/logo-check': typeof AdminLogoCheckRoute
   '/admin/missing-assets': typeof AdminMissingAssetsRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
+  '/admin/site': typeof AdminSiteRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/website-health': typeof AdminWebsiteHealthRoute
   '/admin_/login': typeof AdminLoginRoute
@@ -436,6 +461,7 @@ export interface FileRoutesById {
   '/org/$slug': typeof OrgSlugRoute
   '/person/$slug': typeof PersonSlugRoute
   '/podcast_/$slug': typeof PodcastSlugRoute
+  '/start/$audience': typeof StartAudienceRoute
   '/admin/': typeof AdminIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/newsletter/': typeof NewsletterIndexRoute
@@ -456,6 +482,7 @@ export interface FileRoutesById {
   '/admin/people/': typeof AdminPeopleIndexRoute
   '/admin/submissions/': typeof AdminSubmissionsIndexRoute
   '/api/public/jobs/enrich': typeof ApiPublicJobsEnrichRoute
+  '/api/public/og/$kind/$slug': typeof ApiPublicOgKindSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -478,6 +505,7 @@ export interface FileRouteTypes {
     | '/admin/logo-check'
     | '/admin/missing-assets'
     | '/admin/newsletter'
+    | '/admin/site'
     | '/admin/tags'
     | '/admin/website-health'
     | '/admin/login'
@@ -489,6 +517,7 @@ export interface FileRouteTypes {
     | '/org/$slug'
     | '/person/$slug'
     | '/podcast/$slug'
+    | '/start/$audience'
     | '/admin/'
     | '/learn/'
     | '/newsletter/'
@@ -509,6 +538,7 @@ export interface FileRouteTypes {
     | '/admin/people/'
     | '/admin/submissions/'
     | '/api/public/jobs/enrich'
+    | '/api/public/og/$kind/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -527,6 +557,7 @@ export interface FileRouteTypes {
     | '/admin/logo-check'
     | '/admin/missing-assets'
     | '/admin/newsletter'
+    | '/admin/site'
     | '/admin/tags'
     | '/admin/website-health'
     | '/admin/login'
@@ -538,6 +569,7 @@ export interface FileRouteTypes {
     | '/org/$slug'
     | '/person/$slug'
     | '/podcast/$slug'
+    | '/start/$audience'
     | '/admin'
     | '/learn'
     | '/newsletter'
@@ -558,6 +590,7 @@ export interface FileRouteTypes {
     | '/admin/people'
     | '/admin/submissions'
     | '/api/public/jobs/enrich'
+    | '/api/public/og/$kind/$slug'
   id:
     | '__root__'
     | '/'
@@ -578,6 +611,7 @@ export interface FileRouteTypes {
     | '/admin/logo-check'
     | '/admin/missing-assets'
     | '/admin/newsletter'
+    | '/admin/site'
     | '/admin/tags'
     | '/admin/website-health'
     | '/admin_/login'
@@ -589,6 +623,7 @@ export interface FileRouteTypes {
     | '/org/$slug'
     | '/person/$slug'
     | '/podcast_/$slug'
+    | '/start/$audience'
     | '/admin/'
     | '/learn/'
     | '/newsletter/'
@@ -609,6 +644,7 @@ export interface FileRouteTypes {
     | '/admin/people/'
     | '/admin/submissions/'
     | '/api/public/jobs/enrich'
+    | '/api/public/og/$kind/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -633,8 +669,10 @@ export interface RootRouteChildren {
   OrgSlugRoute: typeof OrgSlugRoute
   PersonSlugRoute: typeof PersonSlugRoute
   PodcastSlugRoute: typeof PodcastSlugRoute
+  StartAudienceRoute: typeof StartAudienceRoute
   LearnIndexRoute: typeof LearnIndexRoute
   ApiPublicJobsEnrichRoute: typeof ApiPublicJobsEnrichRoute
+  ApiPublicOgKindSlugRoute: typeof ApiPublicOgKindSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -772,6 +810,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminNewsletterRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/site': {
+      id: '/admin/site'
+      path: '/site'
+      fullPath: '/admin/site'
+      preLoaderRoute: typeof AdminSiteRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/tags': {
       id: '/admin/tags'
       path: '/tags'
@@ -861,6 +906,13 @@ declare module '@tanstack/react-router' {
       path: '/podcast/$slug'
       fullPath: '/podcast/$slug'
       preLoaderRoute: typeof PodcastSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/start/$audience': {
+      id: '/start/$audience'
+      path: '/start/$audience'
+      fullPath: '/start/$audience'
+      preLoaderRoute: typeof StartAudienceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/episodes/': {
@@ -982,6 +1034,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicJobsEnrichRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/og/$kind/$slug': {
+      id: '/api/public/og/$kind/$slug'
+      path: '/api/public/og/$kind/$slug'
+      fullPath: '/api/public/og/$kind/$slug'
+      preLoaderRoute: typeof ApiPublicOgKindSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -991,6 +1050,7 @@ interface AdminRouteChildren {
   AdminLogoCheckRoute: typeof AdminLogoCheckRoute
   AdminMissingAssetsRoute: typeof AdminMissingAssetsRoute
   AdminNewsletterRoute: typeof AdminNewsletterRoute
+  AdminSiteRoute: typeof AdminSiteRoute
   AdminTagsRoute: typeof AdminTagsRoute
   AdminWebsiteHealthRoute: typeof AdminWebsiteHealthRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1018,6 +1078,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLogoCheckRoute: AdminLogoCheckRoute,
   AdminMissingAssetsRoute: AdminMissingAssetsRoute,
   AdminNewsletterRoute: AdminNewsletterRoute,
+  AdminSiteRoute: AdminSiteRoute,
   AdminTagsRoute: AdminTagsRoute,
   AdminWebsiteHealthRoute: AdminWebsiteHealthRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -1077,8 +1138,10 @@ const rootRouteChildren: RootRouteChildren = {
   OrgSlugRoute: OrgSlugRoute,
   PersonSlugRoute: PersonSlugRoute,
   PodcastSlugRoute: PodcastSlugRoute,
+  StartAudienceRoute: StartAudienceRoute,
   LearnIndexRoute: LearnIndexRoute,
   ApiPublicJobsEnrichRoute: ApiPublicJobsEnrichRoute,
+  ApiPublicOgKindSlugRoute: ApiPublicOgKindSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

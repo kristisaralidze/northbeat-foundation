@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { subscribeToNewsletter } from "@/lib/newsletter.functions";
 import { Button } from '@/components/ui/button';
 
-export function NewsletterSignup({ source = "footer" }: { source?: string }) {
+export function NewsletterSignup({ source = "footer", tag, consentLabel = "Yes, email me the Northbeat newsletter. Unsubscribe any time.", doneMessage = "You're on the list. We'll email you when the next issue is out." }: { source?: string; tag?: "podcast"; consentLabel?: string; doneMessage?: string }) {
   const subscribe = useServerFn(subscribeToNewsletter);
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
@@ -15,9 +15,9 @@ export function NewsletterSignup({ source = "footer" }: { source?: string }) {
     if (!consent) { setState("error"); setMsg("Please tick the box so we can email you."); return; }
     setState("busy");
     try {
-      await subscribe({ data: { email, consent: true, source } });
+      await subscribe({ data: { email, consent: true, source, tag } });
       setState("done");
-      setMsg("You're on the list. We'll email you when the next issue is out.");
+      setMsg(doneMessage);
       setEmail("");
       setConsent(false);
     } catch {
@@ -46,7 +46,7 @@ export function NewsletterSignup({ source = "footer" }: { source?: string }) {
       </div>
       <label className="flex items-start gap-2 nb-small text-muted-foreground">
         <input type="checkbox" className="mt-1 accent-primary" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-        <span>Yes, email me the Northbeat newsletter. Unsubscribe any time.</span>
+        <span>{consentLabel}</span>
       </label>
       <p role="status" aria-live="polite" className={`nb-small ${state === "error" ? "text-danger" : "text-berry"}`}>
         {state === "done" || state === "error" ? msg : ""}
