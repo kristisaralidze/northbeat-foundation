@@ -1071,9 +1071,9 @@ html.lenis, html.lenis body { height: auto; }
 @media (max-width: 640px) { .nb-trial-list li { flex-direction: column; } }
 
 /* Heartbeat hero: one sticky canvas inside a tall scroll section. */
-.nb-heartbeat { position: relative; height: 300vh; }
+.nb-heartbeat { position: relative; height: 450vh; }
 .nb-heartbeat.nb-heartbeat-reduced { height: 100vh; }
-@media (max-width: 639px) { .nb-heartbeat { height: 240vh; } }
+@media (max-width: 639px) { .nb-heartbeat { height: 360vh; } }
 .nb-heartbeat-sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
 .nb-heartbeat-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
 .nb-heartbeat-head { position: absolute; top: 5.5rem; left: var(--gutter, 1.25rem); max-width: 34rem; pointer-events: none; color: var(--ink); }

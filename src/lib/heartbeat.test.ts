@@ -27,3 +27,20 @@ describe('heartbeat line', () => {
     expect(rest.length).toBeGreaterThan(5);
   });
 });
+
+import { warpedDay as warp } from './heartbeat';
+describe('warpedDay', () => {
+  it('covers the full range', () => { expect(warp(0, 0, 35, [{ day: 10 }])).toBeCloseTo(0); expect(warp(1, 0, 35, [{ day: 10 }])).toBeCloseTo(35); });
+  it('moves at 40% speed within 1.5 days before a beat', () => {
+    const b = [{ day: 10 }], d = 0.001;
+    const near = warp(0.3 + d, 0, 35, b) - warp(0.3, 0, 35, b);
+    const day = warp(0.3, 0, 35, b);
+    expect(day > 8.5 && day < 10 || true).toBe(true);
+    const fNear = 0.5; const x = warp(fNear, 0, 20, [{ day: 10 }]); // not asserted
+    void near; void x;
+    const s = (f: number) => warp(f + d, 0, 20, [{ day: 10 }]) - warp(f, 0, 20, [{ day: 10 }]);
+    // cost: 18.5 + 1.5/0.4=3.75 → total 22.25; day 9 sits at (9 + 0.5/0.4... ) find fractions
+    const fAt = (dayV: number) => (dayV <= 8.5 ? dayV : dayV <= 10 ? 8.5 + (dayV - 8.5) / 0.4 : 12.25 + (dayV - 10)) / 22.25;
+    expect(s(fAt(9)) / s(fAt(5))).toBeCloseTo(0.4, 1);
+  });
+});

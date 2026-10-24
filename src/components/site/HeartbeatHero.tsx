@@ -119,8 +119,8 @@ export function HeartbeatHero() {
       if (opening && openT > 3.4) opening = false;
 
       if (p < 0.01 && !reduced) idle = Math.min(2.4, idle + 0.3 * dt);
-      const target = reduced ? 0 : idle + Math.min(1, p / FLIGHT_END) * (flightEnd - idle);
-      prevCur = cur; cur += (target - cur) * Math.min(1, dt * 6);
+      const target = reduced ? 0 : warpedDay(Math.min(1, p / FLIGHT_END), idle, flightEnd, beats);
+      prevCur = cur; cur += (target - cur) * Math.min(1, dt * 3.5);
       smx += (mx - smx) * Math.min(1, dt * 3); smy += (my - smy) * Math.min(1, dt * 3);
 
       const F = phone ? Math.min(0.75 * H, 1.35 * W) : Math.min(0.85 * H, 0.9 * W);
