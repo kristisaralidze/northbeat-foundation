@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
+import type { TablesUpdate } from '@/integrations/supabase/types';
 import { ENTITIES } from './entities';
 import { importEntitySchema, importInputSchema, prepareRow, type Snapshot, type ImportEntity } from './csv-import';
 
@@ -45,7 +46,7 @@ export const importCsvRows = createServerFn({ method: 'POST' })
       const prepared = prepareRow(data.entity, row.values, matches, data.choices, new Date().toISOString().slice(0, 10), data.parents);
       if (prepared.errors.length) { summary.errors.push({ row: row.number, message: prepared.errors.join('; ') }); continue; }
       if (prepared.update) {
-        const { error } = await context.supabase.from('organisations').update(prepared.update.values).eq('id', prepared.update.id);
+        const { error } = await context.supabase.from('organisations').update(prepared.update.values as TablesUpdate<'organisations'>).eq('id', prepared.update.id);
         if (error) summary.errors.push({ row: row.number, message: 'Could not update this row. Check its values and try again.' });
         else summary.updated++;
         continue;
