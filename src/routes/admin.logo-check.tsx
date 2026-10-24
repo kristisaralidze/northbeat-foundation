@@ -4,7 +4,7 @@ import {useState,useRef} from 'react';
 import {supabase} from '@/integrations/supabase/client';
 import {Button} from '@/components/ui/button';
 import {OrganisationLogo} from '@/components/site/OrganisationLogo';
-import {resolveOrganisationLogo,checkLogoUrl} from '@/lib/logo-check';
+import {resolveOrganisationLogo,checkLogoUrl,isUnreadable} from '@/lib/logo-check';
 import {uploadImage} from '@/components/admin/ImageField';
 import {organisationDomain} from '@/lib/organisation-logo';
 export const Route=createFileRoute('/admin/logo-check')({head:()=>({meta:[{title:'Logo check: Northbeat admin'},{name:'description',content:'Stored logo checks, light logos, missing assets and shared parent logos.'},{property:'og:title',content:'Logo check: Northbeat admin'},{property:'og:description',content:'Stored logo checks, light logos, missing assets and shared parent logos.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary'}]}),component:LogoCheck});

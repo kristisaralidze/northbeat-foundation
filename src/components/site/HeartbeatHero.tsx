@@ -411,7 +411,7 @@ export function HeartbeatHero() {
       <h2 id="heartbeat-heading" className="sr-only">Events and deadlines in the next 35 days</h2>
       <p ref={passing} className="nb-heartbeat-now" aria-hidden="true">Coming up in Nordic health</p>
       {next && nextItem && <button key={next.key} type="button" className="nb-heartbeat-next" onClick={openNext}>
-        <OrganisationLogo name={nextItem.orgs[0]?.name ?? nextItem.title} slug={nextItem.orgs[0]?.slug} uploaded={nextItem.orgs[0]?.logo_url} choice={nextItem.orgs[0]?.logo_choice} resolved={nextItem.orgs[0]?.logo_resolved_url} tone={nextItem.orgs[0]?.logo_tone} status={nextItem.orgs[0]?.logo_status} />
+        <OrganisationLogo name={nextItem.orgs[0]?.name ?? nextItem.title} slug={nextItem.orgs[0]?.slug} website={nextItem.orgs[0]?.website} uploaded={nextItem.orgs[0]?.logo_url} choice={nextItem.orgs[0]?.logo_choice} resolved={nextItem.orgs[0]?.logo_resolved_url} tone={nextItem.orgs[0]?.logo_tone} status={nextItem.orgs[0]?.logo_status} />
         <span className="nb-heartbeat-next-text">
           <span className="nb-heartbeat-next-label">Next up</span>
           <span className="nb-heartbeat-next-title">{beatTitle(next.beat.items.map(i => publicTitle(i.title)))}</span>
