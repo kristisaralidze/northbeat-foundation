@@ -76,7 +76,7 @@ describe('public profiles', () => {
 describe('orgRelationLabel', () => {
   it('uses plain-language labels per direction', () => {
     expect(orgRelationLabel('invested_in', 'incoming')).toBe('Backed by');
-    expect(orgRelationLabel('invested_in', 'outgoing')).toBe('Portfolio');
+    expect(orgRelationLabel('invested_in', 'outgoing')).toBe('Invested in');
     expect(orgRelationLabel('spun_out_of', 'outgoing')).toBe('Spun out of');
     expect(orgRelationLabel('acquired', 'incoming')).toBe('Acquired by');
     expect(orgRelationLabel('partner_of', 'incoming')).toBe('Partners');

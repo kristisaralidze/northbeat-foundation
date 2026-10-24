@@ -38,12 +38,12 @@ export function publishedOnly(rows: (ProfileRow & { status?: unknown })[]): Prof
 
 /** Plain-language section labels for organisation relationships, by direction. */
 export const ORG_RELATION_LABELS: Record<string, { outgoing: string; incoming: string }> = {
-  invested_in: { outgoing: 'Portfolio', incoming: 'Backed by' },
+  invested_in: { outgoing: 'Invested in', incoming: 'Backed by' },
   spun_out_of: { outgoing: 'Spun out of', incoming: 'Spinouts' },
   acquired: { outgoing: 'Acquired', incoming: 'Acquired by' },
   partner_of: { outgoing: 'Partners', incoming: 'Partners' },
 };
-export const ORG_RELATION_ORDER = ['Backed by', 'Portfolio', 'Spun out of', 'Spinouts', 'Acquired by', 'Acquired', 'Partners'];
+export const ORG_RELATION_ORDER = ['Invested in', 'Backed by', 'Spun out of', 'Spinouts', 'Acquired by', 'Acquired', 'Partners'];
 export function orgRelationLabel(relation: string, direction: 'outgoing' | 'incoming'): string {
   return ORG_RELATION_LABELS[relation]?.[direction] ?? 'Related organisations';
 }
