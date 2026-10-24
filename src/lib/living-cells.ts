@@ -106,6 +106,8 @@ export function layoutLabels(cells: Cell[], width: number, height: number, measu
   return labels;
 }
 const stepEase = (x: number) => { const t = Math.max(0, Math.min(1, x)); return t * t * (3 - 2 * t); };
+const slotLength = (window: number, n: number) => Math.min(window, 2 * window / (Math.max(1, n) + 1));
+const slot = (from: number, window: number, i: number, n: number) => from + (n > 1 ? i * (window - slotLength(window, n)) / (n - 1) : 0);
 /** Scroll progress of the opening: 0 when the section top is at 85% of the viewport, 1 at 25%. */
 export function openingProgress(top: number, viewport: number) {
   if (viewport <= 0) return 1;
@@ -114,13 +116,11 @@ export function openingProgress(top: number, viewport: number) {
 /** Startups cell over 0..0.15, the other cells one after another over 0.15..0.7. */
 export function cellIntro(p: number, order: number, count: number) {
   if (order <= 0) return stepEase(p / 0.15);
-  const others = Math.max(1, count - 1), step = 0.55 / others;
-  return stepEase((p - 0.15 - (order - 1) * step) / Math.min(0.55, step * 2));
+  return stepEase((p - slot(0.15, 0.55, order - 1, count - 1)) / slotLength(0.55, count - 1));
 }
 /** Links draw over 0.4..0.9, in order of the later of their two cells. */
 export function linkIntro(p: number, order: number, count: number) {
-  const step = 0.5 / Math.max(1, count);
-  return stepEase((p - 0.4 - order * step) / Math.min(0.5, step * 2));
+  return stepEase((p - slot(0.4, 0.5, order, count)) / slotLength(0.5, count));
 }
 /** Organisation lines fade in over 0.9..1. */
 export const relationIntro = (p: number) => stepEase((p - 0.9) / 0.1);
