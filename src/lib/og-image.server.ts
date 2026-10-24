@@ -22,9 +22,9 @@ async function loadFonts() {
 }
 
 type Ctx = ReturnType<ReturnType<typeof PImage.make>['getContext']>;
-/** Serif hairlines are thinner than the rasteriser's fill, so a light stroke keeps them whole. */
+/** Serif hairlines are thinner than the rasteriser's fill, so a few offset fills keep them whole. */
 function serif(ctx: Ctx, text: string, x: number, y: number, colour: string) {
-  ctx.fillStyle = colour; ctx.strokeStyle = colour; ctx.lineWidth = 1.6; ctx.fillText(text, x, y); ctx.strokeText(text, x, y);
+  ctx.fillStyle = colour; for (const [dx, dy] of [[0, 0], [0.6, 0], [0, 0.6], [0.6, 0.6]] as const) ctx.fillText(text, x + dx, y + dy);
 }
 
 function wrap(ctx: Ctx, text: string, maxWidth: number, maxLines: number) {
