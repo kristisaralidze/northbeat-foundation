@@ -59,7 +59,7 @@ export const importCsvRows = createServerFn({ method: 'POST' })
       if (saved?.['status'] === 'skipped') summary.skipped++;
       else {
         summary.added++;
-        matches.entries.push({ id: String(saved?.['id']), name: prepared.name, website: String(prepared.values['website'] ?? '') });
+        matches.entries.push({ id: String(saved?.['id']), slug: String(prepared.values['slug'] ?? ''), name: prepared.name, website: String(prepared.values['website'] ?? '') });
       }
     }
     return summary;

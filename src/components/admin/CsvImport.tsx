@@ -10,7 +10,7 @@ import { CSV_COLUMNS, autoMapping, mapCsvRows, parseCsv, prepareRow, unknownTags
 import { getImportMatches, importCsvRows } from '@/lib/admin/csv-import.functions';
 import { humanize } from '@/lib/admin/entities';
 
-type Summary = { added: number; skipped: number; errors: { row: number; message: string }[] };
+type Summary = { added: number; updated: number; skipped: number; errors: { row: number; message: string }[] };
 export function CsvImport({ entity }: { entity: ImportEntity }) {
   const [open, setOpen] = useState(false);
   const [csv, setCsv] = useState<{ headers: string[]; rows: string[][] } | null>(null);
