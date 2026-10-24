@@ -25,6 +25,12 @@ export function SystoleHeart({ pathname }: { pathname: string }) {
   }, [pathname]);
 
   useEffect(() => {
+    const show = () => setOpen(true);
+    window.addEventListener('northbeat:open-systole', show);
+    return () => window.removeEventListener('northbeat:open-systole', show);
+  }, []);
+
+  useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
     document.addEventListener('keydown', onKey);
