@@ -10,7 +10,7 @@ import { CalendarMenu } from '@/components/site/CalendarMenu';
 import { SaveButton } from '@/components/site/SaveButton';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
-import { countdownLabel, daysUntil, type CalendarEvent } from '@/lib/detail';
+import { countdownLabel, countdownClass, daysUntil, type CalendarEvent } from '@/lib/detail';
 import { friendlyDate } from '@/lib/opportunities';
 import { EVENT_TYPES, humanize } from '@/lib/admin/entities';
 import { eventsQuery } from '@/lib/events.query';
@@ -59,7 +59,7 @@ function Events() {
   </div>;
   return <>
     {deadlines.length > 0 && <section className="hidden md:block bg-frost-wash" aria-label="Closing soon"><div className="nb-container py-7"><div className="mb-4 flex flex-wrap items-baseline justify-between gap-2"><h2 className="nb-h3">Closing soon</h2><span className="nb-small text-muted-foreground">Next 14 days, {deadlines.length} {deadlines.length === 1 ? 'deadline' : 'deadlines'}</span></div>
-      <ul className="nb-deadline-strip">{deadlines.map((item) => <li key={`${item.kind}-${item.id}`} className="nb-card"><p className="nb-small text-muted-foreground mb-2">{item.kind === 'event' ? 'Event applications' : 'Opportunity'}, {friendlyDate(item.deadline, data.now)}</p><h3 className="nb-h3">{item.kind === 'event' ? <Link to="/event/$slug" params={{ slug: item.slug }} className="nb-org-link break-words">{item.title}</Link> : <Link to="/opportunity/$slug" params={{ slug: item.slug }} className="nb-org-link break-words">{item.title}</Link>}</h3></li>)}</ul>
+      <ul className="nb-deadline-strip">{deadlines.map((item) => <li key={`${item.kind}-${item.id}`} className="nb-card"><p className="nb-small text-muted-foreground mb-2">{item.kind === 'event' ? 'Event applications' : 'Opportunity'}, {friendlyDate(item.deadline, data.now)}</p><span className={countdownClass(daysUntil(item.deadline,data.now))}>{countdownLabel(item.deadline,data.now)}</span><h3 className="nb-h3">{item.kind === 'event' ? <Link to="/event/$slug" params={{ slug: item.slug }} className="nb-org-link break-words">{item.title}</Link> : <Link to="/opportunity/$slug" params={{ slug: item.slug }} className="nb-org-link break-words">{item.title}</Link>}</h3></li>)}</ul>
     </div></section>}
     <div className="nb-container nb-section nb-events-page"><header className="mb-6 flex flex-wrap items-end justify-between gap-4"><h1 className="nb-h1">Events</h1>
       <div className="flex gap-1" aria-label="Event view"><Button variant="ghost" className={`nb-btn ${!calendar ? 'nb-btn-primary' : 'nb-btn-quiet'}`} aria-pressed={!calendar} onClick={() => update({ view: 'list' })}><List className="h-4 w-4" />List</Button><Button variant="ghost" className={`nb-btn ${calendar ? 'nb-btn-primary' : 'nb-btn-quiet'}`} aria-pressed={calendar} onClick={() => update({ view: 'calendar' })}><CalendarDays className="h-4 w-4" />Calendar</Button></div></header>

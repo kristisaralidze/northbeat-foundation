@@ -98,7 +98,7 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
         {businessId && <p className="nb-registry-note">Verified in the Finnish Trade Register. <a className="nb-link" href={ytjRecordUrl(businessId)} target="_blank" rel="noopener noreferrer">View the official YTJ record</a></p>}
       </div>
     </header>
-    {isOrg && row['logo_shared_from'] && profile.related.some(g=>g.label==='Part of') && <p className="nb-small">Part of {profile.related.filter(g=>g.label==='Part of').flatMap(g=>g.entries).map(e=><DetailLink key={e.id} item={{...e,kind:'organisations'}}>{e.title}</DetailLink>)}</p>}
+    {isOrg && row['logo_shared_from'] && profile.related.some(g=>g.label==='Part of') && <p className="nb-small">Part of {profile.related.filter(g=>g.label==='Part of').flatMap(g=>g.entries).filter(e=>e.id===row['logo_shared_from']).map(e=><DetailLink key={e.id} item={{...e,kind:'organisations'}}>{e.title}</DetailLink>)}</p>}
     {isOrg && offerChips(text(row,'type') ?? '',row['offer_chips']).length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">How they can help you</h2><ul className="nb-detail-chips">{offerChips(text(row,'type') ?? '',row['offer_chips']).map(chip=><li key={chip} className="nb-reason-chip">{chip}</li>)}</ul></section>}
     {actions}
     {isOrg && detail && <OpenNow items={detail.coming} now={now} />}
