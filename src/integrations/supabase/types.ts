@@ -320,6 +320,36 @@ export type Database = {
         }
         Relationships: []
       }
+      founders: {
+        Row: {
+          created_at: string
+          id: string
+          linkedin_url: string | null
+          name: string
+          one_line: string | null
+          photo_url: string | null
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          linkedin_url?: string | null
+          name: string
+          one_line?: string | null
+          photo_url?: string | null
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          linkedin_url?: string | null
+          name?: string
+          one_line?: string | null
+          photo_url?: string | null
+          sort_order?: number
+        }
+        Relationships: []
+      }
       glossary_term_guides: {
         Row: {
           glossary_term_id: string
@@ -734,6 +764,7 @@ export type Database = {
           email: string
           id: string
           source: string | null
+          tags: string[]
           unsubscribe_token: string
           unsubscribed_at: string | null
           updated_at: string
@@ -745,6 +776,7 @@ export type Database = {
           email: string
           id?: string
           source?: string | null
+          tags?: string[]
           unsubscribe_token?: string
           unsubscribed_at?: string | null
           updated_at?: string
@@ -756,6 +788,7 @@ export type Database = {
           email?: string
           id?: string
           source?: string | null
+          tags?: string[]
           unsubscribe_token?: string
           unsubscribed_at?: string | null
           updated_at?: string
@@ -1544,6 +1577,30 @@ export type Database = {
           },
         ]
       }
+      site_settings: {
+        Row: {
+          contact_email: string | null
+          id: number
+          instagram_url: string | null
+          linkedin_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          contact_email?: string | null
+          id?: number
+          instagram_url?: string | null
+          linkedin_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          contact_email?: string | null
+          id?: number
+          instagram_url?: string | null
+          linkedin_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       submissions: {
         Row: {
           admin_note: string | null
@@ -1601,6 +1658,24 @@ export type Database = {
           status?: Database["public"]["Enums"]["submission_status"]
           type?: Database["public"]["Enums"]["submission_type"]
           updated_at?: string
+        }
+        Relationships: []
+      }
+      systole_waitlist: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
         }
         Relationships: []
       }
