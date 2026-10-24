@@ -28,7 +28,7 @@ function OptionList({ facet, data, search, onToggle }: { facet: Facet; data: Dir
 /** Desktop: each group is its own chip with its count, then Country, Field and Stage open small option lists. */
 export function FilterChipRow(props: { data: DirectoryData; search: ExploreSearch; onToggle: (facet: Facet, value: string) => void }) {
   const options = useMemo(() => Object.fromEntries(VISIBLE_FACETS.map(facet => [facet, facetOptions(props.data, props.search, facet)])), [props.data, props.search]);
-  const groups = options.group ?? [];
+  const groups = options['group'] ?? [];
   return <div className="flex flex-col gap-3">
     {groups.length > 0 && <div className="nb-filter-chips" role="group" aria-label="Group">{groups.map((o) => {
       const on = props.search.group.includes(o.value);
