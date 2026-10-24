@@ -13,6 +13,7 @@ export const Route = createFileRoute("/newsletter/")({
       { property: "og:title", content: "Newsletter: Northbeat" },
       { property: "og:description", content: "The Northbeat newsletter: funding calls, intakes and events in Nordic health innovation." },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://nordic-heartbeat.lovable.app/newsletter" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/newsletter/")({
       <p className="nb-lead">{error instanceof Error ? error.message : String(error)}</p>
     </div>
   ),
+  notFoundComponent: () => <div className="nb-page"><h1 className="nb-h1">Not found</h1></div>,
   component: NewsletterPage,
 });
 
@@ -32,11 +34,19 @@ function NewsletterPage() {
     <div className="nb-page">
       <header className="nb-page-header">
         <h1 className="nb-h1">The Northbeat letter</h1>
-        <p className="nb-lead">Funding calls, programme intakes and events in Nordic health innovation. We track it so you don't miss it.</p>
+        <p className="nb-lead">We track Nordic health innovation so you don't miss it.</p>
       </header>
-      <section aria-label="Sign up" className="nb-card max-w-xl">
-        <h2 className="nb-h3">Get the next issue</h2>
-        <p className="nb-small text-muted-foreground">One email when a new issue is out.</p>
+      <section aria-labelledby="nl-promise" className="max-w-xl">
+        <h2 id="nl-promise" className="nb-h3">In every issue</h2>
+        <ul className="nb-check-list nb-body">
+          <li>New open calls</li>
+          <li>Deadlines coming up</li>
+          <li>Events worth going to</li>
+        </ul>
+        <p className="nb-body mt-6">Once a week, free, unsubscribe any time.</p>
+      </section>
+      <section aria-label="Sign up" className="nb-card mt-8 max-w-xl">
+        <h2 className="nb-h3">Sign up</h2>
         <NewsletterSignup source="newsletter" />
       </section>
       {issues.length > 0 && <section aria-label="Past issues" className="mt-10">
