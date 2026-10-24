@@ -62,10 +62,10 @@ export function warpedDay(f: number, from: number, to: number, beats: { day: num
   for (let i = 0; i < steps; i++) {
     const mid = from + (i + 0.5) * step;
     const near = beats.some(b => b.day >= mid && b.day - mid <= ahead);
-    cost.push(cost[i] + step / (near ? slow : 1));
+    cost.push(cost[i]! + step / (near ? slow : 1));
   }
-  const goal = clamp01(f) * cost[steps];
-  let i = 0; while (i < steps && cost[i + 1] < goal) i++;
-  const seg = cost[i + 1] - cost[i];
-  return from + (i + (seg > 0 ? (goal - cost[i]) / seg : 0)) * step;
+  const goal = clamp01(f) * cost[steps]!;
+  let i = 0; while (i < steps && cost[i + 1]! < goal) i++;
+  const seg = cost[i + 1]! - cost[i]!;
+  return from + (i + (seg > 0 ? (goal - cost[i]!) / seg : 0)) * step;
 }

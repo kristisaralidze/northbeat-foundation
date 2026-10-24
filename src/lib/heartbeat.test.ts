@@ -13,8 +13,8 @@ describe('heartbeat line', () => {
   it('groups items on the same calendar day and keeps only the next 35 days', () => {
     const beats = buildBeats([item('a', 'event', '2026-11-18'), item('b', 'event', '2026-11-18'), item('c', 'event', '2027-01-30'), item('d', 'event', '2026-10-01')], '2026-11-10');
     expect(beats).toHaveLength(1);
-    expect(beats[0].day).toBe(8);
-    expect(beats[0].items).toHaveLength(2);
+    expect(beats[0]!.day).toBe(8);
+    expect(beats[0]!.items).toHaveLength(2);
   });
   it('peaks at the beat day and is flat beyond its width', () => {
     expect(pqrst(0)).toBeGreaterThan(0.9);
