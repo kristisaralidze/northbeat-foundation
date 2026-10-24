@@ -24,10 +24,21 @@ describe('action-first detail rules', () => {
     expect(registrationClosed(null, '2026-11-01T00:00:00Z', '2026-10-24T00:00:00Z')).toBe(false);
     expect(registrationClosed(null, null, '2026-10-24T00:00:00Z')).toBe(false);
   });
-  it('ranks relation, then field, then city, max 6, with reasons', () => {
-    const rows = [{ id: 'c', title: 'C', city: 'Oulu', fieldIds: [] }, { id: 'f', title: 'F', city: null, fieldIds: ['med'] }, { id: 'r', title: 'R', city: null, fieldIds: [] }, ...Array.from({ length: 8 }, (_, i) => ({ id: `x${i}`, title: `X${i}`, city: 'Oulu', fieldIds: [] }))];
-    const out = closeToThem(rows, { id: 'self', city: 'Oulu', fieldNames: { med: 'Medtech' }, relations: { r: 'Partner' } });
+  it('scores relation 100, city 30, type 20, field 10 each, country 5; top 6 with strongest reason', () => {
+    const self = { id: 'self', city: 'Oulu', type: 'investor', fieldNames: { med: 'Medtech', ai: 'AI' }, countryNames: { fi: 'Finland' }, relations: { r: 'Partner' } };
+    const rows = [
+      { id: 'country', title: 'Country', city: null, fieldIds: [], countryIds: ['fi'] }, // 5
+      { id: 'f2', title: 'Two fields', city: null, fieldIds: ['med', 'ai'] }, // 20
+      { id: 't', title: 'Type', city: null, type: 'investor', fieldIds: [] }, // 20
+      { id: 'c', title: 'City', city: 'Oulu', fieldIds: [] }, // 30
+      { id: 'r', title: 'Rel', city: null, fieldIds: [] }, // 100
+      { id: 'cf', title: 'City field', city: 'Oulu', fieldIds: ['med'] }, // 40
+      { id: 'none', title: 'None', city: 'Turku', fieldIds: [] },
+      ...Array.from({ length: 3 }, (_, i) => ({ id: `y${i}`, title: `Y${i}`, city: null, fieldIds: [], countryIds: ['fi'] })),
+    ];
+    const out = closeToThem(rows, self);
     expect(out).toHaveLength(6);
-    expect(out.slice(0, 3).map(o => o.reason)).toEqual(['Partner', 'Same field: Medtech', 'Also in Oulu']);
+    expect(out.map(o => [o.id, o.score])).toEqual([['r', 100], ['cf', 40], ['c', 30], ['t', 20], ['f2', 20], ['country', 5]]);
+    expect(out.map(o => o.reason)).toEqual(['Partner', 'Also in Oulu', 'Also in Oulu', 'Also an investor', 'Same field: Medtech', 'Also in Finland']);
   });
 });
