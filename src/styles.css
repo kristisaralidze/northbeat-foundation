@@ -1069,3 +1069,29 @@ html.lenis, html.lenis body { height: auto; }
 .nb-trial-status.is-completed { color: var(--muted-foreground); background: var(--muted); border-color: transparent; }
 .nb-registry-note { font-size: 13px; color: var(--muted-foreground); margin-top: .75rem; }
 @media (max-width: 640px) { .nb-trial-list li { flex-direction: column; } }
+
+/* Heartbeat hero: one sticky canvas inside a tall scroll section. */
+.nb-heartbeat { position: relative; height: 300vh; }
+.nb-heartbeat.nb-heartbeat-reduced { height: 100vh; }
+@media (max-width: 639px) { .nb-heartbeat { height: 240vh; } }
+.nb-heartbeat-sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+.nb-heartbeat-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: pan-y; }
+.nb-heartbeat-head { position: absolute; top: 5.5rem; left: var(--gutter, 1.25rem); max-width: 34rem; pointer-events: none; color: var(--ink); }
+.nb-heartbeat-head h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3.75rem); line-height: 1.02; margin: .5rem 0 .75rem; font-weight: 400; }
+.nb-heartbeat-head p { color: var(--ink-soft); max-width: 28rem; }
+.nb-heartbeat-live { display: flex; align-items: center; gap: .5rem; font-size: .8125rem; color: var(--ink); }
+.nb-heartbeat-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--berry); display: inline-block; }
+.nb-heartbeat-passing { position: absolute; left: var(--gutter, 1.25rem); bottom: 2rem; color: var(--ink-soft); font-size: .875rem; pointer-events: none; }
+.nb-heartbeat-date { font-family: var(--font-display); font-size: clamp(1.75rem, 3.5vw, 2.75rem); color: var(--ink); line-height: 1.1; }
+.nb-heartbeat-hint { position: absolute; right: var(--gutter, 1.25rem); bottom: 2rem; text-align: right; font-size: .875rem; color: var(--ink-soft); transition: opacity .3s; }
+.nb-heartbeat-caption { position: absolute; left: 50%; bottom: 5.5rem; transform: translateX(-50%); width: max-content; max-width: 90vw; text-align: center; color: var(--ink); opacity: 0; pointer-events: none; }
+.nb-heartbeat-finale { position: absolute; left: 0; right: 0; top: 16%; text-align: center; opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 1.25rem; padding-inline: var(--gutter, 1.25rem); }
+.nb-heartbeat-finale h2 { font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 3rem); font-weight: 400; color: var(--ink); }
+.nb-heartbeat-card { position: absolute; transform: translate(-50%, calc(-100% - 2.5rem)); background: var(--card); color: var(--card-foreground); border: 1px solid var(--border); border-radius: .5rem; padding: .75rem 1rem; min-width: 12rem; max-width: 18rem; font-size: .875rem; z-index: 5; }
+.nb-heartbeat-card ul { display: grid; gap: .5rem; margin: .25rem 0; }
+.nb-heartbeat-card li { display: grid; }
+.nb-heartbeat-card-date, .nb-heartbeat-card-city { color: var(--ink-soft); font-size: .8125rem; }
+@media (max-width: 639px) {
+  .nb-heartbeat-head { top: 4.75rem; right: var(--gutter, 1.25rem); }
+  .nb-heartbeat-hint { bottom: 7rem; }
+}
