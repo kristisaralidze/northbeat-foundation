@@ -49,17 +49,27 @@ export function registrationClosed(applyBy: string | null, start: string | null,
   const limit = applyBy ?? start;
   return Boolean(limit && Number.isFinite(Date.parse(limit)) && Date.parse(now) > Date.parse(limit));
 }
-export type CloseCandidate = { id: string; title: string; city: string | null; fieldIds: string[] };
-/** Up to 6 organisations: direct relation, then same field, then same city, each with a reason. */
-export function closeToThem<T extends CloseCandidate>(rows: T[], self: { id: string; city: string | null; fieldNames: Record<string, string>; relations: Record<string, string> }, limit = 6) {
-  const picked: (T & { reason: string; rank: number })[] = [];
+export type CloseCandidate = { id: string; title: string; city: string | null; type?: string | null; fieldIds: string[]; countryIds?: string[] };
+const typeLabel = (type: string) => { const word = type.replace(/_/g, ' '); return `Also ${/^[aeiou]/i.test(word) ? 'an' : 'a'} ${word}`; };
+/** Top 6 by score: direct relation +100, same city +30, same type +20, each shared field +10, same country +5. The chip names the strongest match. */
+export function closeToThem<T extends CloseCandidate>(rows: T[], self: { id: string; city: string | null; type?: string | null; fieldNames: Record<string, string>; countryNames?: Record<string, string>; relations: Record<string, string> }, limit = 6) {
+  const picked: (T & { reason: string; score: number })[] = [];
   for (const row of rows) {
     if (row.id === self.id) continue;
-    const field = row.fieldIds.find(id => self.fieldNames[id]);
-    const reason = self.relations[row.id] ? { reason: self.relations[row.id]!, rank: 0 } : field ? { reason: `Same field: ${self.fieldNames[field]}`, rank: 1 } : self.city && row.city === self.city ? { reason: `Also in ${row.city}`, rank: 2 } : null;
-    if (reason) picked.push({ ...row, ...reason });
+    const fields = row.fieldIds.filter(id => self.fieldNames[id]);
+    const country = (row.countryIds ?? []).find(id => self.countryNames?.[id]);
+    const parts: [number, string][] = [];
+    if (self.relations[row.id]) parts.push([100, self.relations[row.id]!]);
+    if (self.city && row.city && row.city.toLowerCase() === self.city.toLowerCase()) parts.push([30, `Also in ${row.city}`]);
+    if (self.type && row.type === self.type) parts.push([20, typeLabel(row.type)]);
+    if (fields.length) parts.push([10 * fields.length, `Same field: ${self.fieldNames[fields[0]!]}`]);
+    if (country) parts.push([5, `Also in ${self.countryNames![country]}`]);
+    if (!parts.length) continue;
+    const score = parts.reduce((sum, [n]) => sum + n, 0);
+    const strongest = [...parts].sort((x, y) => y[0] - x[0])[0]!;
+    picked.push({ ...row, reason: strongest[1], score });
   }
-  return picked.sort((a, b) => a.rank - b.rank || a.title.localeCompare(b.title)).slice(0, limit);
+  return picked.sort((a, b) => b.score - a.score || a.title.localeCompare(b.title)).slice(0, limit);
 }
 /** Short reason chip for a relationship group label. */
 export const RELATION_REASON: Record<string, string> = { 'Invested in': 'Invested in', 'Backed by': 'Backer', 'Spun out of': 'Parent', Spinouts: 'Spinout', 'Acquired by': 'Acquirer', Acquired: 'Acquired', Partners: 'Partner' };

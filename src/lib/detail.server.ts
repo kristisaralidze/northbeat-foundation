@@ -29,14 +29,12 @@ export async function detailContext(client: SupabaseClient, kind: 'organisations
     const fieldNames = Object.fromEntries(terms.filter(term => term.kind === 'field').map(term => [term.id, term.name]));
     const relations: Record<string, string> = {};
     for (const group of related) if (group.kind === 'organisations') for (const entry of group.entries) relations[entry.id] ??= RELATION_REASON[group.label] ?? 'Connected';
-    const ranked = closeToThem(orgs.map(org => ({ ...org, title: String(org['name']), city: text(org, 'city'), fieldIds: tags.filter(tag => tag['organisation_id'] === org.id).map(tag => String(tag['term_id'])) })), { id: row.id, city: text(row, 'city'), fieldNames, relations });
+    const countryNames = Object.fromEntries(terms.filter(term => term.kind === 'country').map(term => [term.id, term.name]));
+    const ranked = closeToThem(orgs.map(org => { const ids = tags.filter(tag => tag['organisation_id'] === org.id).map(tag => String(tag['term_id'])); return { ...org, title: String(org['name']), city: text(org, 'city'), type: text(org, 'type'), fieldIds: ids, countryIds: ids }; }), { id: row.id, city: text(row, 'city'), type: text(row, 'type'), fieldNames, countryNames, relations });
     similar = ranked.map(org => ({ ...publicEntry('organisations', org), roles: [org.reason] }));
   }
-  if (kind === 'organisations' && steps.length) {
-    const entries = await all(client, 'guides', 'id,slug,title,one_sentence,journey_step_id,status');
-    guides = entries.filter(guide => steps.includes(String(guide['journey_step_id']))).sort((a, b) => String(a['title']).localeCompare(String(b['title']))).slice(0, 2).map(guide => ({ slug: guide.slug, title: publicTitle(String(guide['title'])), summary: text(guide, 'one_sentence') }));
-  }
-  if (kind === 'events' && (steps.length || fields.length)) {
+  // Organisations and events share one guide match: journey step first, then a shared field.
+  if ((kind === 'organisations' || kind === 'events') && (steps.length || fields.length)) {
     const [entries, tags] = await Promise.all([all(client, 'guides', 'id,slug,title,one_sentence,journey_step_id,status'), all(client, 'guide_terms', 'guide_id,term_id', false)]);
     const score = (guide: ProfileRow) => (steps.includes(String(guide['journey_step_id'])) ? 10 : 0) + (tags.some(tag => tag['guide_id'] === guide.id && fields.includes(String(tag['term_id']))) ? 1 : 0);
     guides = entries.filter(guide => score(guide) > 0).sort((a, b) => score(b) - score(a) || String(a['title']).localeCompare(String(b['title']))).slice(0, 2).map(guide => ({ slug: guide.slug, title: publicTitle(String(guide['title'])), summary: text(guide, 'one_sentence') }));
