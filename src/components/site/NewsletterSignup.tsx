@@ -35,7 +35,7 @@ export function NewsletterSignup({ source = "footer", tag, consentLabel = "Yes, 
           type="email"
           required
           autoComplete="email"
-          placeholder="you@company.fi"
+          placeholder="Your email"
           className="nb-input sm:flex-1"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
