@@ -5,7 +5,7 @@ import { ENTITIES, EVENT_FORMATS, slugify } from './entities';
 export const importEntitySchema = z.enum(['organisations', 'events', 'opportunities']);
 export type ImportEntity = z.infer<typeof importEntitySchema>;
 export const CSV_COLUMNS: Record<ImportEntity, string[]> = {
-  organisations: ['name', 'type', 'short_description', 'website', 'city', 'country', 'fields', 'sub_areas', 'stages', 'journey_steps', 'founded_year', 'source_url', 'contact_email'],
+  organisations: ['slug', 'name', 'type', 'short_description', 'website', 'city', 'country', 'fields', 'sub_areas', 'stages', 'journey_steps', 'founded_year', 'story', 'scale_facts', 'our_take', 'offer_chips', 'how_to_get_involved', 'sources', 'source_url', 'contact_email'],
   events: ['title', 'event_type', 'summary', 'starts_at', 'ends_at', 'city', 'venue', 'format', 'registration_url', 'apply_deadline_at', 'fields', 'journey_steps', 'organiser', 'source_url'],
   opportunities: ['title', 'type', 'summary', 'provider', 'deadline_at', 'amount_min_eur', 'amount_max_eur', 'eligibility', 'apply_url', 'fields', 'stages', 'journey_steps', 'source_url'],
 };
@@ -18,7 +18,7 @@ export function websiteDomain(value: string) {
   try { return new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`).hostname.toLowerCase().replace(/^www\./, ''); } catch { return ''; }
 }
 export type CsvRow = Record<string, string>;
-export type Snapshot = { entries: { id: string; name: string; website: string | null }[]; organisations: { id: string; name: string }[]; terms: { id: string; kind: string; name: string }[] };
+export type Snapshot = { entries: { id: string; slug: string; name: string; website: string | null }[]; organisations: { id: string; name: string }[]; terms: { id: string; kind: string; name: string }[] };
 export type TagChoice = 'create' | 'skip';
 export const importInputSchema = z.object({ entity: importEntitySchema, rows: z.array(z.object({ number: z.number().int().positive(), values: z.record(z.string().max(20000)) })).max(50), choices: z.record(z.enum(['create', 'skip'])), parents: z.record(z.string().uuid()).default({}) });
 
