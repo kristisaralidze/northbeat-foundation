@@ -3,15 +3,15 @@ import { animate, motion, scroll, stagger, useReducedMotion } from 'framer-motio
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** Fade-and-rise transition every time the public page changes. */
+/** Soft 300ms fade every time the public page changes. */
 export function PageTransition({ children, pathname }: { children: ReactNode; pathname: string }) {
   const reduce = useReducedMotion();
   return (
     <motion.div
       key={pathname}
-      initial={reduce ? false : { opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: EASE }}
+      initial={reduce ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
     >
       {children}
     </motion.div>
@@ -66,7 +66,7 @@ export function enhancePageMotion(page: HTMLElement): () => void {
   // page root, so no hydration mismatch); we only add the revealed class.
   // A scroll-position check (not IntersectionObserver) so anchor jumps and
   // fast scrolling past a section still reveal it.
-  const selector = 'section, .nb-card, [data-reveal]';
+  const selector = 'section, .nb-card, [data-reveal], hr, .nb-cover-banner, .nb-cover-strip';
   const pending = new Set<HTMLElement>();
   const seen = new Map<HTMLElement, number>();
   for (const el of page.querySelectorAll<HTMLElement>(selector)) {
@@ -74,7 +74,7 @@ export function enhancePageMotion(page: HTMLElement): () => void {
     const parent = el.parentElement ?? page;
     const order = seen.get(parent) ?? 0;
     seen.set(parent, order + 1);
-    el.style.setProperty('--reveal-delay', `${Math.min(order, 5) * 60}ms`);
+    el.style.setProperty('--reveal-delay', `${Math.min(order, 8) * 70}ms`);
     pending.add(el);
   }
   let ticking = false;
@@ -119,18 +119,73 @@ export function enhancePageMotion(page: HTMLElement): () => void {
   late.observe(page, { childList: true, subtree: true });
   cleanups.push(() => late.disconnect());
 
-  // Cover images: gentle parallax while they cross the viewport.
-  const images = [...page.querySelectorAll<HTMLElement>('.nb-cover-banner img, .nb-cover-strip img, [data-parallax]')];
-  for (const img of images) {
-    img.style.scale = '1.12';
-    const stop = scroll(animate(img, { y: ['-5%', '5%'] }), {
-      target: img.parentElement ?? img,
-      offset: ['start end', 'end start'],
-    });
+  // Large images: subtle parallax, 40px of travel at most.
+  const heroes = [...page.querySelectorAll<HTMLElement>('.nb-cover-banner, .nb-cover-strip, [data-parallax]')];
+  for (const el of heroes) {
+    const stop = scroll(animate(el, { y: [-20, 20] }), { target: el, offset: ['start end', 'end start'] });
     cleanups.push(() => {
       stop();
-      img.style.scale = '';
-      img.style.transform = '';
+      el.style.transform = '';
+    });
+  }
+
+  // Big numbers: count up once when they become visible.
+  for (const el of page.querySelectorAll<HTMLElement>('.nb-event-fact-value')) {
+    const original = el.textContent ?? '';
+    const match = original.match(/^([^\d]*)([\d][\d.,]*)(.*)$/);
+    if (!match) continue;
+    const [, prefix, num, suffix] = match;
+    const decimals = num.includes('.') ? (num.split('.')[1] ?? '').length : 0;
+    const parsed = decimals ? Number(num.replace(/,/g, '')) : Number(num.replace(/[.,]/g, ''));
+    if (!Number.isFinite(parsed) || parsed <= 0) continue;
+    const render = (v: number) => {
+      el.textContent = `${prefix}${decimals ? v.toFixed(decimals) : Math.round(v).toLocaleString('en-GB')}${suffix}`;
+    };
+    render(0);
+    const io = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        io.disconnect();
+        void animate(0, parsed, { duration: 1.2, ease: EASE, onUpdate: render });
+      }
+    }, { rootMargin: '0px 0px -15% 0px' });
+    io.observe(el);
+    cleanups.push(() => { io.disconnect(); el.textContent = original; });
+  }
+
+  // Editorial rows: a small image preview follows the cursor (desktop only).
+  if (window.matchMedia('(pointer: fine)').matches) {
+    const preview = document.createElement('span');
+    preview.className = 'nb-row-preview';
+    preview.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(preview);
+    let current: HTMLImageElement | null = null;
+    const move = (event: PointerEvent) => {
+      preview.style.transform = `translate(${event.clientX + 20}px, ${event.clientY - 56}px)`;
+    };
+    const over = (event: PointerEvent) => {
+      const link = (event.target as HTMLElement).closest?.('a');
+      const img = link?.querySelector('img');
+      if (link && img instanceof HTMLImageElement && img.src && link.closest('.nb-card, .nb-compact-list, .nb-card-grid, .nb-close-grid')) {
+        if (current !== img) {
+          current = img;
+          const clone = document.createElement('img');
+          clone.src = img.currentSrc || img.src;
+          clone.alt = '';
+          preview.replaceChildren(clone);
+        }
+        preview.classList.add('is-visible');
+        move(event);
+      } else if (current) {
+        current = null;
+        preview.classList.remove('is-visible');
+      }
+    };
+    page.addEventListener('pointermove', move, { passive: true });
+    page.addEventListener('pointerover', over, { passive: true });
+    cleanups.push(() => {
+      page.removeEventListener('pointermove', move);
+      page.removeEventListener('pointerover', over);
+      preview.remove();
     });
   }
 

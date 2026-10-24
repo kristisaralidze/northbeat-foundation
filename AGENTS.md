@@ -38,3 +38,4 @@
 - Guide hub picks use organisation/opportunity FK links with a shared three-pick trigger; no automatic guide picks. Why: editorial control and published-only reads.
 - Link preview images render at /api/public/og/$kind/$slug with pure-JS pureimage/pngjs (no wasm or native code) from published rows and official logos only. Why: the server runtime cannot compile wasm from bytes or load native image libraries.
 - Public pages read site_settings, founders and terms only via public_site_settings()/public_founders()/public_terms(); signup tables are visitor insert-only, admin-managed. Why: no direct table access to emails.
+- Editorial restyle (square plum-slide buttons, hairline inputs, text chips, rule-top cards, cursor previews) is scoped to .nb-public-page plus footer/dialog forms in src/styles.css. Why: public pages get the editorial system while home and admin stay untouched.
