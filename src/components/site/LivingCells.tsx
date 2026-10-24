@@ -21,16 +21,21 @@ export function LivingCells() {
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
     let scene: CellScene | null = null, visible = false, raf = 0, previous = 0, time = elapsedRef.current.time, built = elapsedRef.current.built, opening = built ? 1 : 0, disposed = false;
     // Scroll-linked build: reversible until complete, then stays built for the visit.
-    const measure = () => { if (built) return 1; const top = canvas.closest('section')?.getBoundingClientRect().top ?? 0; return openingProgress(top, window.innerHeight); };
+    const section = canvas.closest('section') ?? canvas;
+    const measure = () => built ? 1 : openingProgress(section.getBoundingClientRect().top, window.innerHeight);
+    // Only a real scroll by the visitor may complete the build; a restored or initial position stays reversible.
+    let userScrolled = false;
+    const onScroll = () => { userScrolled = true; if (!motion.matches && !raf && !disposed && !document.hidden) raf = requestAnimationFrame(tick); };
+    window.addEventListener('scroll', onScroll, { passive: true });
     const draw = () => scene?.draw(motion.matches ? 0 : time, motion.matches ? 1 : opening, selectionRef.current);
     const tick = (now: number) => {
-      raf = 0; if (disposed || !visible || document.hidden) { previous = 0; return; }
+      raf = 0; if (disposed || document.hidden) { previous = 0; return; }
       const dt = previous ? Math.min((now - previous) / 1000, .05) : 0; previous = now;
       opening = measure();
-      if (opening >= 1 && !built) { built = true; time = 0; }
+      if (opening >= 1 && !built && userScrolled) { built = true; time = 0; }
       if (built) time += dt;
       elapsedRef.current = { time, built };
-      draw(); if (!motion.matches) raf = requestAnimationFrame(tick);
+      draw(); if (!motion.matches && (visible || !built && opening > 0 && opening < 1)) raf = requestAnimationFrame(tick); else previous = 0;
     };
     const resume = () => { if (visible && !document.hidden && !disposed) { if (motion.matches) draw(); else if (!raf) raf = requestAnimationFrame(tick); } };
     const resize = () => { scene = createCellScene(canvas, data, motion.matches); sceneRef.current = scene; draw(); resume(); };
@@ -39,13 +44,13 @@ export function LivingCells() {
       if (visible) resume();
       else { cancelAnimationFrame(raf); raf = 0; previous = 0; }
       canvas.dataset['animating'] = String(visible && !motion.matches);
-    }, { threshold: .02 });
-    const ro = new ResizeObserver(resize); ro.observe(canvas); observer.observe(canvas);
+    }, { threshold: 0, rootMargin: '0px 0px -15% 0px' });
+    const ro = new ResizeObserver(resize); ro.observe(canvas); observer.observe(section);
     const changed = () => { cancelAnimationFrame(raf); raf = 0; previous = 0; resize(); };
     const visibilityChanged = () => { if (document.hidden) { cancelAnimationFrame(raf); raf = 0; previous = 0; } else resume(); };
     motion.addEventListener('change', changed); document.addEventListener('visibilitychange', visibilityChanged);
     drawRef.current = draw; resize();
-    return () => { disposed = true; cancelAnimationFrame(raf); observer.disconnect(); ro.disconnect(); motion.removeEventListener('change', changed); document.removeEventListener('visibilitychange', visibilityChanged); drawRef.current = null; sceneRef.current = null; };
+    return () => { disposed = true; window.removeEventListener('scroll', onScroll); cancelAnimationFrame(raf); observer.disconnect(); ro.disconnect(); motion.removeEventListener('change', changed); document.removeEventListener('visibilitychange', visibilityChanged); drawRef.current = null; sceneRef.current = null; };
   }, [data]);
   const names = new Map(data.organisations.map(o => [o.id, o.name]));
   const selectedOrg = selection?.orgId ? data.organisations.find(o => o.id === selection.orgId) : null;
