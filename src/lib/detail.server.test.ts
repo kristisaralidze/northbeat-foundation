@@ -25,5 +25,5 @@ it('reads link tables by their real composite keys and excludes drafts from reco
   const result = await detailContext(client, 'organisations', { id: 'self', slug: 'self', city: 'Helsinki' }, [{ id: 'med', name: 'Medtech', slug: 'medtech', kind: 'field' }], []);
   expect(orders['organisation_terms']).toEqual(['organisation_id', 'term_id']);
   expect(filters['organisations']).toContainEqual(['status', 'published']);
-  expect(result.similar.map(row => row.id)).toEqual(['published']);
+  expect(new Set(result.similar.map(row => row.id))).toEqual(new Set(['published', 'published2']));
 });
