@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { autoMapping, mapCsvRows, parseCsv, prepareRow, unknownTags, type Snapshot } from './csv-import';
 
-const snapshot: Snapshot = { entries: [{ id: '1', name: 'Existing', website: 'https://www.existing.fi/about' }], organisations: [{ id: '2', name: 'Partner' }], terms: [{ id: '3', kind: 'field', name: 'Digital health' }] };
+const snapshot: Snapshot = { entries: [{ id: '1', slug: 'existing', name: 'Existing', website: 'https://www.existing.fi/about' }], organisations: [{ id: '2', name: 'Partner' }], terms: [{ id: '3', kind: 'field', name: 'Digital health' }] };
 describe('CSV import rules', () => {
   it('parses quoted commas and newlines and auto-matches column names', () => {
     const csv = parseCsv('Name,Type,Short Description\r\nExample,startup,"A, B\nC"');
@@ -60,5 +60,51 @@ describe('CSV import rules', () => {
     expect(result.values['amount_min_eur']).toBe(1000);
     expect(result.values['deadline_at']).toBe('2026-11-01T00:00:00.000Z');
     expect(result.errors).toEqual([]);
+  });
+});
+describe('organisation rich profile updates by slug', () => {
+  it('updates only the provided rich fields on a slug match', () => {
+    const result = prepareRow('organisations', { slug: 'existing', story: 'A long story.', our_take: 'Worth watching.' }, snapshot, {}, '2026-10-20');
+    expect(result.duplicate).toBe(false);
+    expect(result.update?.id).toBe('1');
+    expect(result.update?.values).toEqual({ story: 'A long story.', our_take: 'Worth watching.' });
+  });
+  it('never overwrites with empty cells', () => {
+    const result = prepareRow('organisations', { slug: 'existing', story: '', our_take: 'New take.' }, snapshot, {}, '2026-10-20');
+    expect(result.update?.values).toEqual({ our_take: 'New take.' });
+  });
+  it('skips a slug match with no rich values as a duplicate', () => {
+    const result = prepareRow('organisations', { slug: 'existing', name: 'Existing' }, snapshot, {}, '2026-10-20');
+    expect(result.duplicate).toBe(true);
+    expect(result.update).toBeUndefined();
+  });
+  it('parses scale_facts, chips, steps and sources into typed values', () => {
+    const result = prepareRow('organisations', {
+      slug: 'existing',
+      scale_facts: '1,500+ | participants | 2025 | https://example.com/a; 12 | cities',
+      offer_chips: 'Workspace | Coaching',
+      how_to_get_involved: 'Apply online | Visit the hub',
+      sources: 'https://example.com/a; example.com/b',
+      founded_year: '2015',
+    }, snapshot, {}, '2026-10-20');
+    expect(result.errors).toEqual([]);
+    expect(result.update?.values).toEqual({
+      scale_facts: [{ value: '1,500+', label: 'participants', year: '2025', source_url: 'https://example.com/a' }, { value: '12', label: 'cities' }],
+      offer_chips: ['Workspace', 'Coaching'],
+      how_to_get_involved: ['Apply online', 'Visit the hub'],
+      sources: ['https://example.com/a', 'https://example.com/b'],
+      founded_year: 2015,
+    });
+  });
+  it('reports invalid rich values without updating', () => {
+    const result = prepareRow('organisations', { slug: 'existing', scale_facts: 'no label', founded_year: 'abc' }, snapshot, {}, '2026-10-20');
+    expect(result.errors).toHaveLength(2);
+    expect(result.update?.values['founded_year']).toBeUndefined();
+  });
+  it('uses the provided slug for new organisations and parses rich fields', () => {
+    const result = prepareRow('organisations', { slug: 'new-org', name: 'New Org', type: 'startup', offer_chips: 'Mentoring' }, snapshot, {}, '2026-10-20');
+    expect(result.update).toBeUndefined();
+    expect(result.values['slug']).toBe('new-org');
+    expect(result.values['offer_chips']).toEqual(['Mentoring']);
   });
 });

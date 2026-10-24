@@ -1,11 +1,17 @@
 import Papa from 'papaparse';
 import { z } from 'zod';
 import { ENTITIES, EVENT_FORMATS, slugify } from './entities';
+import { parsePasteValue } from './paste';
+
+/** Rich organisation profile columns, parsed into typed values and safe to fill on update. */
+type CsvValues = Record<string, string | number | boolean | null | string[] | Record<string, string>[]>;
+const RICH_COLUMNS = new Set(['story', 'scale_facts', 'our_take', 'offer_chips', 'how_to_get_involved', 'sources']);
+const ORG_UPDATE_COLUMNS = ['founded_year', 'story', 'scale_facts', 'our_take', 'offer_chips', 'how_to_get_involved', 'sources'];
 
 export const importEntitySchema = z.enum(['organisations', 'events', 'opportunities']);
 export type ImportEntity = z.infer<typeof importEntitySchema>;
 export const CSV_COLUMNS: Record<ImportEntity, string[]> = {
-  organisations: ['name', 'type', 'short_description', 'website', 'city', 'country', 'fields', 'sub_areas', 'stages', 'journey_steps', 'founded_year', 'source_url', 'contact_email'],
+  organisations: ['slug', 'name', 'type', 'short_description', 'website', 'city', 'country', 'fields', 'sub_areas', 'stages', 'journey_steps', 'founded_year', 'story', 'scale_facts', 'our_take', 'offer_chips', 'how_to_get_involved', 'sources', 'source_url', 'contact_email'],
   events: ['title', 'event_type', 'summary', 'starts_at', 'ends_at', 'city', 'venue', 'format', 'registration_url', 'apply_deadline_at', 'fields', 'journey_steps', 'organiser', 'source_url'],
   opportunities: ['title', 'type', 'summary', 'provider', 'deadline_at', 'amount_min_eur', 'amount_max_eur', 'eligibility', 'apply_url', 'fields', 'stages', 'journey_steps', 'source_url'],
 };
@@ -18,7 +24,7 @@ export function websiteDomain(value: string) {
   try { return new URL(/^https?:\/\//i.test(value) ? value : `https://${value}`).hostname.toLowerCase().replace(/^www\./, ''); } catch { return ''; }
 }
 export type CsvRow = Record<string, string>;
-export type Snapshot = { entries: { id: string; name: string; website: string | null }[]; organisations: { id: string; name: string }[]; terms: { id: string; kind: string; name: string }[] };
+export type Snapshot = { entries: { id: string; slug: string; name: string; website: string | null }[]; organisations: { id: string; name: string }[]; terms: { id: string; kind: string; name: string }[] };
 export type TagChoice = 'create' | 'skip';
 export const importInputSchema = z.object({ entity: importEntitySchema, rows: z.array(z.object({ number: z.number().int().positive(), values: z.record(z.string().max(20000)) })).max(50), choices: z.record(z.enum(['create', 'skip'])), parents: z.record(z.string().uuid()).default({}) });
 
@@ -53,13 +59,36 @@ export function prepareRow(entity: ImportEntity, row: CsvRow, snapshot: Snapshot
   const errors: string[] = [];
   const warnings: string[] = [];
   const name = row[cfg.titleField]?.trim() ?? '';
+  // Organisation rows whose slug matches an existing entry update its rich
+  // profile fields instead of inserting; empty cells never overwrite.
+  const slugValue = row['slug']?.trim() ?? '';
+  const existing = entity === 'organisations' && slugValue ? snapshot.entries.find(e => e.slug === slugValue) : undefined;
+  if (existing) {
+    const updates: Record<string, unknown> = {};
+    for (const column of ORG_UPDATE_COLUMNS) {
+      const raw = row[column]?.trim() ?? '';
+      if (!raw) continue;
+      const parsed = parsePasteValue(entity, column, raw);
+      if (parsed.error) errors.push(parsed.error);
+      else if (parsed.value !== undefined) updates[column] = parsed.value;
+    }
+    const noChanges = Object.keys(updates).length === 0;
+    return { name: existing.name, values: {} as CsvValues, tags: [], organisationId: null, duplicate: noChanges && !errors.length, update: noChanges ? undefined : { id: existing.id, values: updates }, errors, warnings };
+  }
   const duplicate = snapshot.entries.some(e => normalize(e.name) === normalize(name) || (entity === 'organisations' && websiteDomain(row['website'] ?? '') !== '' && websiteDomain(e.website ?? '') === websiteDomain(row['website'] ?? '')));
-  const values: Record<string, string | number | boolean | null> = { status: 'draft', last_checked: today, slug: slugify(name), [cfg.titleField]: name };
+  const values: CsvValues = { status: 'draft', last_checked: today, slug: slugify(slugValue || name), [cfg.titleField]: name };
   if (!name) errors.push(`${cfg.titleField} is required`);
   const tags: { kind: string; name: string; create: boolean; parent_id?: string }[] = [];
   for (const column of CSV_COLUMNS[entity]) {
     const value = row[column]?.trim() ?? '';
     if (!value) continue;
+    if (column === 'slug') continue;
+    if (RICH_COLUMNS.has(column)) {
+      const parsed = parsePasteValue(entity, column, value);
+      if (parsed.error) errors.push(parsed.error);
+      else if (parsed.value !== undefined) values[column] = parsed.value as string[];
+      continue;
+    }
     const kind = TAG_COLUMNS[column];
     if (kind) {
       for (const name of splitTags(value)) {

@@ -96,6 +96,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
       { name: "scale_facts", label: "In numbers", kind: "facts", help: "One per line: 13,000+ | attendees | 2025 | https://source" },
       { name: "our_take", label: "Our take", kind: "textarea" },
       { name: "how_to_get_involved", label: "How to get involved", kind: "lines", help: "One per line" },
+      { name: "sources", label: "Sources", kind: "lines", help: "One URL per line" },
       { name: "website", label: "Website", kind: "url" },
       { name: "linkedin_url", label: "LinkedIn", kind: "url" },
       { name: "logo_url", label: "Logo", kind: "image" },

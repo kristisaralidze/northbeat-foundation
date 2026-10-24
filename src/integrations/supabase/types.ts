@@ -1383,6 +1383,7 @@ export type Database = {
           short_description: string | null
           slug: string
           source_url: string | null
+          sources: Json | null
           status: Database["public"]["Enums"]["entry_status"]
           story: string | null
           ticket_max_eur: number | null
@@ -1464,6 +1465,7 @@ export type Database = {
           short_description?: string | null
           slug: string
           source_url?: string | null
+          sources?: Json | null
           status?: Database["public"]["Enums"]["entry_status"]
           story?: string | null
           ticket_max_eur?: number | null
@@ -1545,6 +1547,7 @@ export type Database = {
           short_description?: string | null
           slug?: string
           source_url?: string | null
+          sources?: Json | null
           status?: Database["public"]["Enums"]["entry_status"]
           story?: string | null
           ticket_max_eur?: number | null

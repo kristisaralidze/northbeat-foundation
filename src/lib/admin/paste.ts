@@ -8,7 +8,7 @@ import type { ImportEntity } from './csv-import';
  * are not supported in paste; empty cells never clear existing values.
  */
 export const PASTE_COLUMNS: Record<ImportEntity, string[]> = {
-  organisations: ['slug', 'name', 'type', 'short_description', 'description', 'website', 'city', 'founded_year', 'story', 'our_take', 'offer_chips', 'how_to_get_involved', 'scale_facts', 'source_url', 'contact_email', 'linkedin_url'],
+  organisations: ['slug', 'name', 'type', 'short_description', 'description', 'website', 'city', 'founded_year', 'story', 'our_take', 'offer_chips', 'how_to_get_involved', 'scale_facts', 'sources', 'source_url', 'contact_email', 'linkedin_url'],
   events: ['slug', 'title', 'event_type', 'summary', 'description', 'starts_at', 'ends_at', 'city', 'venue', 'format', 'registration_url', 'apply_deadline_at', 'story', 'our_take', 'scale_facts', 'who_youll_meet', 'price_info', 'free_ways_in', 'tips', 'source_url'],
   opportunities: ['slug', 'title', 'type', 'summary', 'description', 'deadline_at', 'amount_min_eur', 'amount_max_eur', 'apply_url', 'who_can_apply', 'what_you_get', 'how_to_apply_steps', 'tips', 'source_url'],
 };
@@ -33,6 +33,11 @@ export function parsePasteValue(entity: ImportEntity, column: string, raw: strin
     const facts = value.split(';').map(entry => entry.split('|').map(p => p.trim()));
     if (facts.some(f => f.length < 2 || !f[0] || !f[1])) return { error: 'scale_facts: use value | label | year | source, entries separated by ;' };
     return { value: facts.map(f => ({ value: f[0]!, label: f[1]!, ...(f[2] ? { year: f[2] } : {}), ...(f[3] ? { source_url: f[3] } : {}) })) };
+  }
+  if (column === 'sources') {
+    const urls = value.split(';').map(u => u.trim()).filter(Boolean).map(u => (/^https?:\/\//i.test(u) ? u : `https://${u}`));
+    if (urls.some(u => !z.string().url().safeParse(u).success)) return { error: 'sources: every entry must be a URL, separated by ;' };
+    return { value: urls };
   }
   if (column === cfg.typeField || column === 'format') {
     const normalized = value.toLowerCase().replace(/[\s-]+/g, '_');
