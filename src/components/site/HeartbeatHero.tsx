@@ -384,7 +384,7 @@ export function HeartbeatHero() {
         <Link to="/events" className="nb-btn nb-btn-primary">See all events and deadlines</Link>
       </div>
       {card && <div className="nb-heartbeat-card" style={{ left: card.x, top: card.y }} role={card.pinned ? 'dialog' : 'tooltip'}>
-        <p className="nb-heartbeat-card-date">{dateFor(card.beat.day, true)}</p>
+        <p className="nb-heartbeat-card-date">{beatDate(card.beat, true)}</p>
         <ul>{card.beat.items.map(item => <li key={item.id}>
           {card.pinned ? <a className="nb-link" href={itemPath(item)}>{publicTitle(item.title)}</a> : <span>{publicTitle(item.title)}</span>}
           {item.city && <span className="nb-heartbeat-card-city">{item.city}</span>}
