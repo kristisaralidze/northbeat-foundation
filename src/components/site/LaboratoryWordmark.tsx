@@ -54,8 +54,10 @@ export function LaboratoryWordmark({ compact = false }: { compact?: boolean }) {
           <text key={index} x={metrics.positions[index] ?? 0} y={metrics.cap} style={{ "--i": index } as CSSProperties}>{letter}</text>
         ))}
       </g>
-      <g className="nb-wordmark-heart" transform={`translate(${dotX} ${dotY}) scale(${HEART_SCALE})`}>
-        <path className={`nb-wordmark-heart-beat${compact ? ' nb-wordmark-heart-soft' : ''}`} d={HEART_PATH} />
+      <g transform={`translate(${dotX} ${dotY}) scale(${HEART_SCALE})`}>
+        <g className="nb-wordmark-heart">
+          <path className={`nb-wordmark-heart-beat${compact ? ' nb-wordmark-heart-soft' : ''}`} d={HEART_PATH} />
+        </g>
       </g>
     </svg>
   </Tag>;
