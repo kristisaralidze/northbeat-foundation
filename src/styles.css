@@ -336,7 +336,29 @@ html.lenis, html.lenis body { height: auto; }
   fill: var(--foreground);
   letter-spacing: 0;
 }
-.nb-wordmark-dot { fill: var(--berry); }
+.nb-wordmark-heart { fill: var(--berry); }
+.nb-wordmark-heart-beat {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: nb-heart-lub-dub 1.25s ease-in-out infinite;
+}
+.nb-wordmark-heart-soft { animation-name: nb-heart-lub-dub-soft; }
+@keyframes nb-heart-lub-dub {
+  0% { transform: scale(1); }
+  8% { transform: scale(1.22); }
+  16% { transform: scale(1.02); }
+  26% { transform: scale(1.14); }
+  38% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+@keyframes nb-heart-lub-dub-soft {
+  0% { transform: scale(1); }
+  8% { transform: scale(1.12); }
+  16% { transform: scale(1.02); }
+  26% { transform: scale(1.06); }
+  38% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
 
 /* Written wordmark intro (home hero only, once per visit) */
 .nb-wordmark-animated .nb-wordmark-letters { filter: url(#nb-wet-ink); }
@@ -360,12 +382,13 @@ html.lenis, html.lenis body { height: auto; }
   from { fill: var(--berry); fill-opacity: 0; stroke-opacity: 1; }
   to { fill: var(--foreground); fill-opacity: 1; stroke-opacity: 0; }
 }
-.nb-wordmark-animated .nb-wordmark-dot {
-  transform: scale(0);
+/* Heart pops in where the dot used to land, then starts beating. */
+.nb-wordmark-animated .nb-wordmark-heart {
   transform-box: fill-box;
   transform-origin: center;
   animation: nb-dot-pop 0.6s cubic-bezier(.34,1.56,.64,1) 4.2s both;
 }
+.nb-wordmark-animated .nb-wordmark-heart-beat { animation-delay: 4.8s; }
 @keyframes nb-dot-pop {
   from { transform: scale(0); }
   to { transform: scale(1); }
@@ -386,7 +409,8 @@ html.lenis, html.lenis body { height: auto; }
     fill-opacity: 1;
     stroke: none;
   }
-  .nb-wordmark-animated .nb-wordmark-dot { animation: none; transform: none; }
+  .nb-wordmark-animated .nb-wordmark-heart { animation: none; transform: none; }
+  .nb-wordmark-heart-beat { animation: none; transform: none; }
   .nb-wordmark-animated .nb-home-tagline { animation: none; clip-path: none; }
 }
 @media (max-width: 40rem) {
