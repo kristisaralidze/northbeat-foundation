@@ -105,7 +105,7 @@ export function createCellScene(canvas: HTMLCanvasElement, data: CellData, reduc
         dot(p, cell.dotRadius * dotScale(o.id) * shown, colour(cell), (sharp ? .85 : .85 * .16) * shown);
         if (selected?.orgId === o.id) { ctx.globalAlpha = 1; ctx.strokeStyle = colours['money'] ?? ''; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI * 2); ctx.stroke(); }
       }
-      const nucleus = (phone ? cell.group === 0 ? 16 : 10 : cell.group === 0 ? 21 : 13) * (1 + .14 * cellPulse(time, cell.group, reduced)) * shown;
+      const nucleus = (phone ? cell.group === 0 ? 16 : 10 : cell.group === 0 ? 21 : 13) * (1 + .14 * (live ? cellPulse(time, cell.group) : 0)) * shown;
       membrane(cell, nucleus, time); ctx.fillStyle = colour(cell); ctx.globalAlpha = dim * shown; ctx.fill();
       ctx.fillStyle = white; ctx.font = `${phone ? 9 : 11}px ${mono}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(cell.orgs.length), cell.x, cell.y + .5);
     }
