@@ -20,6 +20,7 @@ import { Route as OpportunitiesRouteImport } from './routes/opportunities'
 import { Route as PodcastRouteImport } from './routes/podcast'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SavedRouteImport } from './routes/saved'
 import { Route as SubmitRouteImport } from './routes/submit'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminBrandDataRouteImport } from './routes/admin.brand-data'
@@ -111,6 +112,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavedRoute = SavedRouteImport.update({
+  id: '/saved',
+  path: '/saved',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SubmitRoute = SubmitRouteImport.update({
@@ -311,6 +317,7 @@ export interface FileRoutesByFullPath {
   '/podcast': typeof PodcastRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/saved': typeof SavedRoute
   '/submit': typeof SubmitRoute
   '/admin/brand-data': typeof AdminBrandDataRoute
   '/admin/cover-images': typeof AdminCoverImagesRoute
@@ -359,6 +366,7 @@ export interface FileRoutesByTo {
   '/podcast': typeof PodcastRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/saved': typeof SavedRoute
   '/submit': typeof SubmitRoute
   '/admin/brand-data': typeof AdminBrandDataRoute
   '/admin/cover-images': typeof AdminCoverImagesRoute
@@ -410,6 +418,7 @@ export interface FileRoutesById {
   '/podcast': typeof PodcastRoute
   '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/saved': typeof SavedRoute
   '/submit': typeof SubmitRoute
   '/admin/brand-data': typeof AdminBrandDataRoute
   '/admin/cover-images': typeof AdminCoverImagesRoute
@@ -462,6 +471,7 @@ export interface FileRouteTypes {
     | '/podcast'
     | '/privacy'
     | '/reset-password'
+    | '/saved'
     | '/submit'
     | '/admin/brand-data'
     | '/admin/cover-images'
@@ -510,6 +520,7 @@ export interface FileRouteTypes {
     | '/podcast'
     | '/privacy'
     | '/reset-password'
+    | '/saved'
     | '/submit'
     | '/admin/brand-data'
     | '/admin/cover-images'
@@ -560,6 +571,7 @@ export interface FileRouteTypes {
     | '/podcast'
     | '/privacy'
     | '/reset-password'
+    | '/saved'
     | '/submit'
     | '/admin/brand-data'
     | '/admin/cover-images'
@@ -611,6 +623,7 @@ export interface RootRouteChildren {
   PodcastRoute: typeof PodcastRoute
   PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SavedRoute: typeof SavedRoute
   SubmitRoute: typeof SubmitRoute
   AdminLoginRoute: typeof AdminLoginRoute
   EventSlugRoute: typeof EventSlugRoute
@@ -701,6 +714,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saved': {
+      id: '/saved'
+      path: '/saved'
+      fullPath: '/saved'
+      preLoaderRoute: typeof SavedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/submit': {
@@ -1047,6 +1067,7 @@ const rootRouteChildren: RootRouteChildren = {
   PodcastRoute: PodcastRoute,
   PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SavedRoute: SavedRoute,
   SubmitRoute: SubmitRoute,
   AdminLoginRoute: AdminLoginRoute,
   EventSlugRoute: EventSlugRoute,

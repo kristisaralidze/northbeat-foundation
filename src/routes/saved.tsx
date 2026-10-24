@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { EMPTY_SEARCH } from '@/lib/explore';
 import { useQuery } from '@tanstack/react-query';
 import { searchIndexQuery } from '@/lib/search.query';
 import { useSavedItems, type SavedKind } from '@/lib/saved';
@@ -28,7 +29,7 @@ function Saved() {
   return <div className="nb-container nb-section">
     <h1 className="nb-h1">Saved</h1>
     <p className="nb-body mt-4 text-muted-foreground">Saved in this browser only. No account needed.</p>
-    {saved.length === 0 && <div className="py-12"><h2 className="nb-h3">Nothing saved yet.</h2><p className="nb-body mt-3 text-muted-foreground">Use the bookmark on any organisation, event or opportunity.</p><Link to="/explore" className="nb-link mt-6 inline-block">Explore organisations</Link></div>}
+    {saved.length === 0 && <div className="py-12"><h2 className="nb-h3">Nothing saved yet.</h2><p className="nb-body mt-3 text-muted-foreground">Use the bookmark on any organisation, event or opportunity.</p><Link to="/explore" search={EMPTY_SEARCH} className="nb-link mt-6 inline-block">Explore organisations</Link></div>}
     {SECTIONS.map(section => {
       const items = saved.filter(s => s.kind === section.kind);
       if (!items.length) return null;
