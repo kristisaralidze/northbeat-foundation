@@ -183,6 +183,13 @@
       "when": 1792881778645,
       "tag": "0025_rich_organisation_fields_and_step_picks",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792882303387,
+      "tag": "0026_grant_rich_organisation_columns",
+      "breakpoints": true
     }
   ]
 }
