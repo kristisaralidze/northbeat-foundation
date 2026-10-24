@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { PageTransition, enhancePageMotion } from './motion';
 
 /** Only mounted on ordinary public routes; the home owns its existing story. */
 export function PublicScrollFrame({ children, pathname }: { children: ReactNode; pathname: string }) {
@@ -68,6 +69,19 @@ export function PublicScrollFrame({ children, pathname }: { children: ReactNode;
       void document.fonts.ready.then(() => { if (!disposed) ScrollTrigger.refresh(); });
     });
     const letters = [...page.querySelectorAll<HTMLElement>('[id^="letter-"]')];
+    // Run the enhancer only once hydration settles (quiet DOM for 350ms),
+    // so its class changes never race React's hydration pass.
+    let motionCleanup = () => {};
+    let quietTimer = 0;
+    const quiet = new MutationObserver(() => {
+      window.clearTimeout(quietTimer);
+      quietTimer = window.setTimeout(() => {
+        quiet.disconnect();
+        if (!disposed) motionCleanup = enhancePageMotion(page);
+      }, 350);
+    });
+    quiet.observe(page, { childList: true, subtree: true, attributes: true });
+    quietTimer = window.setTimeout(() => { quiet.disconnect(); if (!disposed) motionCleanup = enhancePageMotion(page); }, 350);
     const updateLetters = () => {
       let current = letters[0]?.id;
       for (const letter of letters) if (letter.getBoundingClientRect().top <= 240) current = letter.id;
@@ -75,11 +89,11 @@ export function PublicScrollFrame({ children, pathname }: { children: ReactNode;
     };
     window.addEventListener('scroll', updateLetters, { passive: true });
     updateLetters();
-    return () => { disposed = true; clean(); window.removeEventListener('scroll', updateLetters); };
+    return () => { disposed = true; window.clearTimeout(quietTimer); quiet.disconnect(); motionCleanup(); clean(); window.removeEventListener('scroll', updateLetters); };
     }
     return () => { window.clearTimeout(timer); teardown(); };
   }, [pathname]);
-  return <div ref={root} className="nb-public-page">
+  return <div ref={root} className="nb-public-page nb-motion-armed">
     <div ref={bar} className={`nb-compact-bar${pathname === '/explore' ? ' hidden' : ''}`} aria-hidden="true">
       <div className="nb-container nb-compact-identity">
         {identity.detail && (identity.image ? <img src={identity.image} alt="" /> : <span className="nb-compact-monogram">{identity.title.charAt(0)}</span>)}
@@ -89,6 +103,6 @@ export function PublicScrollFrame({ children, pathname }: { children: ReactNode;
       </div>
       {pathname.startsWith('/learn/') && pathname !== '/learn/glossary' && <span data-reading-progress className="nb-reading-progress" />}
     </div>
-    {children}
+    <PageTransition pathname={pathname}>{children}</PageTransition>
   </div>;
 }

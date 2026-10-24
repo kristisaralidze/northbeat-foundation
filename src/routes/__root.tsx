@@ -113,6 +113,9 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <noscript>
+          <style>{`.nb-motion-armed :is(section, .nb-card, [data-reveal]) { opacity: 1 !important; transform: none !important; }`}</style>
+        </noscript>
       </head>
       <body>
         {children}
