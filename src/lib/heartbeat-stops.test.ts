@@ -26,3 +26,18 @@ describe('heartbeat meaning', () => {
     expect((680 / 3.6) * 5.5 * k).toBeLessThanOrEqual(320.0001);
   });
 });
+
+import { mergeBeats, beatTitle } from './heartbeat';
+const it1 = (id: string, orgs = 0) => ({ id, slug: id, kind: 'event' as const, title: id, date: '', city: null, orgs: Array.from({ length: orgs }, () => ({ name: 'o', website: null, logo_url: null, logo_choice: null })) });
+describe('merged beats', () => {
+  it('merges items one day apart or less', () => {
+    const m = mergeBeats([{ day: 17, amp: 3, resting: false, items: [it1('a')] }, { day: 18, amp: 3, resting: false, items: [it1('Slush', 2)] }, { day: 21, amp: 3, resting: false, items: [it1('c')] }]);
+    expect(m.length).toBe(2);
+    expect(m[0]!.day).toBe(17); expect(m[0]!.endDay).toBe(18);
+    expect(m[0]!.items[0]!.title).toBe('Slush');
+  });
+  it('title with more', () => {
+    expect(beatTitle(['Slush 2026', 'a', 'b', 'c', 'd'])).toBe('Slush 2026 + 4 more');
+    expect(beatTitle(['Solo'])).toBe('Solo');
+  });
+});

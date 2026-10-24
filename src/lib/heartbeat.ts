@@ -95,3 +95,18 @@ export function heightScale(maxH: number, H: number, F: number, zAt: number, sha
   if (maxH <= 0) return 1;
   return Math.min(1, (share * H * zAt) / (F * maxH));
 }
+
+export type MergedBeat = Beat & { endDay: number };
+const prominence = (i: HeartbeatItem) => i.orgs.length * 2 + (i.kind === 'event' ? 1 : 0);
+/** Merge beats one day apart or less into one moment; items ordered most prominent first. */
+export function mergeBeats(beats: Beat[]): MergedBeat[] {
+  const out: MergedBeat[] = [];
+  for (const b of [...beats].sort((a, c) => a.day - c.day)) {
+    const last = out[out.length - 1];
+    if (last && b.day - last.endDay <= 1) { last.items = [...last.items, ...b.items]; last.endDay = b.day; }
+    else out.push({ ...b, items: [...b.items], endDay: b.day });
+  }
+  return out.map(b => ({ ...b, items: [...b.items].sort((a, c) => prominence(c) - prominence(a)) }));
+}
+/** "Slush 2026 + 4 more". */
+export const beatTitle = (titles: string[]) => (titles[0] ?? '') + (titles.length > 1 ? ` + ${titles.length - 1} more` : '');
