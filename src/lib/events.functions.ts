@@ -22,7 +22,7 @@ export const getEvents = createServerFn({ method: 'GET' }).handler(async (): Pro
     const { data, error } = await client.from('event_terms').select('event_id,term_id').order('event_id').order('term_id').range(offset, offset + 999);
     if (error) throw new Error('Event tags could not be loaded.'); links.push(...(data ?? [])); if (!data || data.length < 1000) break;
   }
-  const { data: fieldRows, error: fieldError } = await client.from('terms').select('id,name,slug').eq('kind', 'field').order('sort_order').order('name');
+  const { data: fieldRows, error: fieldError } = await client.rpc('public_terms').select('id,name,slug').eq('kind', 'field').order('sort_order').order('name');
   if (fieldError) throw new Error('Event fields could not be loaded.');
   const tags = new Map<string, string[]>(); for (const l of links) tags.set(l.event_id, [...(tags.get(l.event_id) ?? []), l.term_id]);
   const orgLinks = await client.from('organisation_events').select('event_id,role,organisations(name,slug,status)').in('event_id', events.map(e=>e.id));

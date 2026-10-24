@@ -50,7 +50,7 @@ export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey,
   const termIds = (tagLinks ?? []).map((link: { term_id: string }) => link.term_id);
   let terms: ProfileTerm[] = [];
   if (termIds.length) {
-    const { data, error } = await client.from('terms').select('id,name,kind,slug').in('id', termIds).order('kind').order('sort_order').order('name');
+    const { data, error } = await client.rpc('public_terms').select('id,name,kind,slug').in('id', termIds).order('kind').order('sort_order').order('name');
     if (error) throw new Error('The profile tags could not be loaded.');
     terms = (data ?? []) as ProfileTerm[];
   }

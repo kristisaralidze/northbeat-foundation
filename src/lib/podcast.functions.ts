@@ -43,7 +43,7 @@ export const getPodcast = createServerFn({ method: 'GET' }).handler(async (): Pr
   const termIds = [...new Set(topicLinks.map((link) => link.term_id))];
   const terms = new Map<string, string>();
   if (termIds.length) {
-    const { data, error } = await client.from('terms').select('id,name').in('id', termIds).neq('kind', 'journey_step');
+    const { data, error } = await client.rpc('public_terms').select('id,name').in('id', termIds).neq('kind', 'journey_step');
     if (error) throw new Error('Episode topics could not be loaded.');
     for (const term of data ?? []) terms.set(term.id, term.name);
   }

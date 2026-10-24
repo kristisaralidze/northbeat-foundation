@@ -21,7 +21,7 @@ export const getOpportunities = createServerFn({ method: 'GET' }).handler(async 
     if (!data || data.length < 1000) break;
   }
   for (let offset = 0; ; offset += 1000) {
-    const { data, error } = await client.from('terms').select('id,kind,name,slug,parent_id,sort_order').in('kind', ['field', 'stage']).order('sort_order').order('name').order('id').range(offset, offset + 999);
+    const { data, error } = await client.rpc('public_terms').select('id,kind,name,slug,parent_id,sort_order').in('kind', ['field', 'stage']).order('sort_order').order('name').order('id').range(offset, offset + 999);
     if (error) throw new Error('Opportunity filters could not be loaded.');
     terms.push(...(data ?? []));
     if (!data || data.length < 1000) break;
