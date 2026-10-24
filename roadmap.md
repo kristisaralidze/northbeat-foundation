@@ -1,11 +1,11 @@
 # Current fixes (Oct 24)
-- [ ] URGENT: restore Brandfetch icon logos everywhere; stored check only overrides when present (light=ink tile, missing=name tile); admin uploads win; check runs in browser only.
-- [ ] Rich organisation fields: story, scale_facts, our_take, offer_chips, how_to_get_involved, founded_year; admin+CSV editable; page sections after header.
-- [ ] Learn redesign: heartbeat journey line with 8 beats, /learn/step/[step] pages, dictionary teaser; step pages with guide, common mistakes, Go here, Open now; no auto lists.
-- [ ] Opportunity pages: fall back to summary/eligibility/amount when rich fields empty.
-- [ ] Close to them: require 2+ shared signals, rank relation>type+city>prominence, stable-hash ties, max 4, hide under 2.
-- [ ] Admin Paste data box: CSV text, slug-matched, preview old vs new, Apply, empty cells never clear.
-- [ ] Check 390px/1440px; report logo counts.
+- [x] URGENT: restore Brandfetch icon logos everywhere; stored check only overrides when present (light=ink tile, missing=name tile); admin uploads win; check runs in browser only.
+- [x] Rich organisation fields: story, scale_facts, our_take, offer_chips, how_to_get_involved, founded_year; admin+CSV editable; page sections after header.
+- [x] Learn redesign: heartbeat journey line with 8 beats, /learn/step/[step] pages, dictionary teaser; step pages with guide, common mistakes, Go here, Open now; no auto lists.
+- [x] Opportunity pages: fall back to summary/eligibility/amount when rich fields empty.
+- [x] Close to them: require 2+ shared signals, rank relation>type+city>prominence, stable-hash ties, max 4, hide under 2.
+- [x] Admin Paste data box: CSV text, slug-matched, preview old vs new, Apply, empty cells never clear.
+- [x] Check 390px/1440px; report logo counts.
 
 # Site-wide value pass
 - [ ] Official logo image delivery remains blocked in this environment: 162 unreadable CORS responses, 5 requested official uploads, 1 missing website. Re-run the admin check where Brandfetch delivery works; upload the five requested assets.
