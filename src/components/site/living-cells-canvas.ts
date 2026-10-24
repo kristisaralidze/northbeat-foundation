@@ -1,4 +1,4 @@
-import { CELL_GROUPS, CELL_LINKS, cellGroup, cellPulse, dotPosition, dotScale, easeBurst, layoutCells, layoutLabels, membraneRadius, rectOverlap, type Cell, type CellData, type CellLabel, type Point, type Rect } from '@/lib/living-cells';
+import { CELL_GROUPS, CELL_LINKS, cellGroup, cellIntro, cellPulse, dotPosition, dotScale, linkIntro, relationIntro, layoutCells, layoutLabels, membraneRadius, rectOverlap, type Cell, type CellData, type CellLabel, type Point, type Rect } from '@/lib/living-cells';
 
 export type CellSelection = { group: number; orgId?: string } | null;
 interface Curve { from: Cell; to: Cell; start: Point; end: Point; control: Point; sentence: string; index: number }
@@ -51,25 +51,30 @@ export function createCellScene(canvas: HTMLCanvasElement, data: CellData, reduc
     if (!ctx) return;
     ctx.globalAlpha = 1; ctx.clearRect(0, 0, w, h);
     positions = new Map(); scales = new Map();
+    // Opening is scroll progress 0..1; motion and pulses run only once fully built.
+    const live = !reduced && opening >= 1, built = reduced ? 1 : opening;
+    const order = (cell: Cell) => cell.group === 0 ? 0 : cells.filter(c => c.group !== 0).indexOf(cell) + 1;
+    const intro = (cell: Cell) => cellIntro(built, order(cell), cells.length);
     const orgRelated = new Set<string>(selected?.orgId ? [selected.orgId] : []);
     if (selected?.orgId) data.relations.forEach(r => { if (r.from_org_id === selected.orgId) orgRelated.add(r.to_org_id); if (r.to_org_id === selected.orgId) orgRelated.add(r.from_org_id); });
     const groupRelated = new Set<number>(selected ? [selected.group] : []);
     if (selected && !selected.orgId) CELL_LINKS.forEach(l => { if (l.from === selected.group) groupRelated.add(l.to); if (l.to === selected.group) groupRelated.add(l.from); });
     for (const cell of cells) {
-      const scale = (selected?.group === cell.group && !selected.orgId ? 1.1 : 1) * (1 + .06 * cellPulse(time, cell.group, reduced));
+      const scale = (selected?.group === cell.group && !selected.orgId ? 1.1 : 1) * (1 + .06 * (live ? cellPulse(time, cell.group) : 0));
       scales.set(cell.group, scale);
-      cell.orgs.forEach((o, i) => positions.set(o.id, dotPosition(cell, i, reduced ? 0 : time, scale, reduced ? 1 : easeBurst((opening - cells.indexOf(cell) * .06 - i * .003) / .9))));
+      cell.orgs.forEach((o, i) => positions.set(o.id, dotPosition(cell, i, live ? time : 0, scale, intro(cell))));
     }
     const links = curves();
+    const linkOrder = [...links].sort((a, b) => Math.max(order(a.from), order(a.to)) - Math.max(order(b.from), order(b.to)) || a.index - b.index);
     for (const link of links) {
       const highlighted = Boolean(selected && !selected.orgId && (link.from.group === selected.group || link.to.group === selected.group));
       const dim = selected ? selected.orgId ? .16 : highlighted ? 1 : .16 : 1;
-      const progress = reduced ? 1 : easeBurst((opening - Math.max(cells.indexOf(link.from), cells.indexOf(link.to)) * .06) / .9);
+      const progress = linkIntro(built, linkOrder.indexOf(link), links.length);
       ctx.strokeStyle = highlighted ? colours['money'] ?? '' : colours['ink'] ?? ''; ctx.globalAlpha = (highlighted ? .55 : .15) * dim; ctx.lineWidth = .9;
       ctx.beginPath(); ctx.moveTo(link.start.x, link.start.y);
       const end = curvePoint(link, progress), control = { x: link.start.x + (link.control.x - link.start.x) * progress, y: link.start.y + (link.control.y - link.start.y) * progress };
       ctx.quadraticCurveTo(control.x, control.y, end.x, end.y); ctx.stroke();
-      if (!reduced && progress === 1) {
+      if (live && progress === 1) {
         dot(curvePoint(link, (time / 13 + link.index * .137) % 1), 1.7, colours['money'] ?? '', .3 * dim);
         const pulse = time % 3.2;
         const startupLink = link.from.group === 0 || link.to.group === 0;
@@ -77,30 +82,31 @@ export function createCellScene(canvas: HTMLCanvasElement, data: CellData, reduc
         if (p >= 0 && p <= 1) dot(curvePoint(link, startupLink && link.to.group === 0 ? 1 - p : p), 3, colours['money'] ?? '', dim);
       }
     }
-    const flash = reduced ? 0 : Math.max(cellPulse(time, 0), cellPulse(time, 1));
+    const flash = live ? Math.max(cellPulse(time, 0), cellPulse(time, 1)) : 0;
+    const relAlpha = relationIntro(built);
     for (const r of data.relations) {
       const a = positions.get(r.from_org_id), b = positions.get(r.to_org_id); if (!a || !b) continue;
       const related = selected?.orgId && (r.from_org_id === selected.orgId || r.to_org_id === selected.orgId);
       const activeGroup = selected && !selected.orgId && (organisationGroups.get(r.from_org_id) === selected.group || organisationGroups.get(r.to_org_id) === selected.group);
       const dim = selected ? selected.orgId ? related ? 1 : .16 : activeGroup ? 1 : .16 : 1;
-      ctx.globalAlpha = (related ? .65 : .045 + .135 * flash) * dim; ctx.strokeStyle = colours['ink'] ?? ''; ctx.lineWidth = .6;
+      ctx.globalAlpha = (related ? .65 : .045 + .135 * flash) * dim * relAlpha; ctx.strokeStyle = colours['ink'] ?? ''; ctx.lineWidth = .6;
       ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
     }
     for (const cell of cells) {
-      const intro = reduced ? 1 : easeBurst((opening - cells.indexOf(cell) * .06) / .35);
+      const shown = intro(cell);
       const dim = selected ? selected.orgId ? .16 : groupRelated.has(cell.group) ? 1 : .16 : 1;
-      const radius = cell.radius * (scales.get(cell.group) ?? 1) * intro;
+      const radius = cell.radius * (scales.get(cell.group) ?? 1) * shown;
       ctx.fillStyle = colour(cell); ctx.strokeStyle = colour(cell);
-      membrane(cell, radius, time); ctx.globalAlpha = (cell.group === 0 ? .06 : .09) * dim * intro; ctx.fill(); ctx.lineWidth = 1; ctx.globalAlpha = .45 * dim * intro; ctx.stroke();
-      membrane(cell, radius + 5 * intro, time * .87 + .5); ctx.lineWidth = .6; ctx.globalAlpha = .14 * dim * intro; ctx.stroke();
+      membrane(cell, radius, time); ctx.globalAlpha = (cell.group === 0 ? .06 : .09) * dim * shown; ctx.fill(); ctx.lineWidth = 1; ctx.globalAlpha = .45 * dim * shown; ctx.stroke();
+      membrane(cell, radius + 5 * shown, time * .87 + .5); ctx.lineWidth = .6; ctx.globalAlpha = .14 * dim * shown; ctx.stroke();
       for (const o of cell.orgs) {
         const p = positions.get(o.id); if (!p) continue;
         const sharp = selected?.orgId ? orgRelated.has(o.id) : !selected || groupRelated.has(cell.group);
-        dot(p, cell.dotRadius * dotScale(o.id) * intro, colour(cell), (sharp ? .85 : .85 * .16) * intro);
+        dot(p, cell.dotRadius * dotScale(o.id) * shown, colour(cell), (sharp ? .85 : .85 * .16) * shown);
         if (selected?.orgId === o.id) { ctx.globalAlpha = 1; ctx.strokeStyle = colours['money'] ?? ''; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI * 2); ctx.stroke(); }
       }
-      const nucleus = (phone ? cell.group === 0 ? 16 : 10 : cell.group === 0 ? 21 : 13) * (1 + .14 * cellPulse(time, cell.group, reduced)) * intro;
-      membrane(cell, nucleus, time); ctx.fillStyle = colour(cell); ctx.globalAlpha = dim * intro; ctx.fill();
+      const nucleus = (phone ? cell.group === 0 ? 16 : 10 : cell.group === 0 ? 21 : 13) * (1 + .14 * cellPulse(time, cell.group, reduced)) * shown;
+      membrane(cell, nucleus, time); ctx.fillStyle = colour(cell); ctx.globalAlpha = dim * shown; ctx.fill();
       ctx.fillStyle = white; ctx.font = `${phone ? 9 : 11}px ${mono}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(String(cell.orgs.length), cell.x, cell.y + .5);
     }
     // Opaque page-colour label footprints keep even crossing links out of the text.
@@ -108,7 +114,7 @@ export function createCellScene(canvas: HTMLCanvasElement, data: CellData, reduc
     for (const label of labels) {
       const alpha = selected ? selected.orgId ? .16 : groupRelated.has(label.group) ? 1 : .16 : 1;
       ctx.globalAlpha = 1; ctx.fillStyle = background; ctx.fillRect(label.x - 3, label.y - 2, label.width + 6, label.height + 4);
-      ctx.globalAlpha = alpha * (reduced ? 1 : easeBurst((opening - cells.findIndex(c => c.group === label.group) * .06) / .35)); ctx.fillStyle = colours['ink'] ?? ''; ctx.textAlign = label.align;
+      ctx.globalAlpha = alpha * (() => { const c = cells.find(x => x.group === label.group); return c ? intro(c) : 1; })(); ctx.fillStyle = colours['ink'] ?? ''; ctx.textAlign = label.align;
       label.lines.forEach((line, i) => ctx.fillText(line, label.x + (label.align === 'right' ? label.width : 0), label.y + i * (phone ? 11 : 13)));
     }
     ctx.globalAlpha = 1; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.font = `${phone ? 8 : 10}px ${font}`;
