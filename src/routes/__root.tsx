@@ -16,6 +16,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { EMPTY_SEARCH } from "@/lib/explore";
 
 // Admin and auth-helper screens keep the plain look; everything else gets the site layout.
 const isPlainPath = (p: string) => p === "/directions" || p === "/admin" || p.startsWith("/admin/") || p.startsWith("/reset-password");
@@ -28,7 +29,7 @@ function NotFoundComponent() {
         <h1 className="nb-h1">This page has no pulse.</h1>
         <p className="nb-body">We couldn't find what you were looking for.</p>
         <ul className="nb-404-links">
-          <li><Link to="/explore" search={{}} className="nb-link">Explore</Link></li>
+          <li><Link to="/explore" search={EMPTY_SEARCH} className="nb-link">Explore</Link></li>
           <li><Link to="/events" className="nb-link">Events</Link></li>
           <li><Link to="/" className="nb-link">Homepage</Link></li>
         </ul>
