@@ -1,4 +1,9 @@
 # Living cells ecosystem
+# Site-wide value pass
+- [ ] Apply all ten polish requests, uploaded prominence rankings and three draft playbooks.
+- [ ] Verify public pages at 390px and 1440px, editorial admin readback and rule tests.
+
+# Living cells ecosystem
 - [x] Replace home grid with one interactive canvas, published organisation dots and real organisation relations.
 - [x] Add specified group links, membrane motion, pulses, hover/tap cards and accessible navigation.
 - [x] Test rules and verify populated 390px/1440px views, reduced motion and off-screen pausing; 28 tests passed, 59 to 61 fps sampled, Explore and organisation navigation checked.
