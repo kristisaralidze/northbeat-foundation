@@ -207,6 +207,7 @@ export function HeartbeatHero() {
       }
 
       // Logos and labels.
+      { const hr = headline.current?.getBoundingClientRect(), cr = el.getBoundingClientRect(); if (hr) headBox = { x: 0, y: 0, w: hr.right - cr.left + 12, h: hr.bottom - cr.top + 12 }; }
       const nextHits: Hit[] = []; const labels: { x: number; y: number; w: number; h: number }[] = []; const flatDates: number[] = [];
       const visibleBeats = beats.filter(b => m > 0 || (b.day >= cur - 0.3 && b.day <= cur + 12)).slice(0, 40);
       const ordered = [...visibleBeats].sort((a, b) => a.day - b.day);
@@ -253,7 +254,7 @@ export function HeartbeatHero() {
             flatDates.push(fp.x); ctx.globalAlpha = sceneAlpha * clamp01((m - 0.6) / 0.4); ctx.fillStyle = SOFT; ctx.font = `11px ${body}`;
             ctx.fillText(dateFor(b.day), peak.x, cy - r - 6);
           }
-        } else if (pp && mi < 0.3 && pp.z < (phone ? 9 : 14)) {
+        } else if (pp && mi < 0.3 && pp.z < 14 && !phone) {
           const titleSize = Math.max(13, Math.min(22, F / pp.z * 0.22));
           const title = publicTitle(b.items[0].title) + (b.items.length > 1 ? ` +${b.items.length - 1}` : '');
           ctx.font = `${titleSize}px ${display}`; const tw = Math.min(ctx.measureText(title).width, W * 0.5);
