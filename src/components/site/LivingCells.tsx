@@ -22,7 +22,7 @@ export function LivingCells() {
     let scene: CellScene | null = null, visible = false, raf = 0, previous = 0, time = elapsedRef.current.time, built = elapsedRef.current.built, opening = built ? 1 : 0, disposed = false;
     // Scroll-linked build: reversible until complete, then stays built for the visit.
     const section = canvas.closest('section') ?? canvas;
-    const measure = () => built ? 1 : openingProgress(section.getBoundingClientRect().top, window.innerHeight);
+    const measure = () => built ? 1 : openingProgress(canvas.getBoundingClientRect().top, window.innerHeight);
     // Only a real scroll by the visitor may complete the build; a restored or initial position stays reversible.
     let userScrolled = false;
     const onScroll = () => { userScrolled = true; if (!motion.matches && !raf && !disposed && !document.hidden) raf = requestAnimationFrame(tick); };
