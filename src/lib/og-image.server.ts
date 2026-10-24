@@ -64,6 +64,26 @@ function drawLogo(img: ReturnType<typeof PImage.make>, logo: { width: number; he
   }
 }
 
+/** Plum heart centred at (cx, cy); size is the heart's full height. */
+function drawHeart(ctx: Ctx, cx: number, cy: number, size: number) {
+  const s = size / 20; const p = (x: number, y: number) => [cx + x * s, cy + y * s] as const;
+  ctx.fillStyle = COLOURS.plum; ctx.beginPath();
+  ctx.moveTo(...p(0, 7.6));
+  ctx.bezierCurveTo(...p(-9, 1.7), ...p(-9, -4.1), ...p(-9, -4.1));
+  ctx.bezierCurveTo(...p(-9, -6.8), ...p(-6.9, -8.9), ...p(-4.4, -8.9));
+  ctx.bezierCurveTo(...p(-2.6, -8.9), ...p(-1, -7.9), ...p(0, -6.4));
+  ctx.bezierCurveTo(...p(1, -7.9), ...p(2.6, -8.9), ...p(4.4, -8.9));
+  ctx.bezierCurveTo(...p(6.9, -8.9), ...p(9, -6.8), ...p(9, -4.1));
+  ctx.bezierCurveTo(...p(9, 1.7), ...p(0, 7.6), ...p(0, 7.6));
+  ctx.closePath(); ctx.fill();
+}
+
+/** Heart inside the O of a drawn NORTHBEAT: centred in the counter at 53% of the cap height. */
+function wordmarkHeart(ctx: Ctx, x: number, baseline: number, fontPt: number) {
+  const oX = x + ctx.measureText('N').width + ctx.measureText('O').width / 2;
+  drawHeart(ctx, oX, baseline - fontPt * 0.7 * 0.53, fontPt * 0.17);
+}
+
 function roundRect(ctx: Ctx, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r); ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath(); ctx.fill();
 }
