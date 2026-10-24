@@ -3,7 +3,6 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Menu, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { siteInfoQuery } from "@/lib/site.query";
-import { longDate } from "@/lib/site";
 import { LaboratoryWordmark } from "./LaboratoryWordmark";
 import { NewsletterSignup } from "./NewsletterSignup";
 import { Button } from "@/components/ui/button";
@@ -123,7 +122,6 @@ function FooterBottom() {
         {data?.contactEmail && <a href={`mailto:${data.contactEmail}`} className="nb-link">{data.contactEmail}</a>}
         {data?.linkedinUrl && <a href={data.linkedinUrl} target="_blank" rel="noopener noreferrer" className="nb-link">LinkedIn</a>}
         {data?.instagramUrl && <a href={data.instagramUrl} target="_blank" rel="noopener noreferrer" className="nb-link">Instagram</a>}
-        {data?.updatedOn && <span>Updated {longDate(data.updatedOn)}</span>}
       </div>
       <p className="text-muted-foreground">© 2026 Northbeat. The heartbeat of Nordic health innovation.</p>
     </div>

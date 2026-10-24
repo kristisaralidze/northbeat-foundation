@@ -61,8 +61,8 @@ function Guide() {
         <h2 className="nb-eyebrow mb-3">Sources</h2>
         <ul className="space-y-2">{sources.map((s) => <li key={s.url} className="nb-small"><a href={s.url} target="_blank" rel="noopener noreferrer" className="nb-link">{s.title}</a></li>)}</ul>
       </section>}
-      {(guide.last_checked || guide.reviewed_by) && <p className="nb-small mt-10 border-t border-hairline pt-6 text-muted-foreground">
-        {guide.last_checked && <>Last checked {dateLabel(guide.last_checked)}.</>}{guide.last_checked && guide.reviewed_by && ' '}{guide.reviewed_by && <>Reviewed by {guide.reviewed_by}.</>}
+      {guide.reviewed_by && <p className="nb-small mt-10 border-t border-hairline pt-6 text-muted-foreground">
+        <>Reviewed by {guide.reviewed_by}.</>
       </p>}
       {(previous || next) && <nav aria-label={area ? `More in ${area.name}` : 'More guides'} className="mt-12 grid gap-4 border-t border-hairline pt-8 sm:grid-cols-2">
         {previous ? <Link to="/learn/$slug" params={{ slug: previous.slug }} className="group"><span className="nb-eyebrow">Previous</span><span className="nb-body mt-1 block text-ink group-hover:text-berry">{previous.title}</span></Link> : <span />}

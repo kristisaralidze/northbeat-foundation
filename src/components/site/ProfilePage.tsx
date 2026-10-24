@@ -75,7 +75,6 @@ function StandardProfilePage({ profile }: { profile: PublicProfile }) {
       <WebLink url={text(row, 'linkedin_url')}>LinkedIn</WebLink><WebLink url={text(row, 'registration_url')}>Register</WebLink><WebLink url={text(row, 'apply_url')}>Apply</WebLink>{kind !== 'episodes' && <WebLink url={text(row, 'embed_url')}>Listen to episode</WebLink>}
       {email && <a href={`mailto:${encodeURIComponent(email)}`} className="nb-link break-all">{email}</a>}
     </div>
-    {text(row, 'last_checked') && <p className="nb-small text-muted-foreground">Last checked {date(text(row, 'last_checked'))}</p>}
   </aside>;
   return <article className="nb-container nb-section">
     {(isOrg || kind === 'events') && <OrganisationCover image={text(row, 'cover_image_url')} website={text(row, 'image_source_url') ?? text(row, isOrg ? 'website' : 'source_url')} name={profile.title} />}
