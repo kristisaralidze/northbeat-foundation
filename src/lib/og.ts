@@ -10,10 +10,10 @@ export type OgKind = 'org' | 'event' | 'opportunity';
 export const ogImageUrl = (kind: OgKind | 'site', slug: string) => `${SITE_URL}/api/public/og/${kind}/${encodeURIComponent(slug)}`;
 
 /** Only official logos: an admin upload, else the Brandfetch icon for the organisation's own domain. */
-export function previewLogoUrl(o: { website: string | null; logo_url: string | null; logo_choice: string | null; logo_image_source: string | null; logo_image_source_url: string | null }): string | null {
+export function previewLogoUrl(o: { logo_resolved_url?: string | null; logo_status?: string | null; website: string | null; logo_url: string | null; logo_choice: string | null; logo_image_source: string | null; logo_image_source_url: string | null }): string | null {
   const uploaded = officialLogo(o.logo_url, o.website, o.logo_image_source, o.logo_image_source_url);
   if (uploaded && (o.logo_choice === 'upload' || o.logo_image_source === 'admin_upload')) return uploaded;
-  return brandfetchLogoUrl(o.website, o.logo_choice && o.logo_choice !== 'upload' ? o.logo_choice : 'icon');
+  return o.logo_status === 'missing' ? null : o.logo_resolved_url ?? null;
 }
 
 function shortDate(value: string, timezone?: string | null) {

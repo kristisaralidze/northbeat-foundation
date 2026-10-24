@@ -1,0 +1,8 @@
+- [x] Shared urgency and Systole visibility
+- [x] Compact Explore and uploaded rankings
+- [x] Organisation offers and varied recommendations
+- [x] Events calendar icons and organiser logos
+- [x] Opportunity details and closed visibility
+- [x] Editorial guide selections and draft playbooks
+- [x] Fixed search logo slots and podcast themes
+- [x] Tests and 390px/1440px page checks

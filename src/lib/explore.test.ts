@@ -59,14 +59,14 @@ d2('explore groups and sort', () => {
 });
 
 d2('featured sort', () => {
-  i2('puts prominence first, then most connections, then A to Z', () => {
+  i2('puts ranks 1, 2, 3 before unranked with alphabetical ties', () => {
     const rows = [
       { id: 'a', name: 'Alpha', prominence: 0, connections: 1 },
-      { id: 'b', name: 'Beta', prominence: 5, connections: 0 },
-      { id: 'c', name: 'Gamma', prominence: 0, connections: 4 },
-      { id: 'd', name: 'Delta', prominence: 0, connections: 1 },
+      { id: 'b', name: 'Beta', prominence: 1, connections: 0 },
+      { id: 'c', name: 'Gamma', prominence: 3, connections: 4 },
+      { id: 'd', name: 'Delta', prominence: 2, connections: 1 },
     ] as never[];
-    e2(sortOrganisations(rows, 'featured').map((o: { id: string }) => o.id)).toEqual(['b', 'c', 'a', 'd']);
+    e2(sortOrganisations(rows, 'featured').map((o: { id: string }) => o.id)).toEqual(['b', 'd', 'c', 'a']);
   });
   i2('defaults to featured', () => { e2(pe({}).sort).toBe('featured'); });
 });

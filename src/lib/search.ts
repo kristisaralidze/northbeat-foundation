@@ -1,5 +1,5 @@
 export type SearchKind = 'organisation' | 'event' | 'opportunity' | 'guide' | 'glossary';
-export type SearchItem = { kind: SearchKind; slug: string; title: string; line: string | null; type: string | null; city: string | null; date: string | null; end: string | null; logo: string | null; website: string | null; logoChoice: string | null; amountMin: number | null; amountMax: number | null; online: boolean };
+export type SearchItem = { organiserSlug?:string; organiserName?:string; logoResolved?:string|null;logoTone?:string|null;logoStatus?:string|null; kind: SearchKind; slug: string; title: string; line: string | null; type: string | null; city: string | null; date: string | null; end: string | null; logo: string | null; website: string | null; logoChoice: string | null; amountMin: number | null; amountMax: number | null; online: boolean };
 export const SEARCH_GROUPS: { kind: SearchKind; label: string }[] = [
   { kind: 'organisation', label: 'Organisations' }, { kind: 'event', label: 'Events' }, { kind: 'opportunity', label: 'Opportunities' }, { kind: 'guide', label: 'Learn guides' }, { kind: 'glossary', label: 'Glossary' },
 ];
@@ -14,8 +14,8 @@ export function scoreItem(item: SearchItem, query: string): number {
   if (norm(`${item.line ?? ''} ${item.city ?? ''}`).includes(q)) return 1;
   return 0;
 }
-export function searchAll(items: SearchItem[], query: string, perGroup = 5) {
-  return SEARCH_GROUPS.map(group => ({ ...group, items: items.filter(i => i.kind === group.kind).map(i => ({ i, s: scoreItem(i, query) })).filter(x => x.s > 0).sort((a, b) => b.s - a.s || a.i.title.localeCompare(b.i.title)).slice(0, perGroup).map(x => x.i) })).filter(g => g.items.length);
+export function searchAll(items: SearchItem[], query: string, perGroup = 5, now = new Date().toISOString()) {
+  return SEARCH_GROUPS.map(group => ({ ...group, items: items.filter(i => i.kind === group.kind && !(i.kind==='opportunity' && i.date && Date.parse(i.date)<Date.parse(now))).map(i => ({ i, s: scoreItem(i, query) })).filter(x => x.s > 0).sort((a, b) => b.s - a.s || a.i.title.localeCompare(b.i.title)).slice(0, perGroup).map(x => x.i) })).filter(g => g.items.length);
 }
 export function itemHref(item: Pick<SearchItem, 'kind' | 'slug'>) {
   const slug = encodeURIComponent(item.slug);

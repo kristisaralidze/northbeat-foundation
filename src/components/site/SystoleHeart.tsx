@@ -17,11 +17,9 @@ export function SystoleHeart({ pathname }: { pathname: string }) {
   // Hide while the home heartbeat section is on screen, so the Next up card is never covered.
   useEffect(() => {
     setHidden(false);
-    const target = document.querySelector('.nb-heartbeat');
-    if (!target) return;
-    const io = new IntersectionObserver(([entry]) => setHidden(Boolean(entry?.isIntersecting)));
-    io.observe(target);
-    return () => io.disconnect();
+    const update = () => { const target = document.querySelector<HTMLElement>('.nb-heartbeat'); if (!target || target.classList.contains('nb-heartbeat-reduced')) {setHidden(false);return;} const r=target.getBoundingClientRect();setHidden(r.top < window.innerHeight && r.bottom > 0 && target.dataset['flight']==='true'); };
+    update(); window.addEventListener('scroll',update,{passive:true});window.addEventListener('northbeat:flight',update);window.addEventListener('resize',update);
+    return () => {window.removeEventListener('scroll',update);window.removeEventListener('northbeat:flight',update);window.removeEventListener('resize',update);};
   }, [pathname]);
 
   useEffect(() => {
@@ -45,7 +43,7 @@ export function SystoleHeart({ pathname }: { pathname: string }) {
 
   return <>
     <button ref={button} type="button" className="nb-heart-button" data-hidden={hidden && !open} aria-hidden={hidden && !open} tabIndex={hidden && !open ? -1 : 0}
-      aria-haspopup="dialog" aria-expanded={open} aria-controls="systole-panel" aria-label="Something is coming" onClick={() => setOpen(o => !o)}>
+      aria-haspopup="dialog" aria-expanded={open} aria-controls="systole-panel" aria-label="Something is coming" onClick={() => setOpen(true)}>
       <span className="nb-heart-label" aria-hidden="true">Something is coming</span>
       <span className="nb-heart-circle" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none"><path className="nb-heart-line" d={LINE} pathLength={1} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>

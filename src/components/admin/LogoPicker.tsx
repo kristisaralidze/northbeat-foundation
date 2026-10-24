@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { OrganisationLogo } from '@/components/site/OrganisationLogo';
+import {checkLogoUrl} from '@/lib/logo-check';
 import { LOGO_CHOICES } from '@/lib/organisation-logo';
 import { uploadImage } from './ImageField';
 
@@ -22,7 +23,7 @@ export function LogoPicker({ id, name, website, row }: { id: string; name: strin
   };
   const upload = async (file?: File) => {
     if (!file) return;
-    try { setBusy(true); const url = await uploadImage(file, 'logos'); setBusy(false); if (await save({ logo_url: url, logo_image_source: 'admin_upload', logo_image_source_url: url, logo_choice: 'upload' }, 'upload')) setUploaded(url); }
+    try { setBusy(true); const url = await uploadImage(file, 'logos'); const checked=await checkLogoUrl(url); setBusy(false); if (await save({ logo_url: url, logo_image_source: 'admin_upload', logo_image_source_url: url, logo_choice: 'upload',...checked,logo_resolved_url:url,logo_checked_at:new Date().toISOString() }, 'upload')) setUploaded(url); }
     catch (e) { setBusy(false); toast.error(e instanceof Error ? e.message : 'Upload failed.'); }
   };
   const tile = (value: string, uploadedSrc?: string | null) => <button key={value} type="button" disabled={busy} aria-pressed={choice === value} onClick={() => save({ logo_choice: value }, value)}
@@ -32,7 +33,7 @@ export function LogoPicker({ id, name, website, row }: { id: string; name: strin
   </button>;
   return <section className="mt-12 max-w-3xl space-y-3 border-t pt-8">
     <h2 className="text-xl font-semibold">Logo picker</h2>
-    <p className="text-sm text-muted-foreground">Click the version to use everywhere. Empty tiles mean Brandfetch has no usable version (missing, a photo, or wider than 3:1).</p>
+    <p className="text-sm text-muted-foreground">Click the version to use everywhere. Run Logo check after changing a Brandfetch choice. Uploads always win.</p>
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       {LOGO_CHOICES.map(v => tile(v))}
       {uploaded && tile('upload', uploaded)}

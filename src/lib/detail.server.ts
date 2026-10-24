@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { isRolling } from './opportunities';
 import { closeToThem, RELATION_REASON, withinDays } from './detail';
 import { publicEntry, text, publicTitle, type DetailContext, type DetailItem, type ProfileRow, type ProfileTerm, type RelatedGroup } from './profiles';
 
@@ -16,10 +17,10 @@ async function all(client: SupabaseClient, table: string, columns: string, publi
 }
 export async function detailContext(client: SupabaseClient, kind: 'organisations' | 'events', row: ProfileRow, terms: ProfileTerm[], related: RelatedGroup[]): Promise<DetailContext> {
   const now = new Date().toISOString();
-  const [events, opportunities] = await Promise.all([all(client, 'events', 'id,slug,title,summary,event_type,starts_at,ends_at,city,status'), all(client, 'opportunities', 'id,slug,title,summary,type,deadline_at,location,status')]);
+  const [events, opportunities] = await Promise.all([all(client, 'events', 'id,slug,title,summary,event_type,starts_at,ends_at,city,status'), all(client, 'opportunities', 'id,slug,title,summary,type,deadline_at,location,description,status')]);
   const dated: DetailItem[] = [...events.map(item => ({ ...publicEntry('events', item), kind: 'events' as const, date: text(item, 'starts_at'), end: text(item, 'ends_at'), city: text(item, 'city') })), ...opportunities.map(item => ({ ...publicEntry('opportunities', item), kind: 'opportunities' as const, date: text(item, 'deadline_at'), end: null, city: text(item, 'location') }))];
   const linked = new Set(related.flatMap(group => group.entries.map(entry => `${group.kind}:${entry.id}`)));
-  const coming = kind === 'organisations' ? dated.filter(item => linked.has(`${item.kind}:${item.id}`) && (item.date ? Date.parse(item.end ?? item.date) >= Date.parse(now) : item.kind === 'opportunities')).sort((a, b) => (a.date ? Date.parse(a.date) : Infinity) - (b.date ? Date.parse(b.date) : Infinity)) : [];
+  const coming = kind === 'organisations' ? dated.filter(item => linked.has(`${item.kind}:${item.id}`) && (item.date ? Date.parse(item.end ?? item.date) >= Date.parse(now) : item.kind === 'opportunities' && isRolling(opportunities.find(o=>o.id===item.id) as unknown as Parameters<typeof isRolling>[0]))).sort((a, b) => (a.date ? Date.parse(a.date) : Infinity) - (b.date ? Date.parse(b.date) : Infinity)) : [];
   const sameWeek = kind === 'events' ? dated.filter(item => item.id !== row.id && item.kind === 'events' && withinDays(item.date, text(row, 'starts_at'), 3)).sort((a, b) => Date.parse(a.date ?? '') - Date.parse(b.date ?? '')) : [];
   let similar: DetailContext['similar'] = []; let guides: DetailContext['guides'] = [];
   const fields = terms.filter(term => term.kind === 'field').map(term => term.id);
@@ -34,7 +35,7 @@ export async function detailContext(client: SupabaseClient, kind: 'organisations
     similar = ranked.map(org => ({ ...publicEntry('organisations', org), roles: [org.reason] }));
   }
   // Organisations and events share one guide match: journey step first, then a shared field.
-  if ((kind === 'organisations' || kind === 'events') && (steps.length || fields.length)) {
+  if ((kind === 'events') && (steps.length || fields.length)) {
     const [entries, tags] = await Promise.all([all(client, 'guides', 'id,slug,title,one_sentence,journey_step_id,status'), all(client, 'guide_terms', 'guide_id,term_id', false)]);
     const score = (guide: ProfileRow) => (steps.includes(String(guide['journey_step_id'])) ? 10 : 0) + (tags.some(tag => tag['guide_id'] === guide.id && fields.includes(String(tag['term_id']))) ? 1 : 0);
     guides = entries.filter(guide => score(guide) > 0).sort((a, b) => score(b) - score(a) || String(a['title']).localeCompare(String(b['title']))).slice(0, 2).map(guide => ({ slug: guide.slug, title: publicTitle(String(guide['title'])), summary: text(guide, 'one_sentence') }));

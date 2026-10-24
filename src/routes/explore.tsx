@@ -69,7 +69,7 @@ function Explore() {
     </header>
     <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen}><FilterStack data={data} search={search} onToggle={toggle} /></FilterSheet>
     <section aria-label="Organisations" className="min-w-0">
-      {results.length ? <CardGrid>{results.map((org) => <OrganisationCard key={org.id} organisation={org} terms={data.terms} />)}</CardGrid> : <div className="py-16">
+      {results.length ? <div className="nb-directory-grid">{results.map((org) => <OrganisationCard key={org.id} organisation={org} terms={data.terms} />)}</div> : <div className="py-16">
         <h2 className="nb-h2">Nothing matches these filters.</h2>
         <div className="mt-6 flex flex-wrap gap-3">
           {filtered && <Button variant="ghost" onClick={clear} className="nb-btn nb-btn-secondary">Clear filters</Button>}

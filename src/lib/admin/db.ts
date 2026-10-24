@@ -94,6 +94,9 @@ export async function saveEntry(
   termIds: string[],
   links: Record<string, LinkRow[]>,
 ): Promise<string> {
+  if (cfg.key === 'guides' && (links['guide_organisations']?.length ?? 0) + (links['guide_opportunities']?.length ?? 0) > 3) throw new Error('Pick at most three hub entries per guide.');
+  if (cfg.key === 'opportunities' && Array.isArray(values['tips']) && values['tips'].length > 3) throw new Error('Add at most three tips.');
+  if (cfg.key === 'organisations' && Array.isArray(values['offer_chips']) && values['offer_chips'].length && (values['offer_chips'].length < 2 || values['offer_chips'].length > 4)) throw new Error('Add two to four offer chips, or leave empty for type defaults.');
   const payload: Record<string, unknown> = { ...values };
   if (!payload["slug"]) payload["slug"] = slugify(String(payload[cfg.titleField] ?? ""));
   if (payload["status"] === "published" && !payload["published_at"]) payload["published_at"] = new Date().toISOString();

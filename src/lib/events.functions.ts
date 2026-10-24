@@ -25,7 +25,10 @@ export const getEvents = createServerFn({ method: 'GET' }).handler(async (): Pro
   const { data: fieldRows, error: fieldError } = await client.from('terms').select('id,name,slug').eq('kind', 'field').order('sort_order').order('name');
   if (fieldError) throw new Error('Event fields could not be loaded.');
   const tags = new Map<string, string[]>(); for (const l of links) tags.set(l.event_id, [...(tags.get(l.event_id) ?? []), l.term_id]);
-  const withTags = events.map(e => ({ ...e, termIds: tags.get(e.id) ?? [] }));
+  const orgLinks = await client.from('organisation_events').select('event_id,role,organisations(name,slug,status)').in('event_id', events.map(e=>e.id));
+  if (orgLinks.error) throw new Error('Event organisers could not be loaded.');
+  const organiserFor = (id:string) => { const links = (orgLinks.data ?? []).filter(l=>l.event_id===id && l.organisations?.status==='published'); const o = (links.find(l=>/organi[sz]er|host/i.test(l.role)) ?? links[0])?.organisations; return o ? {name:o.name,slug:o.slug} : undefined; };
+  const withTags = events.map(e => ({ ...e, organiser: organiserFor(e.id), termIds: tags.get(e.id) ?? [] }));
   const used = new Set(withTags.flatMap(e => e.termIds));
   return { events: withTags, opportunities, now: new Date().toISOString(), fields: (fieldRows ?? []).filter(f => used.has(f.id)) };
 });

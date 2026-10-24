@@ -41,7 +41,7 @@ export type LinkDef = {
   /** Link table has no role column. */
   noRole?: boolean;
 };
-export const ORG_RELATIONS = ["invested_in", "spun_out_of", "acquired", "partner_of"] as const;
+export const ORG_RELATIONS = ["invested_in", "spun_out_of", "acquired", "partner_of", "part_of"] as const;
 
 export type EntityConfig = {
   key: EntityKey;
@@ -91,6 +91,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
       { name: "type", label: "Type", kind: "select", options: ORG_TYPES, required: true },
       { name: "short_description", label: "Short description", kind: "textarea" },
       { name: "description", label: "Description", kind: "textarea" },
+      { name: "offer_chips", label: "How they can help you", kind: "lines", help: "2 to 4 short offers, one per line. Leave empty for type defaults." },
       { name: "website", label: "Website", kind: "url" },
       { name: "linkedin_url", label: "LinkedIn", kind: "url" },
       { name: "logo_url", label: "Logo", kind: "image" },
@@ -102,7 +103,7 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
       { name: "longitude", label: "Map longitude", kind: "number" },
       { name: "news_feed_url", label: "News feed (RSS or Atom on their own website)", kind: "url" },
       { name: "founded_year", label: "Founded year", kind: "number" },
-      { name: "prominence", label: "Prominence (higher shows first in Explore Featured)", kind: "number" },
+      { name: "prominence", label: "Prominence (1 first, then 2, then 3; 0 unranked)", kind: "number" },
       { name: "contact_email", label: "Contact email", kind: "email" },
       { name: "contact_email_public", label: "Show contact email publicly", kind: "boolean" },
       { name: "ticket_min_eur", label: "Ticket min (EUR, investors)", kind: "number" },
@@ -195,6 +196,10 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
       { name: "location", label: "Location (jobs)", kind: "text" },
       { name: "employment_type", label: "Employment type (jobs)", kind: "text" },
       { name: "remote_ok", label: "Remote OK (jobs)", kind: "boolean" },
+      { name: "who_can_apply", label: "Who can apply", kind: "lines" },
+      { name: "what_you_get", label: "What you get", kind: "textarea" },
+      { name: "how_to_apply_steps", label: "How to apply", kind: "lines" },
+      { name: "tips", label: "Tips (up to 3)", kind: "lines" },
     ],
     links: [
       L("organisation_opportunities", "opportunity_id", "organisation_id", "organisations", "Organisations"),
@@ -243,6 +248,8 @@ export const ENTITIES: Record<EntityKey, EntityConfig> = {
       { name: "cover_url", label: "Cover image", kind: "image" },
     ],
     links: [
+      { table: "guide_organisations", selfFk: "guide_id", otherFk: "organisation_id", other: "organisations", label: "In the hub: organisations (3 picks total)", noRole: true },
+      { table: "guide_opportunities", selfFk: "guide_id", otherFk: "opportunity_id", other: "opportunities", label: "In the hub: opportunities (3 picks total)", noRole: true },
       { table: "glossary_term_guides", selfFk: "guide_id", otherFk: "glossary_term_id", other: "glossary", label: "Glossary terms", noRole: true },
     ],
   },

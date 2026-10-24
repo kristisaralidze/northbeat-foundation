@@ -34,5 +34,8 @@ export const getOpportunities = createServerFn({ method: 'GET' }).handler(async 
   }
   const tags = new Map<string, string[]>();
   for (const link of links) tags.set(link.opportunity_id, [...(tags.get(link.opportunity_id) ?? []), link.term_id]);
-  return { opportunities: opportunities.map((item) => ({ ...item, termIds: tags.get(item.id) ?? [] })), terms, now: new Date().toISOString() };
+  const providers = await client.from('organisation_opportunities').select('opportunity_id,role,organisations(name,slug,status)').in('opportunity_id',opportunities.map(o=>o.id));
+  if(providers.error)throw new Error('Opportunity providers could not be loaded.');
+  const providerFor = (id:string) => {const list=(providers.data??[]).filter(l=>l.opportunity_id===id&&l.organisations?.status==='published');const org=(list.find(l=>/provider/i.test(l.role))??list[0])?.organisations;return org?{name:org.name,slug:org.slug}:undefined;};
+  return { opportunities: opportunities.map((item) => ({ ...item, provider:providerFor(item.id), termIds: tags.get(item.id) ?? [] })), terms, now: new Date().toISOString() };
 });

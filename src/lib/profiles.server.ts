@@ -6,7 +6,7 @@ import { detailContext } from './detail.server';
 const COLUMNS: Record<EntityKey, string> = {
   organisations: '', people: '',
   events: 'id,slug,status,title,event_type,summary,description,starts_at,ends_at,apply_deadline_at,timezone,format,venue,city,registration_url,price_note,source_url,last_checked,founded_year,story,scale_facts,our_take,who_youll_meet,price_info,free_ways_in,tips,profile_sources',
-  opportunities: 'id,slug,status,title,type,summary,description,opens_at,deadline_at,amount_min_eur,amount_max_eur,apply_url,location,employment_type,remote_ok,source_url,last_checked',
+  opportunities: 'id,slug,status,title,type,summary,description,opens_at,deadline_at,amount_min_eur,amount_max_eur,apply_url,location,employment_type,remote_ok,source_url,last_checked,who_can_apply,what_you_get,how_to_apply_steps,tips',
   episodes: 'id,slug,status,title,episode_number,season,summary,show_notes,transcript,audio_url,embed_url,duration_seconds,published_on,cover_url,source_url,last_checked',
   guides: '', glossary: '',
 };
@@ -30,8 +30,10 @@ export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey,
   const [row] = await readEntries(client, kind, { slug });
   if (!row) return null;
   if (kind === 'organisations' || kind === 'events') {
-    const columns = kind === 'organisations' ? 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_choice,logo_image_source,logo_image_source_url,brand_accent,video_url,video_source_url,openalex_id,research,business_id,registration_date,company_form,main_business_line,latitude,longitude,news_items' : 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url,video_url,video_source_url,latitude,longitude';
-    const cover = await client.from(kind).select(columns).eq('id', row.id).eq('status', 'published').maybeSingle();
+    const columns: string = kind === 'organisations' ? 'offer_chips,logo_resolved_url,logo_tone,logo_status,logo_shared_from,cover_image_url,cover_image_status,image_source_url,logo_url,logo_choice,logo_image_source,logo_image_source_url,brand_accent,video_url,video_source_url,openalex_id,research,business_id,registration_date,company_form,main_business_line,latitude,longitude,news_items' : 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url,video_url,video_source_url,latitude,longitude';
+    const table: string = kind;
+    const assetClient: SupabaseClient<any> = client;
+    const cover = await assetClient.from(table).select(columns).eq('id', row.id).eq('status', 'published').maybeSingle();
     if (cover.error) throw new Error('This profile could not be loaded. Please try again.');
     const assets = cover.data as unknown as Record<string, unknown> | null;
     if (assets) for (const column of columns.split(',')) row[column] = ['string', 'number'].includes(typeof assets[column]) || (assets[column] && typeof assets[column] === 'object') ? assets[column] as never : null;

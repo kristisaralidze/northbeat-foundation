@@ -7,7 +7,7 @@ import { CardGrid, EntryCard } from '@/components/site/EntryCard';
 import { OrganisationLogo } from '@/components/site/OrganisationLogo';
 import { humanize } from '@/lib/admin/entities';
 import { amountLabel, friendlyDate } from '@/lib/opportunities';
-import { countdownLabel, daysUntil } from '@/lib/detail';
+import { countdownLabel, countdownClass, daysUntil } from '@/lib/detail';
 import { itemHref, type SearchItem } from '@/lib/search';
 
 export const Route = createFileRoute('/saved')({
@@ -50,8 +50,8 @@ function SavedCard({ kind, slug, title, item, now, pending }: { kind: SavedKind;
     : kind === 'opportunity' ? (item.date ? (days !== null && days < 0 ? `Closed ${friendlyDate(item.date, now)}` : `Closes ${friendlyDate(item.date, now)}`) : 'No fixed deadline') : null;
   const soon = days !== null && days >= 0 && days < 14;
   return <EntryCard id={slug} kind={kind} slug={slug} title={item.title} link={kind === 'organisation' ? <Link to="/org/$slug" params={{ slug }} className="nb-org-link">{item.title}</Link> : kind === 'event' ? <Link to="/event/$slug" params={{ slug }} className="nb-org-link">{item.title}</Link> : <Link to="/opportunity/$slug" params={{ slug }} className="nb-org-link">{item.title}</Link>}
-    media={kind === 'organisation' ? <OrganisationLogo name={item.title} uploaded={item.logo} website={item.website} choice={item.logoChoice ?? 'icon'} /> : undefined}
+    media={<OrganisationLogo name={item.organiserName ?? item.title} slug={kind==='organisation'?slug:item.organiserSlug} uploaded={item.logo} resolved={item.logoResolved} tone={item.logoTone} status={item.logoStatus} website={item.website} choice={item.logoChoice ?? 'icon'} />}
     line={item.line}
     facts={[item.type ? humanize(item.type) : null, kind === 'opportunity' ? amountLabel({ amount_min_eur: item.amountMin, amount_max_eur: item.amountMax }) : item.online ? 'Online' : item.city, kind === 'organisation' ? null : item.date && kind === 'event' ? friendlyDate(item.date, now) : null]}
-    footer={when && <span className={`nb-countdown${soon ? ' nb-countdown-signal' : ''}`}>{when}</span>} />;
+    footer={when && <span className={countdownClass(days)}>{when}</span>} />;
 }

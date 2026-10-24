@@ -1,5 +1,5 @@
 export type Founder = { id: string; name: string; one_line: string | null; photo_url: string | null; linkedin_url: string | null };
-export type SiteInfo = { contactEmail: string | null; linkedinUrl: string | null; instagramUrl: string | null; founders: Founder[]; updatedOn: string | null };
+export type SiteInfo = { contactEmail: string | null; linkedinUrl: string | null; instagramUrl: string | null; podcastThemes?: string[]; founders: Founder[]; updatedOn: string | null };
 
 /** Newest ISO date (YYYY-MM-DD) among the values, or null when none are valid. */
 export function newestDate(values: (string | null | undefined)[]): string | null {

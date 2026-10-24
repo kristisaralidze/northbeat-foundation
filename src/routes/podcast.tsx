@@ -2,13 +2,14 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
 import { Radio } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { siteInfoQuery } from '@/lib/site.query';
 import { podcastQuery } from '@/lib/podcast.query';
 import { durationLabel, episodeLabel, sortEpisodes } from '@/lib/podcast';
 import { dateLabel } from '@/lib/events';
 import { NewsletterSignup } from '@/components/site/NewsletterSignup';
 
 export const Route = createFileRoute('/podcast')({
-  loader: ({ context }) => context.queryClient.ensureQueryData(podcastQuery),
+  loader: async ({ context }) => { await Promise.all([context.queryClient.ensureQueryData(podcastQuery), context.queryClient.ensureQueryData(siteInfoQuery)]); },
   head: () => ({
     meta: [
       { title: 'Podcast: Northbeat' },
@@ -28,6 +29,7 @@ export const Route = createFileRoute('/podcast')({
 
 function Podcast() {
   const { data } = useSuspenseQuery(podcastQuery);
+  const { data: site } = useSuspenseQuery(siteInfoQuery);
   const episodes = sortEpisodes(data.episodes);
   return <div className="nb-container nb-section">
     <header className="mb-8"><h1 className="nb-h1">Podcast</h1>
@@ -46,8 +48,8 @@ function Podcast() {
         </li>;
       })}
     </ul>}
-    {episodes.length === 0 && <p className="nb-body mb-8">First episodes in December 2026.</p>}
-    <section aria-labelledby="podcast-signup" className="nb-card mt-10 max-w-xl">
+    {episodes.length === 0 && <div><p className="nb-lead mb-8">Season 1, December 2026</p>{Boolean(site.podcastThemes?.length) && <section className="mb-8"><h2 className="nb-h2 mb-5">What we’ll talk about</h2><ul className="nb-check-list nb-body">{site.podcastThemes?.slice(0,3).map(t=><li key={t}>{t}</li>)}</ul></section>}</div>}
+    <section aria-labelledby="podcast-signup" className="mt-10 max-w-xl">
       <h2 id="podcast-signup" className="nb-h3">Get the first episode in your inbox</h2>
       <NewsletterSignup source="podcast" tag="podcast" consentLabel="Yes, email me when the first episode is out. Unsubscribe any time." doneMessage="You're on the list. We'll email you when the first episode is out." />
     </section>

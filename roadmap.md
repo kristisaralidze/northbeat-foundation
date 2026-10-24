@@ -1,3 +1,9 @@
+# Site-wide value pass
+- [ ] Official logo image delivery remains blocked in this environment: 162 unreadable CORS responses, 5 requested official uploads, 1 missing website. Re-run the admin check where Brandfetch delivery works; upload the five requested assets.
+- [x] Logo follow-up: stored icon/logo canvas checks, tone-aware shared display, parent relations, admin grid and one full check; apply attached round-two entry fixes.
+- [x] Apply all ten polish requests, uploaded prominence rankings and three draft playbooks.
+- [x] Verify public pages at 390px and 1440px, editorial admin readback and rule tests.
+
 # Living cells ecosystem
 - [x] Replace home grid with one interactive canvas, published organisation dots and real organisation relations.
 - [x] Add specified group links, membrane motion, pulses, hover/tap cards and accessible navigation.
@@ -26,7 +32,7 @@
 
 # Admin CSV import
 - [x] Import three batch-four drafts with 23 tags and three provider links; preserve Next call TBA in descriptions; update Eir deadline and Terkko website.
-- [ ] Show Next call TBA instead of the existing undated-list heading/label. Blocker: requested no-code import cannot change the current page labels.
+- [x] Undated non-rolling calls use Next call to be announced.
 - [x] Import 11 batch-three drafts with 42 tags and two organiser links; no duplicate rows or unknown tags.
 - [x] Reconcile batch-two sub-area links against the source CSV: all 14 links already present.
 - [x] Insert all 42 batch-two rows as organisation drafts checked 2026-10-20, with 138 existing-tag links; no duplicates or unknown tags.

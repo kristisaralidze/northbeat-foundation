@@ -3,7 +3,8 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { heartbeatQuery } from '@/lib/heartbeat.query';
 import { buildBeats, clamp01, heightAt, HORIZON, localKey, restingBeats, smoothstep, beatHeight, buildStops, dayAtProgress, sectionHeightVh, heightScale, REST_HEIGHT, mergeBeats, beatTitle, type Beat, type HeartbeatItem } from '@/lib/heartbeat';
-import { chosenLogoSrc } from '@/components/site/OrganisationLogo';
+import { countdownClass } from '@/lib/detail';
+import { OrganisationLogo, chosenLogoSrc } from '@/components/site/OrganisationLogo';
 import { publicTitle } from '@/lib/profiles';
 import { brandfetchLogoUrl } from '@/lib/organisation-logo';
 
@@ -18,8 +19,8 @@ function dateFor(day: number, long = false) {
 }
 /** One logo per item: the organiser's official logo, else the Brandfetch icon for the event's own website. */
 function itemLogo(item: HeartbeatItem) {
-  for (const o of item.orgs) { const src = chosenLogoSrc(o.logo_choice, o.logo_url, o.website); if (src) return src; }
-  return brandfetchLogoUrl(item.website ?? null, 'icon');
+  for (const o of item.orgs) { const src = (o.logo_choice==='upload'?o.logo_url:o.logo_resolved_url); if (src) return src; }
+  return null;
 }
 /** "17 Nov" or "17–18 Nov" for a merged beat. */
 function beatDate(b: Beat, long = false) {
@@ -124,6 +125,7 @@ export function HeartbeatHero() {
       // Transition: about one screen of scroll at the end. First half: 3D fades and sinks 40px. Second half: flat timeline draws left to right.
       const span = Math.min(0.35, H / Math.max(1, host.offsetHeight - H));
       const FLIGHT_END = Math.max(0.3, 1 - span - 0.04);
+      const flight = !reduced && p < FLIGHT_END; if(host.dataset['flight']!==String(flight)){host.dataset['flight']=String(flight);window.dispatchEvent(new Event('northbeat:flight'));}
       const fadeT = reduced ? 1 : smoothstep((p - FLIGHT_END) / (span / 2));
       const drawT = reduced ? 1 : clamp01((p - FLIGHT_END - span / 2) / (span / 2));
       if (opening && !openStart) openStart = t;
@@ -254,10 +256,8 @@ export function HeartbeatHero() {
         if (peak.x < -60 || peak.x > W + 60 || peak.y < -60 || peak.y > H + 60) continue;
         const cy = peak.y - r - Math.max(10, r * 1.2);
         placed.push({ b, peak, r, cy, alpha, mi, pp, fp });
-        // Only logos that actually loaded get a circle; failed or missing logos leave just the spike.
         const srcs = beatLogos.get(b) ?? [];
-        const ready: HTMLImageElement[] = [];
-        for (const src of srcs) { if (ready.length >= 3) break; const img = src && drawnLogos < 60 ? image(src) : null; if (img) ready.push(img); }
+        const ready = b.items.slice(0,3).map((item,i)=>({img:srcs[i]?image(srcs[i] as string):null,name:item.orgs[0]?.name??item.title,tone:item.orgs[0]?.logo_tone??'dark'}));
         const topLimit = (passing.current ? passing.current.offsetTop + passing.current.offsetHeight : 100) + 16;
         if (ready.length && cy - r < topLimit && m < 0.6) ready.length = 0;
         (placed[placed.length - 1] as { logos?: boolean }).logos = ready.length > 0;
@@ -270,11 +270,12 @@ export function HeartbeatHero() {
         ctx.globalAlpha = sceneAlpha; // logos are never greyed by distance
         for (let k = 0; k < total; k++) {
           const x = peak.x + (k - (total - 1) / 2) * gap;
-          const img = ready[k];
-          if (img) {
-            drawnLogos++; circle(ctx, x, cy, r, TILE, LINE);
-            ctx.save(); ctx.beginPath(); ctx.arc(x, cy, r * 0.78, 0, Math.PI * 2); ctx.clip();
-            const sz = r * 1.4; ctx.drawImage(img, x - sz / 2, cy - sz / 2, sz, sz); ctx.restore();
+          const logo = ready[k]; const img=logo?.img;
+          if (logo) {
+            drawnLogos++;const light=logo.tone==='light';ctx.fillStyle=light?INK:TILE;ctx.strokeStyle=LINE;
+            ctx.beginPath();ctx.roundRect(x-r,cy-r,r*2,r*2,Math.min(8,r*.3));ctx.fill();ctx.stroke();
+            if(img){const area=r*1.52;const ratio=img.naturalWidth/img.naturalHeight;const w=ratio>=1?area:area*ratio;const h=ratio>=1?area/ratio:area;ctx.drawImage(img,x-w/2,cy-h/2,w,h);}
+            else{ctx.fillStyle=light?TILE:INK;ctx.font=`${Math.max(7,r*.3)}px ${body}`;ctx.textAlign='center';ctx.textBaseline='middle';const words=logo.name.split(' ');ctx.fillText(words.slice(0,2).join(' '),x,cy-3,r*1.7);if(words.length>2)ctx.fillText(words.slice(2).join(' '),x,cy+7,r*1.7);}
           } else {
             circle(ctx, x, cy, r, TILE, LINE); ctx.fillStyle = INK; ctx.font = `${Math.max(9, r * 0.7)}px ${body}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(`+${extra}`, x, cy);
           }
@@ -410,13 +411,11 @@ export function HeartbeatHero() {
       <h2 id="heartbeat-heading" className="sr-only">Events and deadlines in the next 35 days</h2>
       <p ref={passing} className="nb-heartbeat-now" aria-hidden="true">Coming up in Nordic health</p>
       {next && nextItem && <button key={next.key} type="button" className="nb-heartbeat-next" onClick={openNext}>
-        {nextLogo && !nextLogoFailed
-          ? <img src={nextLogo} alt="" width={32} height={32} onError={() => setNextLogoFailed(true)} />
-          : nextItem.orgs[0] && <span className="nb-heartbeat-next-org">{nextItem.orgs[0].name}</span>}
+        <OrganisationLogo name={nextItem.orgs[0]?.name ?? nextItem.title} slug={nextItem.orgs[0]?.slug} uploaded={nextItem.orgs[0]?.logo_url} choice={nextItem.orgs[0]?.logo_choice} resolved={nextItem.orgs[0]?.logo_resolved_url} tone={nextItem.orgs[0]?.logo_tone} status={nextItem.orgs[0]?.logo_status} />
         <span className="nb-heartbeat-next-text">
           <span className="nb-heartbeat-next-label">Next up</span>
           <span className="nb-heartbeat-next-title">{beatTitle(next.beat.items.map(i => publicTitle(i.title)))}</span>
-          <span className="nb-heartbeat-next-meta">{beatDate(next.beat, true)}, <span className={deadline ? 'nb-heartbeat-next-deadline' : undefined}>{whenText}</span></span>
+          <span className="nb-heartbeat-next-meta">{beatDate(next.beat, true)}, <span className={countdownClass(nextDays)}>{whenText}</span></span>
         </span>
       </button>}
       <div ref={finale} className="nb-heartbeat-finale">

@@ -4,7 +4,7 @@ export type OpportunityRow = {
   amount_min_eur: number | null; amount_max_eur: number | null;
   location: string | null; employment_type: string | null; remote_ok: boolean | null;
   termIds: string[];
-  description?: string | null;
+  provider?: {name:string;slug:string}|undefined; description?: string | null;
   apply_url?: string | null;
 };
 export type OpportunityTerm = { id: string; kind: string; name: string; slug: string; parent_id: string | null; sort_order: number };
