@@ -1,4 +1,4 @@
-import { CELL_GROUPS, CELL_LINKS, cellPulse, dotPosition, dotScale, easeBurst, layoutCells, layoutLabels, membraneRadius, rectOverlap, type Cell, type CellData, type CellLabel, type Point, type Rect } from '@/lib/living-cells';
+import { CELL_GROUPS, CELL_LINKS, cellGroup, cellPulse, dotPosition, dotScale, easeBurst, layoutCells, layoutLabels, membraneRadius, rectOverlap, type Cell, type CellData, type CellLabel, type Point, type Rect } from '@/lib/living-cells';
 
 export type CellSelection = { group: number; orgId?: string } | null;
 interface Curve { from: Cell; to: Cell; start: Point; end: Point; control: Point; sentence: string; index: number }
@@ -20,7 +20,7 @@ export function createCellScene(canvas: HTMLCanvasElement, data: CellData, reduc
   const colours: Record<string, string> = { ink: token('--ink'), money: token('--cell-money'), science: token('--cell-science'), support: token('--cell-support') };
   const background = token('--home-surface') || token('--background'), white = token('--cell-white');
   const font = token('--font-body'), mono = token('--cell-mono');
-  const organisationGroups = new Map(data.organisations.map(o => [o.id, cellsGroup(o.type)]));
+  const organisationGroups = new Map(data.organisations.map(o => [o.id, cellGroup(o.type)]));
   const fontSize = phone ? 9 : 11;
   ctx.font = `${fontSize}px ${font}`;
   const cells = layoutCells(data, w, h);
