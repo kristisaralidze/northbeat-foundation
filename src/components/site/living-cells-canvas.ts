@@ -20,6 +20,7 @@ export function createCellScene(canvas: HTMLCanvasElement, data: CellData, reduc
   const colours: Record<string, string> = { ink: token('--ink'), money: token('--cell-money'), science: token('--cell-science'), support: token('--cell-support') };
   const background = token('--home-surface') || token('--background'), white = token('--cell-white');
   const font = token('--font-body'), mono = token('--cell-mono');
+  const organisationGroups = new Map(data.organisations.map(o => [o.id, cellsGroup(o.type)]));
   const fontSize = phone ? 9 : 11;
   ctx.font = `${fontSize}px ${font}`;
   const cells = layoutCells(data, w, h);
@@ -80,7 +81,7 @@ export function createCellScene(canvas: HTMLCanvasElement, data: CellData, reduc
     for (const r of data.relations) {
       const a = positions.get(r.from_org_id), b = positions.get(r.to_org_id); if (!a || !b) continue;
       const related = selected?.orgId && (r.from_org_id === selected.orgId || r.to_org_id === selected.orgId);
-      const activeGroup = selected && !selected.orgId && (data.organisations.some(o => o.id === r.from_org_id && cells.find(c => c.group === selected.group)?.orgs.some(x => x.id === o.id)) || cells.find(c => c.group === selected.group)?.orgs.some(o => o.id === r.to_org_id));
+      const activeGroup = selected && !selected.orgId && (organisationGroups.get(r.from_org_id) === selected.group || organisationGroups.get(r.to_org_id) === selected.group);
       const dim = selected ? selected.orgId ? related ? 1 : .16 : activeGroup ? 1 : .16 : 1;
       ctx.globalAlpha = (related ? .65 : .045 + .135 * flash) * dim; ctx.strokeStyle = colours['ink'] ?? ''; ctx.lineWidth = .6;
       ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
