@@ -22,6 +22,10 @@ async function loadFonts() {
 }
 
 type Ctx = ReturnType<ReturnType<typeof PImage.make>['getContext']>;
+/** Serif hairlines are thinner than the rasteriser's fill, so a light stroke keeps them whole. */
+function serif(ctx: Ctx, text: string, x: number, y: number, colour: string) {
+  ctx.fillStyle = colour; ctx.strokeStyle = colour; ctx.lineWidth = 1.6; ctx.fillText(text, x, y); ctx.strokeText(text, x, y);
+}
 
 function wrap(ctx: Ctx, text: string, maxWidth: number, maxLines: number) {
   const words = text.split(/\s+/).filter(Boolean); const lines: string[] = []; let line = '';
@@ -75,11 +79,11 @@ export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
   ctx.fillStyle = COLOURS.paper; ctx.fillRect(0, 0, W, H);
   const pad = 80;
   // Flat heartbeat line along the bottom, one beat in plum.
-  ctx.strokeStyle = COLOURS.ink; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, 540); ctx.lineTo(880, 540); ctx.lineTo(905, 500); ctx.lineTo(930, 580); ctx.lineTo(955, 540); ctx.lineTo(W, 540); ctx.stroke();
+  ctx.strokeStyle = COLOURS.ink; ctx.lineWidth = 3 * S; ctx.beginPath(); ctx.moveTo(0, 540); ctx.lineTo(880, 540); ctx.lineTo(905, 500); ctx.lineTo(930, 580); ctx.lineTo(955, 540); ctx.lineTo(W, 540); ctx.stroke();
   ctx.fillStyle = COLOURS.plum; ctx.beginPath(); ctx.arc(905, 500, 8, 0, Math.PI * 2); ctx.fill();
   if (input.home) {
     ctx.fillStyle = COLOURS.ink; ctx.font = '150pt Bodoni';
-    const word = 'NORTHBEAT'; const w = ctx.measureText(word).width; ctx.fillText(word, (W - w) / 2, 300);
+    const word = 'NORTHBEAT'; const w = ctx.measureText(word).width; serif(ctx, word, (W - w) / 2, 300, COLOURS.ink);
     ctx.font = '40pt Body'; ctx.fillStyle = COLOURS.muted; const t = 'The heartbeat of Nordic health innovation.'; ctx.fillText(t, (W - ctx.measureText(t).width) / 2, 390);
     return encode(img);
   }
@@ -94,9 +98,9 @@ export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
   ctx.fillStyle = COLOURS.plum; ctx.font = '30pt Body'; ctx.fillText(input.eyebrow, textX, top);
   ctx.fillStyle = COLOURS.ink; ctx.font = '64pt Bodoni';
   const lines = wrap(ctx, input.title, W - pad * 2, logo ? 2 : 3);
-  lines.forEach((line, i) => ctx.fillText(line, textX, top + 84 + i * 80));
+  lines.forEach((line, i) => serif(ctx, line, textX, top + 84 + i * 80, COLOURS.ink));
   if (input.subtitle) { ctx.font = '30pt Body'; ctx.fillStyle = COLOURS.muted; const sub = wrap(ctx, input.subtitle, W - pad * 2, 1)[0]!; ctx.fillText(sub, textX, top + 84 + lines.length * 80 + 10); }
-  ctx.font = '30pt Bodoni'; ctx.fillStyle = COLOURS.ink; ctx.fillText('NORTHBEAT', W - pad - ctx.measureText('NORTHBEAT').width, pad + 30);
+  ctx.font = '30pt Bodoni'; ctx.fillStyle = COLOURS.ink; serif(ctx, 'NORTHBEAT', W - pad - ctx.measureText('NORTHBEAT').width, pad + 30, COLOURS.ink);
   return encode(img);
 }
 
