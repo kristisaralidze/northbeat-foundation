@@ -22,21 +22,16 @@ const isPlainPath = (p: string) => p === "/directions" || p === "/admin" || p.st
 
 function NotFoundComponent() {
   return (
-    <div className="theme-site flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="nb-display text-ink">404</h1>
-        <h2 className="nb-h2 mt-4 text-ink">Page not found</h2>
-        <p className="nb-body mt-2 text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="nb-btn nb-btn-primary"
-          >
-            Go home
-          </Link>
-        </div>
+    <div className="nb-404">
+      <div className="nb-404-line" aria-hidden />
+      <div className="nb-container nb-404-content">
+        <h1 className="nb-h1">This page has no pulse.</h1>
+        <p className="nb-body">We couldn't find what you were looking for.</p>
+        <ul className="nb-404-links">
+          <li><Link to="/explore" className="nb-link">Explore</Link></li>
+          <li><Link to="/events" className="nb-link">Events</Link></li>
+          <li><Link to="/" className="nb-link">Homepage</Link></li>
+        </ul>
       </div>
     </div>
   );
