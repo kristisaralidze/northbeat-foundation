@@ -64,26 +64,47 @@ export function enhancePageMotion(page: HTMLElement): () => void {
 
   // Sections and cards: CSS keeps them hidden (SSR-consistent class on the
   // page root, so no hydration mismatch); we only add the revealed class.
+  // A scroll-position check (not IntersectionObserver) so anchor jumps and
+  // fast scrolling past a section still reveal it.
   const selector = 'section, .nb-card, [data-reveal]';
-  const revealables = [...page.querySelectorAll<HTMLElement>(selector)];
+  const pending = new Set<HTMLElement>();
   const seen = new Map<HTMLElement, number>();
-  for (const el of revealables) {
+  for (const el of page.querySelectorAll<HTMLElement>(selector)) {
     if (el.closest('[data-native-scroll]') || el.closest('.nb-compact-bar')) continue;
     const parent = el.parentElement ?? page;
     const order = seen.get(parent) ?? 0;
     seen.set(parent, order + 1);
     el.style.setProperty('--reveal-delay', `${Math.min(order, 5) * 60}ms`);
-    const stop = inView(
-      el,
-      () => el.classList.add('nb-revealed'),
-      { margin: '0px 0px -10% 0px', once: true },
-    );
-    cleanups.push(() => {
-      stop();
+    pending.add(el);
+  }
+  let ticking = false;
+  const revealPassed = () => {
+    ticking = false;
+    const line = window.innerHeight * 0.92;
+    for (const el of pending) {
+      if (el.getBoundingClientRect().top <= line) {
+        el.classList.add('nb-revealed');
+        pending.delete(el);
+      }
+    }
+    if (pending.size === 0) window.removeEventListener('scroll', onScroll);
+  };
+  const onScroll = () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(revealPassed);
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  revealPassed();
+  cleanups.push(() => {
+    window.removeEventListener('scroll', onScroll);
+    for (const el of pending) {
       el.classList.remove('nb-revealed');
       el.style.removeProperty('--reveal-delay');
-    });
-  }
+    }
+    pending.clear();
+  });
   // Content added later (for example the past-events toggle) must stay visible.
   const late = new MutationObserver(records => {
     for (const record of records) {
