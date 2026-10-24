@@ -1552,7 +1552,7 @@ html, body { overflow-x: clip; }
 
 /* Explore controls: local exceptions to text-only editorial filters. */
 .theme-site { --explore-menu-surface: #FBF6EE; --explore-menu-border: #E5E5E5; --explore-menu-hover: color-mix(in srgb, var(--ink) 5%, var(--explore-menu-surface)); --explore-menu-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 9%, transparent); }
-.nb-public-page .nb-explore-search input { padding-left: 36px; }
+.theme-site .nb-public-page .nb-explore-search input[type='search'] { padding-left: 36px; }
 .theme-site .nb-explore-filter-trigger { display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; width: auto; min-height: 44px; height: auto; padding: 8px 12px; border: 1px solid var(--explore-menu-border); border-radius: 6px; background: var(--background); color: var(--ink); box-shadow: none; cursor: pointer; font-size: 14px; transition: border-color 150ms ease, background-color 150ms ease; }
 .theme-site .nb-explore-filter-trigger:hover, .theme-site .nb-explore-filter-trigger[data-state='open'] { border-color: var(--ink); background: var(--explore-menu-hover); }
 .theme-site .nb-explore-filter-trigger[data-active='true'] { border-color: var(--berry); color: var(--berry); background: color-mix(in srgb, var(--berry) 5%, var(--background)); }
