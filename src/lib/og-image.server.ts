@@ -68,7 +68,7 @@ function roundRect(ctx: Ctx, x: number, y: number, w: number, h: number, r: numb
   ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r); ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath(); ctx.fill();
 }
 
-export type OgInput = { eyebrow: string; title: string; subtitle?: string | null; logoUrl?: string | null; home?: boolean };
+export type OgInput = { eyebrow: string; title: string; subtitle?: string | null; logoUrl?: string | null; logoTone?:string|null|undefined;logoName?:string|undefined; home?: boolean };
 
 export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
   fontsReady ??= loadFonts().catch(e => { fontsReady = null; throw e; });
@@ -89,15 +89,17 @@ export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
   }
   let textX = pad;
   const logo = input.logoUrl ? await decodeLogo(input.logoUrl) : null;
-  if (logo) {
+  const tile=Boolean(logo||input.logoName);
+  if (tile) {
     ctx.fillStyle = COLOURS.hairline; roundRect(ctx, pad - 2, pad - 2, 124, 124, 22);
-    ctx.fillStyle = COLOURS.white; roundRect(ctx, pad, pad, 120, 120, 20);
-    drawLogo(img, logo, (pad + 16) * S, (pad + 16) * S, 88 * S);
+    ctx.fillStyle = input.logoTone==='light'?COLOURS.ink:COLOURS.white; roundRect(ctx, pad, pad, 120, 120, 20);
+    if(logo)drawLogo(img, logo, (pad + 14.4) * S, (pad + 14.4) * S, 91.2 * S);
+    else{ctx.font='15pt Body';ctx.fillStyle=input.logoTone==='light'?COLOURS.white:COLOURS.ink;const names=wrap(ctx,input.logoName??input.title,100,4);names.forEach((n,i)=>ctx.fillText(n,pad+10,pad+30+i*22));}
   }
-  const top = logo ? pad + 120 + 60 : pad + 60;
+  const top = tile ? pad + 120 + 60 : pad + 60;
   ctx.fillStyle = COLOURS.plum; ctx.font = '30pt Body'; ctx.fillText(input.eyebrow, textX, top);
   ctx.fillStyle = COLOURS.ink; ctx.font = '64pt Bodoni';
-  const lines = wrap(ctx, input.title, W - pad * 2, logo ? 2 : 3);
+  const lines = wrap(ctx, input.title, W - pad * 2, tile ? 2 : 3);
   lines.forEach((line, i) => serif(ctx, line, textX, top + 84 + i * 80, COLOURS.ink));
   if (input.subtitle) { ctx.font = '30pt Body'; ctx.fillStyle = COLOURS.muted; const sub = wrap(ctx, input.subtitle, W - pad * 2, 1)[0]!; ctx.fillText(sub, textX, top + 84 + lines.length * 80 + 4); }
   ctx.font = '30pt Bodoni'; ctx.fillStyle = COLOURS.ink; serif(ctx, 'NORTHBEAT', W - pad - ctx.measureText('NORTHBEAT').width, pad + 30, COLOURS.ink);

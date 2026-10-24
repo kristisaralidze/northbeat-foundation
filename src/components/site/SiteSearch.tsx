@@ -58,7 +58,7 @@ function SearchDialog({ onClose }: { onClose: () => void }) {
         {groups.map(g => <div key={g.kind} className="py-1"><p className="nb-small px-3 py-2 text-muted-foreground">{g.label}</p>{g.items.map(item => { index += 1; const i = index;
           return <a key={`${item.kind}-${item.slug}`} id={`sr-${i}`} role="option" aria-selected={i === active} data-active={i === active} href={itemHref(item)} className="nb-search-result" onMouseMove={() => setActive(i)} onClick={e => { e.preventDefault(); go(item); }}>
             <span className="nb-search-logo-space">{item.kind === 'organisation' ? <OrganisationLogo name={item.title} slug={item.slug} uploaded={item.logo} resolved={item.logoResolved} tone={item.logoTone} status={item.logoStatus} website={item.website} choice={item.logoChoice ?? 'icon'} /> : item.organiserSlug ? <OrganisationLogo name={item.organiserName ?? item.title} slug={item.organiserSlug} /> : item.kind === 'event' || item.kind === 'opportunity' ? <OrganisationLogo name={item.title} /> : null}</span>
-            <span className="min-w-0 flex-1"><span className="block truncate">{item.title}</span>{(item.type || item.city) && <span className="nb-small block truncate text-muted-foreground">{[item.type ? humanize(item.type) : null, item.online ? 'Online' : item.city].filter(Boolean).join(', ')}</span>}</span>
+            <span className="min-w-0 flex-1"><span className="block break-words">{item.title}</span>{(item.type || item.city) && <span className="nb-small block truncate text-muted-foreground">{[item.type ? humanize(item.type) : null, item.online ? 'Online' : item.city].filter(Boolean).join(', ')}</span>}</span>
           </a>; })}</div>)}
       </div>
     </DialogContent>
