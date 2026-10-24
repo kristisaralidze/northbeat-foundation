@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react";
+import { useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -13,7 +14,8 @@ export function facetOptions(data: DirectoryData, search: ExploreSearch, facet: 
 }
 
 function OptionList({ facet, data, search, onToggle }: { facet: Facet; data: DirectoryData; search: ExploreSearch; onToggle: (facet: Facet, value: string) => void }) {
-  return <div className="space-y-1">{facetOptions(data, search, facet).map((o) => {
+  const options = useMemo(() => facetOptions(data, search, facet), [data, search, facet]);
+  return <div className="space-y-1">{options.map((o) => {
     const id = `explore-${facet}-${o.value}`;
     return <label key={o.value} htmlFor={id} className="nb-filter-option nb-explore-option" data-selected={search[facet].includes(o.value)}>
       <Checkbox id={id} checked={search[facet].includes(o.value)} onCheckedChange={() => onToggle(facet, o.value)} className="shadow-none border-hairline data-[state=checked]:border-primary" />
@@ -25,7 +27,8 @@ function OptionList({ facet, data, search, onToggle }: { facet: Facet; data: Dir
 
 /** Desktop: each group is its own chip with its count, then Country, Field and Stage open small option lists. */
 export function FilterChipRow(props: { data: DirectoryData; search: ExploreSearch; onToggle: (facet: Facet, value: string) => void }) {
-  const groups = facetOptions(props.data, props.search, "group");
+  const options = useMemo(() => Object.fromEntries(VISIBLE_FACETS.map(facet => [facet, facetOptions(props.data, props.search, facet)])), [props.data, props.search]);
+  const groups = options['group'] ?? [];
   return <div className="flex flex-col gap-3">
     {groups.length > 0 && <div className="nb-filter-chips" role="group" aria-label="Group">{groups.map((o) => {
       const on = props.search.group.includes(o.value);
@@ -33,7 +36,7 @@ export function FilterChipRow(props: { data: DirectoryData; search: ExploreSearc
     })}</div>}
     <div className="nb-filter-chips" role="group" aria-label="Filters">{VISIBLE_FACETS.filter((f) => f !== "group").map((facet) => {
     const n = props.search[facet].length;
-    if (!facetOptions(props.data, props.search, facet).length) return null;
+    if (!options[facet]?.length) return null;
     return <Popover key={facet}><PopoverTrigger asChild><Button variant="ghost" type="button" className="nb-explore-filter-trigger" data-active={n > 0}>{FACET_LABELS[facet]}{n > 0 ? ` (${n})` : ""}<ChevronDown className="h-4 w-4" aria-hidden /></Button></PopoverTrigger>
       <PopoverContent align="start" className="theme-site nb-filter-pop nb-explore-menu w-72" data-native-scroll><OptionList facet={facet} {...props} /></PopoverContent></Popover>;
   })}</div></div>;

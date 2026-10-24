@@ -16,7 +16,8 @@ import { EVENT_TYPES, humanize } from '@/lib/admin/entities';
 import { eventsQuery } from '@/lib/events.query';
 import { compactSearch } from '@/lib/search-params';
 import { closingSoon, dayKey, filterEvents, monthLabel, shiftMonth, validMonth, dateLabel, groupByMonth, isThisWeek, matchesListFilters, type EventRow } from '@/lib/events';
-import { useState } from 'react';
+import { memo, useMemo, useState } from 'react';
+import { ListFilterSelect } from '@/components/site/ListFilterSelect';
 import { SlidersHorizontal } from 'lucide-react';
 import { FilterSheet } from '@/components/site/FilterSheet';
 const searchSchema = z.object({ type: fallback(z.string(), '').default(''), city: fallback(z.string(), '').default(''), field: fallback(z.string(), '').default(''), online: fallback(z.boolean(), false).default(false), month: fallback(z.string(), '').default(''), view: fallback(z.string(), 'list').default('list'), archive: fallback(z.boolean(), false).default(false) });
@@ -32,28 +33,35 @@ export const Route = createFileRoute('/events')({
   errorComponent: ({ reset }) => { const client = useQueryClient(); return <div className="nb-container nb-section"><h1 className="nb-h2">Events couldn’t be loaded</h1><p className="nb-body mt-4 text-danger" role="alert">Please try again in a moment.</p><Button variant="ghost" className="nb-btn nb-btn-primary mt-6" onClick={async () => { await client.resetQueries({ queryKey: ['public-events'] }); reset(); }}>Try again</Button></div>; },
   notFoundComponent: () => <div className="nb-container nb-section"><h1 className="nb-h2">Events not found</h1></div>,
 });
-function MonthList({ events, now, label }: { events: EventRow[]; now: string; label?: string }) {
-  return <div>{label && <h2 className="nb-h2 mt-12">{label}</h2>}{groupByMonth(events).map(g => <section key={g.month || 'tba'} aria-label={g.month ? monthLabel(g.month) : 'Dates to be announced'}><h2 className="nb-month-heading">{g.month ? monthLabel(g.month) : 'Dates to be announced'}</h2><ul>{g.events.map(e => <EventRowItem key={e.id} event={e} now={now} />)}</ul></section>)}</div>;
-}
+const MonthList = memo(function MonthList({ events, now, label }: { events: EventRow[]; now: string; label?: string }) {
+  const groups = useMemo(() => groupByMonth(events), [events]);
+  return <div>{label && <h2 className="nb-h2 mt-12">{label}</h2>}{groups.map(g => <section key={g.month || 'tba'} aria-label={g.month ? monthLabel(g.month) : 'Dates to be announced'}><h2 className="nb-month-heading">{g.month ? monthLabel(g.month) : 'Dates to be announced'}</h2><ul>{g.events.map(e => <EventRowItem key={e.id} event={e} now={now} />)}</ul></section>)}</div>;
+});
 function Events() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const { data } = useSuspenseQuery(eventsQuery); const search = Route.useSearch(); const navigate = useNavigate({ from: '/events' });
   const calendar = search.view === 'calendar'; const currentMonth = dayKey(data.now).slice(0, 7); const month = validMonth(search.month) || currentMonth;
-  const fields = data.fields ?? [];
-  const list = { type: search.type, city: search.city, online: search.online, field: search.field };
-  const pick = (archive: boolean, patch: Partial<typeof list> = {}) => filterEvents(data.events, { type: '', city: '', month: '', archive }, data.now).filter(e => matchesListFilters(e, { ...list, ...patch }, fields));
-  const upcoming = pick(false); const past = pick(true).reverse();
-  const inCalendar = filterEvents(data.events, { type: '', city: '', month, archive: false }, data.now).filter(e => matchesListFilters(e, list, fields));
-  const types = EVENT_TYPES.filter((type) => pick(false, { type }).length > 0 || type === search.type);
-  const cities = [...new Set(pick(false, { city: '' }).map((event) => event.city).filter((city): city is string => Boolean(city)))].sort();
-  const fieldOptions = fields.filter(f => pick(false, { field: f.slug }).length > 0 || f.slug === search.field);
-  const deadlines = closingSoon(data);
+  const { upcoming, past, inCalendar, types, cities, fieldOptions, deadlines } = useMemo(() => {
+    const fields = data.fields ?? [];
+    const list = { type: search.type, city: search.city, online: search.online, field: search.field };
+    const future = filterEvents(data.events, { type: '', city: '', month: '', archive: false }, data.now);
+    const history = filterEvents(data.events, { type: '', city: '', month: '', archive: true }, data.now);
+    const pick = (patch: Partial<typeof list> = {}) => future.filter(e => matchesListFilters(e, { ...list, ...patch }, fields));
+    return {
+      upcoming: pick(), past: history.filter(e => matchesListFilters(e, list, fields)).reverse(),
+      inCalendar: filterEvents(future, { type: '', city: '', month, archive: false }, data.now).filter(e => matchesListFilters(e, list, fields)),
+      types: EVENT_TYPES.filter(type => pick({ type }).length > 0 || type === search.type),
+      cities: [...new Set(pick({ city: '' }).map(e => e.city).filter((city): city is string => Boolean(city)))].sort(),
+      fieldOptions: fields.filter(f => pick({ field: f.slug }).length > 0 || f.slug === search.field),
+      deadlines: closingSoon(data),
+    };
+  }, [data, search.type, search.city, search.online, search.field, month]);
   const update = (patch: Partial<typeof search>) => navigate({ search: (prev) => ({ ...prev, ...patch }), resetScroll: false });
   const filtered = Boolean(search.type || search.city || search.field || search.online);
   const controls = <div className="flex flex-wrap items-end gap-4 pb-6">
-    <label className="min-w-0 flex-1 basis-40"><span className="nb-small mb-2 block text-muted-foreground">Type</span><select aria-label="Event type" className="nb-input" value={search.type} onChange={e => update({ type: e.target.value })}><option value="">All types</option>{types.map(type => <option key={type} value={type}>{humanize(type)}</option>)}</select></label>
-    <label className="min-w-0 flex-1 basis-40"><span className="nb-small mb-2 block text-muted-foreground">City</span><select aria-label="City" className="nb-input" value={search.city} onChange={e => update({ city: e.target.value })}><option value="">All cities</option>{cities.map(city => <option key={city}>{city}</option>)}</select></label>
-    {fieldOptions.length > 0 && <label className="min-w-0 flex-1 basis-40"><span className="nb-small mb-2 block text-muted-foreground">Field</span><select aria-label="Field" className="nb-input" value={search.field} onChange={e => update({ field: e.target.value })}><option value="">All fields</option>{fieldOptions.map(f => <option key={f.id} value={f.slug}>{f.name}</option>)}</select></label>}
+    <ListFilterSelect label="Type" ariaLabel="Event type" allLabel="All types" value={search.type} options={types.map(type => ({ value: type, label: humanize(type) }))} onValueChange={type => { void update({ type }); }} />
+    <ListFilterSelect label="City" allLabel="All cities" value={search.city} options={cities.map(city => ({ value: city, label: city }))} onValueChange={city => { void update({ city }); }} />
+    {(fieldOptions.length > 0 || search.field) && <ListFilterSelect label="Field" allLabel="All fields" value={search.field} options={fieldOptions.map(f => ({ value: f.slug, label: f.name }))} onValueChange={field => { void update({ field }); }} />}
     <label className="flex min-h-11 items-center gap-3 nb-small"><Checkbox checked={search.online} onCheckedChange={v => update({ online: v === true })} />Online only</label>
     {filtered && <Button variant="ghost" className="nb-btn nb-btn-quiet" onClick={() => update({ type: '', city: '', field: '', online: false })}>Clear filters</Button>}
   </div>;

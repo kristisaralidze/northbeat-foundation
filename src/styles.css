@@ -1562,6 +1562,16 @@ html, body { overflow-x: clip; }
 .theme-site .nb-explore-option { padding: 8px; }
 .theme-site .nb-explore-option:hover, .theme-site .nb-explore-option:focus-within, .theme-site .nb-explore-select-option[data-highlighted] { background: var(--explore-menu-hover); color: var(--ink); }
 .theme-site .nb-explore-option[data-selected='true'], .theme-site .nb-explore-select-option[data-state='checked'] { color: var(--berry); background: color-mix(in srgb, var(--berry) 7%, var(--explore-menu-surface)); }
+.theme-site .nb-list-filter .nb-explore-filter-trigger { width: 100%; }
+.nb-events-page .nb-event-date { padding: 12px 4px; border: 1px solid var(--hairline); border-top: 2px solid var(--berry); border-radius: 4px; background: var(--background); }
+.nb-list-fact-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.nb-list-fact-badges > span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border: 1px solid var(--hairline); border-radius: 4px; background: var(--background); font-size: 12px; line-height: 1.5; }
+.nb-list-fact-badges svg { width: 12px; height: 12px; flex-shrink: 0; }
+.nb-events-page .nb-event-row .nb-h3 { transition: color 150ms ease; }
+.nb-events-page .nb-event-row:hover .nb-h3 { color: var(--berry); }
+.nb-opportunities-page .nb-entry-card-facts li { white-space: normal; overflow-wrap: anywhere; border: 1px solid var(--hairline); border-radius: 4px; background: var(--background); }
+.nb-opportunities-page .nb-entry-card { border-radius: 8px; border-top: 2px solid var(--hairline); }
+.nb-opportunities-page .nb-entry-card:hover { border-top-color: var(--berry); }
 
 /* Cards become editorial rows: thin top rule, no shadow, shift right on hover */
 .nb-public-page .nb-card { background: transparent; border: 0; border-top: 1px solid var(--hairline); border-radius: 0; padding: 1.25rem 2.5rem 1.25rem 0; position: relative; box-shadow: none; transition: transform .25s cubic-bezier(.22,1,.36,1); }

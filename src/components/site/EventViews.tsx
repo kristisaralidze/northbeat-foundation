@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ArrowUpRight, CalendarDays, MapPin } from 'lucide-react';
 import { humanize } from '@/lib/admin/entities';
@@ -10,11 +11,16 @@ export function EventList({ events }: { events: EventRow[] }) {
   </article>)}</div>;
 }
 export function EventCalendar({ events, month, today }: { events: EventRow[]; month: string; today: string }) {
+  const days = useMemo(() => calendarDays(month), [month]);
+  const byDay = useMemo(() => {
+    const ranges = events.map(event => ({ event, ...eventDays(event) }));
+    return new Map(days.map(day => [day, ranges.filter(r => r.start && day >= r.start && day <= r.end).map(r => r.event)]));
+  }, [events, days]);
   return <div className="overflow-x-auto pb-2"><div className="nb-calendar" aria-label="Event calendar">
     {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => <div key={day} className="nb-eyebrow border-b border-hairline p-3 text-center">{day}</div>)}
-    {calendarDays(month).map((day) => <div key={day} className={`nb-calendar-day ${day.slice(0, 7) !== month ? 'bg-frost-wash' : 'bg-background'}`}>
+    {days.map((day) => <div key={day} className={`nb-calendar-day ${day.slice(0, 7) !== month ? 'bg-frost-wash' : 'bg-background'}`}>
       <time dateTime={day} className={`nb-small ${day === today ? 'font-semibold text-primary' : 'text-muted-foreground'}`} aria-label={dateLabel(day)}>{Number(day.slice(-2))}{day === today && <span className="sr-only"> today</span>}</time>
-      <div className="mt-2 space-y-2">{events.filter((event) => { const range = eventDays(event); return range.start && day >= range.start && day <= range.end; }).map((event) => <Link key={event.id} to="/event/$slug" params={{ slug: event.slug }} className="nb-calendar-entry">{event.title}</Link>)}</div>
+      <div className="mt-2 space-y-2">{(byDay.get(day) ?? []).map((event) => <Link key={event.id} to="/event/$slug" params={{ slug: event.slug }} className="nb-calendar-entry">{event.title}</Link>)}</div>
     </div>)}
   </div></div>;
 }

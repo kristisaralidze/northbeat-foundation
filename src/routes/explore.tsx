@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OrganisationCard } from "@/components/site/OrganisationCard";
@@ -43,7 +43,7 @@ function Explore() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const results = sortOrganisations(filterOrganisations(data, search), search.sort);
+  const results = useMemo(() => sortOrganisations(filterOrganisations(data, search), search.sort), [data, search]);
   const label = (facet: Facet, value: string) => facet === "group" ? GROUP_OPTIONS.find(g => g.value === value)?.label ?? humanize(value) : facet === "type" ? humanize(value) : data.terms.find((term) => term.kind === facet && term.slug === value)?.name ?? humanize(value);
   const selected = FACETS.flatMap((facet) => search[facet].map((value) => ({ facet, value, label: label(facet, value) })));
   const toggle = (facet: Facet, value: string) => { void navigate({ search: (prev) => ({ ...prev, [facet]: prev[facet].includes(value) ? prev[facet].filter((v) => v !== value) : [...prev[facet], value] }), resetScroll: false }); };
