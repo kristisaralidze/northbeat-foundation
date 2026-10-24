@@ -124,10 +124,15 @@ export function HeartbeatHero() {
       prevCur = cur; cur += (target - cur) * Math.min(1, dt * 3.5);
       smx += (mx - smx) * Math.min(1, dt * 3); smy += (my - smy) * Math.min(1, dt * 3);
 
-      const F = phone ? Math.min(0.75 * H, 1.35 * W) : Math.min(0.85 * H, 0.9 * W);
-      const CX = (phone ? 0.5 : 0.38) * W, HY = (phone ? 0.46 : 0.42) * H;
+      // Reserve the bottom for the Next up card (its height + 24px) and fit the nearest line point above it.
+      const nextEl = host.querySelector<HTMLElement>('.nb-heartbeat-next');
+      const reserve = (nextEl?.offsetHeight || (phone ? 76 : 76)) + 24 + (phone ? 16 : 24);
+      const usable = H - reserve;
+      const HY = (phone ? 0.36 : 0.34) * H;
+      const F = Math.min(phone ? Math.min(0.75 * H, 1.35 * W) : Math.min(0.85 * H, 0.9 * W), (usable - HY - 8) * 3.6 / 2.95);
+      const CX = (phone ? 0.5 : 0.38) * W;
       const camX = phone ? -0.6 : -1.8 + (smx - 0.5) * 2;
-      const k = heightScale(maxAmp, H, F, 6);
+      const k = heightScale(maxAmp, usable - 96 - (phone ? 70 : 80), F, 3.6, 1);
       const rise = openT < 1 ? 0 : clamp01((openT - 1) / 2.4);
       const camH = (opening ? 1 + 1.6 * smoothstep(rise) : 2.6) + (0.5 - smy) * 0.7;
       const m = reduced ? 1 : smoothstep((p - FLIGHT_END) / (UNROLL_END - FLIGHT_END));
@@ -153,6 +158,7 @@ export function HeartbeatHero() {
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
+      if (m < 1) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, usable + (H - usable) * smoothstep(m)); ctx.clip(); }
       if (t < pulseUntil) { const s = pulseScale; ctx.translate(W / 2, H / 2); ctx.scale(s, s); ctx.translate(-W / 2, -H / 2); }
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
@@ -212,7 +218,7 @@ export function HeartbeatHero() {
       type Box = { x: number; y: number; w: number; h: number };
       const overlaps = (a: Box, list: Box[]) => list.some(l => a.x < l.x + l.w && a.x + a.w > l.x && a.y < l.y + l.h && a.y + a.h > l.y);
       const nextHits: Hit[] = []; const logoBoxes: Box[] = []; const labels: Box[] = []; const flatDates: number[] = [];
-      const visibleBeats = beats.filter(b => m > 0 || (b.day >= cur - 0.3 && b.day <= cur + 12)).slice(0, 40);
+      const visibleBeats = beats.filter(b => m > 0 || (b.day >= cur && b.day <= cur + 12)).slice(0, 40);
       const ordered = [...visibleBeats].sort((a, b) => a.day - b.day);
       const placed: { b: Beat; peak: { x: number; y: number }; r: number; cy: number; alpha: number; mi: number; pp: ReturnType<typeof proj>; fp: { x: number; y: number } }[] = [];
       let drawnLogos = 0;
@@ -284,6 +290,8 @@ export function HeartbeatHero() {
         }
       }
       ctx.globalAlpha = 1;
+      if (m < 1) ctx.restore();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       hits.current = nextHits;
 
       // HTML overlays.

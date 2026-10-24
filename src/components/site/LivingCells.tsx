@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { livingCellsQuery } from '@/lib/ecosystem.query';
-import { CELL_GROUPS, CELL_LINKS, cellGroup, cellHref, relationSentence } from '@/lib/living-cells';
+import { CELL_GROUPS, CELL_LINKS, cellGroup, cellHref, openingProgress, relationSentence } from '@/lib/living-cells';
 import { createCellScene, type CellScene, type CellSelection } from './living-cells-canvas';
 import { OrganisationLogo } from './OrganisationLogo';
 
@@ -10,7 +10,7 @@ export function LivingCells() {
   const { data } = useSuspenseQuery(livingCellsQuery);
   const canvasRef = useRef<HTMLCanvasElement>(null), sceneRef = useRef<CellScene | null>(null);
   const selectionRef = useRef<CellSelection>(null), drawRef = useRef<(() => void) | null>(null);
-  const elapsedRef = useRef({ time: 0, opening: 0, started: false });
+  const elapsedRef = useRef({ time: 0, built: false });
   const [selection, setSelection] = useState<CellSelection>(null);
   const select = (value: CellSelection) => {
     if (sameSelection(value, selectionRef.current)) return;
@@ -19,19 +19,24 @@ export function LivingCells() {
   useEffect(() => {
     const canvas = canvasRef.current; if (!canvas) return;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let scene: CellScene | null = null, visible = false, started = elapsedRef.current.started, raf = 0, previous = 0, time = elapsedRef.current.time, opening = elapsedRef.current.opening, disposed = false;
-    const draw = () => scene?.draw(motion.matches ? 0 : time, motion.matches ? 10 : opening, selectionRef.current);
+    let scene: CellScene | null = null, visible = false, raf = 0, previous = 0, time = elapsedRef.current.time, built = elapsedRef.current.built, opening = built ? 1 : 0, disposed = false;
+    // Scroll-linked build: reversible until complete, then stays built for the visit.
+    const measure = () => { if (built) return 1; const top = canvas.closest('section')?.getBoundingClientRect().top ?? 0; return openingProgress(top, window.innerHeight); };
+    const draw = () => scene?.draw(motion.matches ? 0 : time, motion.matches ? 1 : opening, selectionRef.current);
     const tick = (now: number) => {
       raf = 0; if (disposed || !visible || document.hidden) { previous = 0; return; }
-      const dt = previous ? Math.min((now - previous) / 1000, .05) : 0; previous = now; time += dt; opening += dt;
-      elapsedRef.current = { time, opening, started };
+      const dt = previous ? Math.min((now - previous) / 1000, .05) : 0; previous = now;
+      opening = measure();
+      if (opening >= 1 && !built) { built = true; time = 0; }
+      if (built) time += dt;
+      elapsedRef.current = { time, built };
       draw(); if (!motion.matches) raf = requestAnimationFrame(tick);
     };
     const resume = () => { if (visible && !document.hidden && !disposed) { if (motion.matches) draw(); else if (!raf) raf = requestAnimationFrame(tick); } };
     const resize = () => { scene = createCellScene(canvas, data, motion.matches); sceneRef.current = scene; draw(); resume(); };
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry?.isIntersecting ?? false;
-      if (visible) { if (!started) { started = true; opening = 0; elapsedRef.current.started = true; } resume(); }
+      if (visible) resume();
       else { cancelAnimationFrame(raf); raf = 0; previous = 0; }
       canvas.dataset['animating'] = String(visible && !motion.matches);
     }, { threshold: .02 });
