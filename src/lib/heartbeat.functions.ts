@@ -15,11 +15,11 @@ export const getHeartbeat = createServerFn({ method: 'GET' }).handler(async (): 
   const to = new Date(now.getTime() + 37 * 86_400_000).toISOString();
   const [events, opps] = await Promise.all([
     client.from('events').select('id,slug,title,starts_at,city,registration_url').eq('status', 'published').gte('starts_at', from).lte('starts_at', to).limit(500),
-    client.from('opportunities').select('id,slug,title,deadline_at,location').eq('status', 'published').gte('deadline_at', from).lte('deadline_at', to).limit(500),
+    client.from('opportunities').select('id,slug,title,deadline_at,location').eq('status', 'published').gte('deadline_at', now.toISOString()).lte('deadline_at', to).limit(500),
   ]);
   if (events.error || opps.error) throw new Error('The calendar could not be loaded.');
   const eventIds = (events.data ?? []).map(e => e.id); const oppIds = (opps.data ?? []).map(o => o.id);
-  const orgCols = 'name,website,logo_url,logo_choice,status';
+  const orgCols = 'slug,name,website,logo_url,logo_choice,status,logo_resolved_url,logo_tone,logo_status';
   const [eo, oo] = await Promise.all([
     eventIds.length ? client.from('organisation_events').select(`event_id, organisations(${orgCols})`).in('event_id', eventIds) : Promise.resolve({ data: [], error: null }),
     oppIds.length ? client.from('organisation_opportunities').select(`opportunity_id, organisations(${orgCols})`).in('opportunity_id', oppIds) : Promise.resolve({ data: [], error: null }),
@@ -28,7 +28,7 @@ export const getHeartbeat = createServerFn({ method: 'GET' }).handler(async (): 
   const add = (id: string, org: unknown) => {
     const o = org as (HeartbeatOrg & { status: string }) | null;
     if (!o || o.status !== 'published') return;
-    orgsFor.set(id, [...(orgsFor.get(id) ?? []), { name: o.name, website: o.website, logo_url: o.logo_url, logo_choice: o.logo_choice }]);
+    orgsFor.set(id, [...(orgsFor.get(id) ?? []), { slug:o.slug,logo_resolved_url:o.logo_resolved_url,logo_tone:o.logo_tone,logo_status:o.logo_status,name: o.name, website: o.website, logo_url: o.logo_url, logo_choice: o.logo_choice }]);
   };
   for (const row of (eo.data ?? []) as { event_id: string; organisations: unknown }[]) add(row.event_id, row.organisations);
   for (const row of (oo.data ?? []) as { opportunity_id: string; organisations: unknown }[]) add(row.opportunity_id, row.organisations);

@@ -170,7 +170,7 @@
   --berry: oklch(0.43 0.135 358);
   --berry-hover: oklch(0.37 0.135 358);
   --berry-soft: oklch(0.94 0.03 358);
-  --signal: oklch(0.6 0.16 45);
+  --signal: var(--berry);
   --frost: oklch(0.955 0.018 300);
   /* Footer surface: frost at 60% over cream, as a named token. */
   --frost-wash: color-mix(in oklab, var(--frost) 60%, var(--cream));
@@ -1413,3 +1413,31 @@ html, body { overflow-x: clip; }
 .nb-event-facts { display: grid; gap: 24px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 @media (min-width: 768px) { .nb-event-facts { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 .nb-event-fact-value { font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-size: 2.25rem; line-height: 1.1; color: var(--ink); }
+
+/* Value pass: stable shared logo tiles and restrained urgency. */
+.theme-site .nb-org-logo, .nb-org-logo { display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:48px;height:48px;padding:0;border-radius:8px;background:var(--snow,var(--background));color:var(--ink,var(--foreground));overflow:hidden;border:1px solid var(--hairline,var(--border)); }
+.theme-site .nb-org-logo[data-tone="light"],.nb-org-logo[data-tone="light"] {background:var(--ink,var(--foreground));color:var(--snow,var(--background));}
+.theme-site .nb-org-logo img,.nb-org-logo img {width:100%;height:100%;padding:12%;object-fit:contain;}
+.nb-logo-name {font-family:var(--font-body);font-size:9px;line-height:1.1;text-align:center;overflow-wrap:anywhere;max-height:100%;padding:4px;}
+.theme-site .nb-official-logo-large {width:72px;height:72px;}
+.theme-site .nb-countdown {border-radius:8px;background:transparent;color:var(--muted-foreground);padding:4px 8px;border:1px solid transparent;}
+.theme-site .nb-countdown-filled {background:var(--berry);border-color:var(--berry);color:var(--snow);}
+.theme-site .nb-countdown-outline {background:transparent;border-color:var(--berry);color:var(--berry);}
+.theme-site .nb-countdown-plain {padding:0;color:var(--muted-foreground);}
+.nb-directory-grid {display:grid;grid-template-columns:minmax(0,1fr);gap:16px 32px;}
+@media(min-width:768px){.nb-directory-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+.nb-directory-row {display:grid;grid-template-columns:40px minmax(0,1fr) 44px;align-items:start;gap:16px;padding:16px 0;min-width:0;}
+.theme-site .nb-directory-row .nb-org-logo{width:40px;height:40px;}
+.nb-directory-description {font-size:14px;line-height:1.5;margin-top:8px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.nb-calendar-icon {width:44px;height:44px;padding:0;display:inline-flex;justify-content:center;align-items:center;color:var(--berry);}
+.nb-event-organiser-row {display:flex;align-items:center;gap:16px;}
+.nb-search-logo-space {display:flex;width:32px;height:32px;flex:0 0 32px;border-radius:8px;background:var(--accent);overflow:hidden;}
+.theme-site .nb-search-logo-space .nb-org-logo{width:32px;height:32px;}
+.nb-search-logo-space .nb-logo-name{font-size:7px;}
+.nb-opportunity-facts {display:flex;flex-wrap:wrap;align-items:center;gap:24px;margin:24px 0 32px;}
+.nb-opportunity-facts > p {display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.nb-opportunity-amount {font-family:var(--font-display);font-size:40px;line-height:1.2;overflow-wrap:anywhere;}
+.nb-apply-steps {list-style:decimal;padding-left:24px;max-width:760px;}
+.nb-apply-steps li+li {margin-top:16px;}
+.theme-site .nb-heartbeat-next .nb-org-logo {width:40px;height:40px;}
+.theme-site .nb-heartbeat-next .nb-org-logo img {width:100%;height:100%;}

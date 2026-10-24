@@ -1,4 +1,4 @@
-export type HeartbeatOrg = { name: string; website: string | null; logo_url: string | null; logo_choice: string | null };
+export type HeartbeatOrg = {slug?:string;logo_resolved_url?:string|null;logo_tone?:string|null;logo_status?:string|null; name: string; website: string | null; logo_url: string | null; logo_choice: string | null };
 export type HeartbeatItem = { id: string; slug: string; kind: 'event' | 'opportunity'; title: string; date: string; city: string | null; website?: string | null; orgs: HeartbeatOrg[] };
 export type HeartbeatData = { items: HeartbeatItem[]; now: string };
 export type Beat = { day: number; amp: number; items: HeartbeatItem[]; resting: false };

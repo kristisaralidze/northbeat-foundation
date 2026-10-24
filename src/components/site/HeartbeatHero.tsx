@@ -3,7 +3,8 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { heartbeatQuery } from '@/lib/heartbeat.query';
 import { buildBeats, clamp01, heightAt, HORIZON, localKey, restingBeats, smoothstep, beatHeight, buildStops, dayAtProgress, sectionHeightVh, heightScale, REST_HEIGHT, mergeBeats, beatTitle, type Beat, type HeartbeatItem } from '@/lib/heartbeat';
-import { chosenLogoSrc } from '@/components/site/OrganisationLogo';
+import { countdownClass } from '@/lib/detail';
+import { OrganisationLogo, chosenLogoSrc } from '@/components/site/OrganisationLogo';
 import { publicTitle } from '@/lib/profiles';
 import { brandfetchLogoUrl } from '@/lib/organisation-logo';
 
@@ -18,8 +19,8 @@ function dateFor(day: number, long = false) {
 }
 /** One logo per item: the organiser's official logo, else the Brandfetch icon for the event's own website. */
 function itemLogo(item: HeartbeatItem) {
-  for (const o of item.orgs) { const src = chosenLogoSrc(o.logo_choice, o.logo_url, o.website); if (src) return src; }
-  return brandfetchLogoUrl(item.website ?? null, 'icon');
+  for (const o of item.orgs) { const src = (o.logo_choice==='upload'?o.logo_url:o.logo_resolved_url); if (src) return src; }
+  return null;
 }
 /** "17 Nov" or "17–18 Nov" for a merged beat. */
 function beatDate(b: Beat, long = false) {
@@ -124,6 +125,7 @@ export function HeartbeatHero() {
       // Transition: about one screen of scroll at the end. First half: 3D fades and sinks 40px. Second half: flat timeline draws left to right.
       const span = Math.min(0.35, H / Math.max(1, host.offsetHeight - H));
       const FLIGHT_END = Math.max(0.3, 1 - span - 0.04);
+      const flight = !reduced && p < FLIGHT_END; if(host.dataset['flight']!==String(flight)){host.dataset['flight']=String(flight);window.dispatchEvent(new Event('northbeat:flight'));}
       const fadeT = reduced ? 1 : smoothstep((p - FLIGHT_END) / (span / 2));
       const drawT = reduced ? 1 : clamp01((p - FLIGHT_END - span / 2) / (span / 2));
       if (opening && !openStart) openStart = t;
@@ -410,13 +412,11 @@ export function HeartbeatHero() {
       <h2 id="heartbeat-heading" className="sr-only">Events and deadlines in the next 35 days</h2>
       <p ref={passing} className="nb-heartbeat-now" aria-hidden="true">Coming up in Nordic health</p>
       {next && nextItem && <button key={next.key} type="button" className="nb-heartbeat-next" onClick={openNext}>
-        {nextLogo && !nextLogoFailed
-          ? <img src={nextLogo} alt="" width={32} height={32} onError={() => setNextLogoFailed(true)} />
-          : nextItem.orgs[0] && <span className="nb-heartbeat-next-org">{nextItem.orgs[0].name}</span>}
+        <OrganisationLogo name={nextItem.orgs[0]?.name ?? nextItem.title} slug={nextItem.orgs[0]?.slug} uploaded={nextItem.orgs[0]?.logo_url} choice={nextItem.orgs[0]?.logo_choice} resolved={nextItem.orgs[0]?.logo_resolved_url} tone={nextItem.orgs[0]?.logo_tone} status={nextItem.orgs[0]?.logo_status} />
         <span className="nb-heartbeat-next-text">
           <span className="nb-heartbeat-next-label">Next up</span>
           <span className="nb-heartbeat-next-title">{beatTitle(next.beat.items.map(i => publicTitle(i.title)))}</span>
-          <span className="nb-heartbeat-next-meta">{beatDate(next.beat, true)}, <span className={deadline ? 'nb-heartbeat-next-deadline' : undefined}>{whenText}</span></span>
+          <span className="nb-heartbeat-next-meta">{beatDate(next.beat, true)}, <span className={countdownClass(nextDays)}>{whenText}</span></span>
         </span>
       </button>}
       <div ref={finale} className="nb-heartbeat-finale">

@@ -4,7 +4,6 @@ import {useSuspenseQuery} from '@tanstack/react-query';
 import {Button} from '@/components/ui/button';
 import {CalendarMenu} from './CalendarMenu';
 import {OrganisationLogo} from './OrganisationLogo';
-import {EntryLink} from './ProfilePage';
 import {opportunitiesQuery} from '@/lib/opportunities.query';
 import {amountLabel,isClosed,isRolling} from '@/lib/opportunities';
 import {dateLabel} from '@/lib/events';
@@ -34,7 +33,7 @@ export function OpportunityDetail({profile}:{profile:PublicProfile}) {
     {benefit&&<section className="nb-detail-section"><h2 className="nb-h2 mb-5">What you get</h2><p className="nb-body whitespace-pre-line">{benefit}</p></section>}
     {steps.length>0&&<section className="nb-detail-section"><h2 className="nb-h2 mb-5">How to apply</h2><ol className="nb-apply-steps nb-body">{steps.map(s=><li key={s}>{s}</li>)}</ol></section>}
     {tips.length>0&&<section className="nb-detail-section"><h2 className="nb-h2 mb-5">Tips</h2><ul className="nb-check-list nb-body">{tips.map(s=><li key={s}>{s}</li>)}</ul></section>}
-    {providers.length>0&&<section className="nb-detail-section"><h2 className="nb-h2 mb-5">Provider</h2><ul className="space-y-4">{providers.map(p=><li key={p.id} className="flex items-center gap-4"><OrganisationLogo name={p.title} slug={p.slug}/><h3 className="nb-h3"><EntryLink kind="organisations" entry={p} className="nb-link">{p.title}</EntryLink></h3></li>)}</ul></section>}
+    {providers.length>0&&<section className="nb-detail-section"><h2 className="nb-h2 mb-5">Provider</h2><ul className="space-y-4">{providers.map(p=><li key={p.id} className="flex items-center gap-4"><OrganisationLogo name={p.title} slug={p.slug}/><h3 className="nb-h3"><Link to="/org/$slug" params={{slug:p.slug}} className="nb-link">{p.title}</Link></h3></li>)}</ul></section>}
     {similar.length>0&&<section className="nb-detail-section"><h2 className="nb-h2 mb-5">Similar</h2><ul className="space-y-5">{similar.map(o=><li key={o.id}><h3 className="nb-h3"><Link to="/opportunity/$slug" params={{slug:o.slug}} className="nb-link">{o.title}</Link></h3>{o.deadline_at&&<p className="nb-small text-muted-foreground">Closes {dateLabel(o.deadline_at)}</p>}</li>)}</ul></section>}
   </article>;
 }

@@ -40,7 +40,7 @@ function SearchDialog({ onClose }: { onClose: () => void }) {
   function onKey(e: React.KeyboardEvent) {
     if (e.key === 'ArrowDown') { e.preventDefault(); setActive(a => Math.min(a + 1, flat.length - 1)); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(a => Math.max(a - 1, 0)); }
-    else if (e.key === 'Enter' && flat[active]) { e.preventDefault(); go(flat[active]!); }
+    else if (e.key === 'Enter' && flat[active]) { e.preventDefault(); const item=flat[active];if(item)go(item); }
   }
   let index = -1;
   return <Dialog open onOpenChange={o => { if (!o) onClose(); }}>
@@ -57,7 +57,7 @@ function SearchDialog({ onClose }: { onClose: () => void }) {
         {query.trim() && data && flat.length === 0 && <p className="nb-small p-4 text-muted-foreground">Nothing found for "{query.trim()}".</p>}
         {groups.map(g => <div key={g.kind} className="py-1"><p className="nb-small px-3 py-2 text-muted-foreground">{g.label}</p>{g.items.map(item => { index += 1; const i = index;
           return <a key={`${item.kind}-${item.slug}`} id={`sr-${i}`} role="option" aria-selected={i === active} data-active={i === active} href={itemHref(item)} className="nb-search-result" onMouseMove={() => setActive(i)} onClick={e => { e.preventDefault(); go(item); }}>
-            {item.kind === 'organisation' && <OrganisationLogo name={item.title} uploaded={item.logo} website={item.website} choice={item.logoChoice ?? 'icon'} />}
+            <span className="nb-search-logo-space">{item.kind === 'organisation' ? <OrganisationLogo name={item.title} slug={item.slug} uploaded={item.logo} resolved={item.logoResolved} tone={item.logoTone} status={item.logoStatus} website={item.website} choice={item.logoChoice ?? 'icon'} /> : item.organiserSlug ? <OrganisationLogo name={item.organiserName ?? item.title} slug={item.organiserSlug} /> : item.kind === 'event' || item.kind === 'opportunity' ? <OrganisationLogo name={item.title} /> : null}</span>
             <span className="min-w-0 flex-1"><span className="block truncate">{item.title}</span>{(item.type || item.city) && <span className="nb-small block truncate text-muted-foreground">{[item.type ? humanize(item.type) : null, item.online ? 'Online' : item.city].filter(Boolean).join(', ')}</span>}</span>
           </a>; })}</div>)}
       </div>

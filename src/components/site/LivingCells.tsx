@@ -71,7 +71,7 @@ export function LivingCells() {
         } else select(hit);
       }} />
       {selectedOrg && group && <aside className="nb-cells-card" aria-live="polite">
-        {selectedOrg && <OrganisationLogo name={selectedOrg.name} website={selectedOrg.website} uploaded={selectedOrg.logo_url} choice={selectedOrg.logo_choice} />}
+        {selectedOrg && <OrganisationLogo name={selectedOrg.name} slug={selectedOrg.slug} website={selectedOrg.website} uploaded={selectedOrg.logo_url} choice={selectedOrg.logo_choice} />}
         <a className="nb-cells-card-title" href={href}>{selectedOrg?.name ?? group.name}</a>
         <p>{group.name}</p>
         {sentences.length > 0 && <ul>{[...new Set(sentences)].map(sentence => <li key={sentence}>{sentence}</li>)}</ul>}

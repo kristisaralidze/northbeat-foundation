@@ -7,7 +7,7 @@ import { SaveButton } from './SaveButton';
 export function OrganisationCard({ organisation: org, terms }: { organisation: DirectoryOrganisation; terms: DirectoryTerm[] }) {
   const country = terms.filter(t => t.kind === 'country' && org.termIds.includes(t.id)).map(t => t.name).join(', ');
   return <article data-result-id={org.id} className="nb-directory-row">
-    <OrganisationLogo name={org.name} slug={org.slug} uploaded={org.logo_url} website={org.website} choice={org.logo_choice ?? null} />
+    <OrganisationLogo name={org.name} slug={org.slug} uploaded={org.logo_url} website={org.website} choice={org.logo_choice ?? null} resolved={org.logo_resolved_url} tone={org.logo_tone} status={org.logo_status} />
     <div className="min-w-0"><h2 className="nb-h3"><Link to="/org/$slug" params={{slug:org.slug}} className="nb-org-link">{org.name}</Link></h2>
       <p className="nb-small text-muted-foreground">{humanize(org.type)} · {[org.city,country].filter(Boolean).join(', ')}</p>
       {org.parent_name && <p className="nb-small text-muted-foreground">Part of {org.parent_name}</p>}

@@ -63,7 +63,7 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
   const website = safeWebUrl(text(row, 'website')); const description = text(row, 'description');
   const video = officialVideo(text(row, 'video_url'), text(row, 'video_source_url'));
   const accent = isOrg ? brandColour(row['brand_accent']) : null;
-  const logo = <OrganisationLogo name={profile.title} uploaded={isOrg ? text(row,'logo_url') : officialLogo(text(row,'logo_url'), text(row,'registration_url') ?? text(row,'source_url'), text(row,'logo_image_source'), text(row,'logo_image_source_url'))} website={isOrg ? text(row,'website') : text(row,'registration_url') ?? text(row,'source_url')} choice={isOrg ? (text(row,'logo_choice') ?? 'icon') : 'verified'} large eager />;
+  const logo = <OrganisationLogo name={profile.title} slug={isOrg ? row.slug : undefined} resolved={isOrg ? text(row,'logo_resolved_url') : undefined} tone={text(row,'logo_tone')} status={isOrg ? text(row,'logo_status') : undefined} uploaded={isOrg ? text(row,'logo_url') : officialLogo(text(row,'logo_url'), text(row,'registration_url') ?? text(row,'source_url'), text(row,'logo_image_source'), text(row,'logo_image_source_url'))} website={isOrg ? text(row,'website') : text(row,'registration_url') ?? text(row,'source_url')} choice={isOrg ? (text(row,'logo_choice') ?? 'icon') : 'verified'} large eager />;
   const organisers = connections.flatMap(group => group.entries);
   const organiser = organisers.find(entry => entry.roles.some(role => /organi[sz]er|host/i.test(role))) ?? organisers[0];
   const register = safeWebUrl(text(row, 'registration_url')); const eventSite = safeWebUrl(text(row, 'source_url'));
@@ -98,7 +98,7 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
         {businessId && <p className="nb-registry-note">Verified in the Finnish Trade Register. <a className="nb-link" href={ytjRecordUrl(businessId)} target="_blank" rel="noopener noreferrer">View the official YTJ record</a></p>}
       </div>
     </header>
-    {isOrg && profile.related.some(g=>g.label==='Part of') && <p className="nb-small">Part of {profile.related.filter(g=>g.label==='Part of').flatMap(g=>g.entries).map(e=><DetailLink key={e.id} item={{...e,kind:'organisations'}}>{e.title}</DetailLink>)}</p>}
+    {isOrg && row['logo_shared_from'] && profile.related.some(g=>g.label==='Part of') && <p className="nb-small">Part of {profile.related.filter(g=>g.label==='Part of').flatMap(g=>g.entries).map(e=><DetailLink key={e.id} item={{...e,kind:'organisations'}}>{e.title}</DetailLink>)}</p>}
     {isOrg && offerChips(text(row,'type') ?? '',row['offer_chips']).length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">How they can help you</h2><ul className="nb-detail-chips">{offerChips(text(row,'type') ?? '',row['offer_chips']).map(chip=><li key={chip} className="nb-reason-chip">{chip}</li>)}</ul></section>}
     {actions}
     {isOrg && detail && <OpenNow items={detail.coming} now={now} />}

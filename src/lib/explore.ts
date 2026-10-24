@@ -12,7 +12,7 @@ export type DirectoryTerm = { id: string; kind: string; name: string; slug: stri
 export type DirectoryOrganisation = {
   id: string; slug: string; name: string; type: string; short_description: string | null;
   logo_url: string | null; cover_image_url?: string | null; published_at?: string | null; website: string | null; city: string | null; termIds: string[];
-  logo_choice?: string | null; prominence?: number; connections?: number; logo_image_source?: string | null; logo_image_source_url?: string | null; image_source_url?: string | null;
+  logo_resolved_url?: string | null; logo_tone?: string | null; logo_status?: string | null; logo_shared_from?: string | null; parent_name?: string | null; parent_slug?: string | null; logo_choice?: string | null; prominence?: number; connections?: number; logo_image_source?: string | null; logo_image_source_url?: string | null; image_source_url?: string | null;
 };
 export type DirectoryData = { organisations: DirectoryOrganisation[]; terms: DirectoryTerm[] };
 export const EMPTY_SEARCH: ExploreSearch = { q: "", sort: "featured", group: [], type: [], field: [], sub_area: [], country: [], stage: [] };

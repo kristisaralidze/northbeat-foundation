@@ -16,6 +16,7 @@ export function OpportunityCard({ opportunity: o, now }: { opportunity: Opportun
   const cal: CalendarEvent | null = o.deadline_at && days !== null && days >= 0 ? { id: o.id, title: `Deadline: ${publicTitle(o.title)}`, start: o.deadline_at, end: null, allDay: true, location: '', description: `Apply: ${apply}`, url: apply } : null;
   const when = o.deadline_at ? (days !== null && days < 0 ? `Closed ${friendlyDate(o.deadline_at, now)}` : `Closes ${friendlyDate(o.deadline_at, now)}`) : isRolling(o) ? 'Open all year' : 'Next call to be announced';
   return <EntryCard id={o.id} kind="opportunity" slug={o.slug} title={publicTitle(o.title)}
+    media={<OrganisationLogo name={o.provider?.name ?? publicTitle(o.title)} slug={o.provider?.slug} />}
     link={<Link to="/opportunity/$slug" params={{ slug: o.slug }} className="nb-org-link">{publicTitle(o.title)}</Link>}
     line={o.summary ? publicCopy(o.summary) : null}
     facts={[humanize(o.type), amount || (o.type === 'job' ? o.location : null), when]}

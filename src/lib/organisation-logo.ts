@@ -15,7 +15,7 @@ export function organisationLogoUrl(uploaded?: string | null, website?: string |
   const domain = organisationDomain(website);
   return domain && clientId.trim() ? `https://cdn.brandfetch.io/domain/${domain}/w/128/h/128/fallback/404/type/icon?c=${encodeURIComponent(clientId.trim())}` : null;
 }
-export const LOGO_CHOICES = ['icon', 'icon-dark', 'logo', 'logo-dark', 'symbol', 'symbol-dark'] as const;
+export const LOGO_CHOICES = ['icon', 'icon-dark', 'logo', 'logo-dark'] as const;
 export type LogoChoice = typeof LOGO_CHOICES[number] | 'upload';
 /** Hotlinked Brandfetch CDN URL for one logo version; fallback=404 errors instead of the placeholder. */
 export function brandfetchLogoUrl(website: string | null | undefined, choice: string = 'icon', clientId = BRANDFETCH_CLIENT_ID): string | null {

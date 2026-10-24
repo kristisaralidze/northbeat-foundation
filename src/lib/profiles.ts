@@ -41,9 +41,10 @@ export const ORG_RELATION_LABELS: Record<string, { outgoing: string; incoming: s
   invested_in: { outgoing: 'Invested in', incoming: 'Backed by' },
   spun_out_of: { outgoing: 'Spun out of', incoming: 'Spinouts' },
   acquired: { outgoing: 'Acquired', incoming: 'Acquired by' },
+  part_of: { outgoing: 'Part of', incoming: 'Sub-units' },
   partner_of: { outgoing: 'Partners', incoming: 'Partners' },
 };
-export const ORG_RELATION_ORDER = ['Invested in', 'Backed by', 'Spun out of', 'Spinouts', 'Acquired by', 'Acquired', 'Partners'];
+export const ORG_RELATION_ORDER = ['Invested in', 'Backed by', 'Spun out of', 'Spinouts', 'Acquired by', 'Acquired', 'Partners', 'Part of', 'Sub-units'];
 export function orgRelationLabel(relation: string, direction: 'outgoing' | 'incoming'): string {
   return ORG_RELATION_LABELS[relation]?.[direction] ?? 'Related organisations';
 }
