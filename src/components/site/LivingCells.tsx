@@ -10,6 +10,7 @@ export function LivingCells() {
   const { data } = useSuspenseQuery(livingCellsQuery);
   const canvasRef = useRef<HTMLCanvasElement>(null), sceneRef = useRef<CellScene | null>(null);
   const selectionRef = useRef<CellSelection>(null), drawRef = useRef<(() => void) | null>(null);
+  const elapsedRef = useRef({ time: 0, opening: 0, started: false });
   const [selection, setSelection] = useState<CellSelection>(null);
   const select = (value: CellSelection) => {
     if (sameSelection(value, selectionRef.current)) return;
@@ -18,18 +19,19 @@ export function LivingCells() {
   useEffect(() => {
     const canvas = canvasRef.current; if (!canvas) return;
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let scene: CellScene | null = null, visible = false, started = false, raf = 0, previous = 0, time = 0, opening = 0, disposed = false;
+    let scene: CellScene | null = null, visible = false, started = elapsedRef.current.started, raf = 0, previous = 0, time = elapsedRef.current.time, opening = elapsedRef.current.opening, disposed = false;
     const draw = () => scene?.draw(motion.matches ? 0 : time, motion.matches ? 10 : opening, selectionRef.current);
     const tick = (now: number) => {
       raf = 0; if (disposed || !visible || document.hidden) { previous = 0; return; }
       const dt = previous ? Math.min((now - previous) / 1000, .05) : 0; previous = now; time += dt; opening += dt;
+      elapsedRef.current = { time, opening, started };
       draw(); if (!motion.matches) raf = requestAnimationFrame(tick);
     };
     const resume = () => { if (visible && !document.hidden && !disposed) { if (motion.matches) draw(); else if (!raf) raf = requestAnimationFrame(tick); } };
     const resize = () => { scene = createCellScene(canvas, data, motion.matches); sceneRef.current = scene; draw(); resume(); };
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry?.isIntersecting ?? false;
-      if (visible) { if (!started) { started = true; opening = 0; } resume(); }
+      if (visible) { if (!started) { started = true; opening = 0; elapsedRef.current.started = true; } resume(); }
       else { cancelAnimationFrame(raf); raf = 0; previous = 0; }
       canvas.dataset['animating'] = String(visible && !motion.matches);
     }, { threshold: .02 });
