@@ -1,4 +1,5 @@
 # Current fixes (Oct 24)
+- [ ] Replace Systole floating button/panel with edge tab, ECG-paper sheet, shared-link opening; verify signup and 390px/1440px.
 - [x] URGENT: restore Brandfetch icon logos everywhere; stored check only overrides when present (light=ink tile, missing=name tile); admin uploads win; check runs in browser only.
 - [x] Rich organisation fields: story, scale_facts, our_take, offer_chips, how_to_get_involved, founded_year; admin+CSV editable; page sections after header.
 - [x] Learn redesign: heartbeat journey line with 8 beats, /learn/step/[step] pages, dictionary teaser; step pages with guide, common mistakes, Go here, Open now; no auto lists.
