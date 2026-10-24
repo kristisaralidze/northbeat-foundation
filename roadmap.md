@@ -146,6 +146,6 @@
 
 # Trust pages and details
 - [x] About, Start pages, Systole, Podcast, Newsletter, Footer, link previews, 404, mobile menu
-- [ ] Close to them scoring (+100/+30/+20/+10/+5)
-- [ ] Learn guides on organisation pages
-- [ ] Registration closed button on events
+- [x] Close to them scoring (+100/+30/+20/+10/+5)
+- [x] Learn guides on organisation pages (shows once organisations have journey steps tagged)
+- [x] Registration closed button on events
