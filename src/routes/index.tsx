@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LaboratoryWordmark } from "@/components/site/LaboratoryWordmark";
 import { AtmosphericImage } from "@/components/site/AtmosphericImage";
@@ -26,7 +26,34 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+/** Plays the wordmark writing intro once per visit; any scroll, click or key skips it. */
+function useWordmarkIntro() {
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    if (done) return;
+    let played = false;
+    try { played = sessionStorage.getItem('nb-wordmark-played') === '1'; } catch { /* private mode */ }
+    if (played || window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setDone(true); return; }
+    const finish = () => {
+      setDone(true);
+      try { sessionStorage.setItem('nb-wordmark-played', '1'); } catch { /* private mode */ }
+    };
+    const timer = window.setTimeout(finish, 4300);
+    window.addEventListener('scroll', finish, { once: true, passive: true });
+    window.addEventListener('pointerdown', finish, { once: true });
+    window.addEventListener('keydown', finish, { once: true });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener('scroll', finish);
+      window.removeEventListener('pointerdown', finish);
+      window.removeEventListener('keydown', finish);
+    };
+  }, [done]);
+  return done;
+}
+
 function Index() {
+  const wordmarkDone = useWordmarkIntro();
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
@@ -39,7 +66,7 @@ function Index() {
   }, []);
   return (
     <div className="nb-home-story">
-      <section className="nb-home-wordmark-section">
+      <section className={`nb-home-wordmark-section${wordmarkDone ? '' : ' nb-wordmark-animated'}`}>
         <div className="nb-arrival-atmosphere"><AtmosphericImage eager /></div>
         <div className="nb-home-opening-content">
           <div className="nb-home-wordmark-slot"><LaboratoryWordmark /></div>
