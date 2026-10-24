@@ -8,9 +8,10 @@ it('reads link tables by their real composite keys and excludes drafts from reco
     events: [], opportunities: [],
     organisations: [
       { id: 'published', slug: 'published', name: 'Published', status: 'published', city: 'Helsinki' },
+      { id: 'published2', slug: 'published2', name: 'Published 2', status: 'published', city: 'Helsinki' },
       { id: 'draft', slug: 'draft', name: 'Draft', status: 'draft', city: 'Helsinki' },
     ],
-    organisation_terms: [{ organisation_id: 'published', term_id: 'med' }, { organisation_id: 'draft', term_id: 'med' }],
+    organisation_terms: [{ organisation_id: 'published', term_id: 'med' }, { organisation_id: 'published2', term_id: 'med' }, { organisation_id: 'draft', term_id: 'med' }],
   };
   const client = { from(table: string) {
     filters[table] = []; orders[table] = [];

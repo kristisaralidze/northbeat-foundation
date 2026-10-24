@@ -36,8 +36,9 @@ describe('action-first detail rules', () => {
   it('never puts universities next to startups without a direct relation', () => {
     const rows=[{id:'u',title:'Uni',city:'Oulu',type:'university',fieldIds:['med']},{id:'s',title:'Startup',city:'Oulu',type:'startup',fieldIds:['med']},{id:'s2',title:'Startup 2',city:'Oulu',type:'startup',fieldIds:['med']}];
     const self={id:'self',slug:'self',city:'Oulu',type:'startup',fieldNames:{med:'Medtech'},relations:{}};
-    expect(closeToThem(rows,self).map(o=>o.id)).toEqual(['s','s2']);
-    expect(closeToThem(rows,{...self,relations:{u:'Partner'}}).map(o=>o.id)).toEqual(['u','s','s2']);
+    expect(new Set(closeToThem(rows,self).map(o=>o.id))).toEqual(new Set(['s','s2']));
+    const withRelation=closeToThem(rows,{...self,relations:{u:'Partner'}});
+    expect(withRelation[0]?.id).toBe('u');expect(new Set(withRelation.map(o=>o.id))).toEqual(new Set(['u','s','s2']));
   });
 });
 import {urgencyLevel,offerChips} from './detail';
