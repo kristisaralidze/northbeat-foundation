@@ -14,7 +14,7 @@ export function OrganisationLogo({name,slug,uploaded,website,eager=false,large=f
 }) {
   const {data}=useQuery({...directoryQuery,enabled:Boolean(slug)});
   const org=data?.organisations.find(o=>o.slug===slug);
-  const upload=(choice==='upload'||org?.logo_choice==='upload'||isMediaUpload(uploaded))?(uploaded??org?.logo_url):null;
+  const upload=(choice==='upload'||org?.logo_choice==='upload'||org?.logo_image_source==='admin_upload'||isMediaUpload(uploaded))?(uploaded??org?.logo_url):null;
   const src=upload??(resolved===undefined?org?.logo_resolved_url:resolved)??(choice==='verified'?uploaded:null);
   const [failed,setFailed]=useState<string|null>(null);
   const missing=!src||src===failed||(!upload&&(status??org?.logo_status)==='missing');
