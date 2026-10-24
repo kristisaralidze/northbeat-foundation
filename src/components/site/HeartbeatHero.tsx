@@ -7,7 +7,6 @@ import { chosenLogoSrc } from '@/components/site/OrganisationLogo';
 import { publicTitle } from '@/lib/profiles';
 import { brandfetchLogoUrl } from '@/lib/organisation-logo';
 
-const FLIGHT_END = 0.68, UNROLL_END = 0.9;
 const OPENING_KEY = 'northbeat:heartbeat-opening';
 type Hit = { x: number; y: number; r: number; beat: Beat };
 type Card = { beat: Beat; x: number; y: number; pinned: boolean };
@@ -122,6 +121,11 @@ export function HeartbeatHero() {
       const dt = Math.min(0.1, (t - last) / 1000); last = t;
       if (!visible) return;
       const p = progress();
+      // Transition: about one screen of scroll at the end. First half: 3D fades and sinks 40px. Second half: flat timeline draws left to right.
+      const span = Math.min(0.35, H / Math.max(1, host.offsetHeight - H));
+      const FLIGHT_END = Math.max(0.3, 1 - span - 0.04);
+      const fadeT = reduced ? 1 : smoothstep((p - FLIGHT_END) / (span / 2));
+      const drawT = reduced ? 1 : clamp01((p - FLIGHT_END - span / 2) / (span / 2));
       if (opening && !openStart) openStart = t;
       const openT = opening ? (t - openStart) / 1000 : 99;
       if (opening && openT > 3.4) opening = false;
@@ -142,7 +146,7 @@ export function HeartbeatHero() {
       const k = heightScale(maxAmp, usable - 96 - (phone ? 70 : 80), F, 3.6, 1);
       const rise = openT < 1 ? 0 : clamp01((openT - 1) / 2.4);
       const camH = (opening ? 1 + 1.6 * smoothstep(rise) : 2.6) + (0.5 - smy) * 0.7;
-      const m = reduced ? 1 : smoothstep((p - FLIGHT_END) / (UNROLL_END - FLIGHT_END));
+      const m = 0; // no morph: the 3D line never turns into the flat line
       const pad = phone ? 20 : 56;
       const flatX = (d: number) => pad + (d / HORIZON) * (W - 2 * pad);
       const flatY = (h: number) => (phone ? 0.5 * H - h * 8 : 0.56 * H - h * 13);
@@ -159,13 +163,13 @@ export function HeartbeatHero() {
         }
       }
       const ahead = beats.find(b => b.day > cur + 0.05) ?? null;
-      const nk = m > 0.05 || !ahead ? '' : String(ahead.day);
+      const nk = fadeT >= 1 || !ahead ? '' : String(ahead.day);
       if (nk !== lastNext) { lastNext = nk; setNext(ahead && nk ? { beat: ahead, key: nk } : null); }
       const nearestBeat = beats.find(b => b.day >= cur - 0.3) ?? null;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
-      if (m < 1) { ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, usable + (H - usable) * smoothstep(m)); ctx.clip(); }
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, usable); ctx.clip(); ctx.translate(0, 40 * fadeT);
       if (t < pulseUntil) { const s = pulseScale; ctx.translate(W / 2, H / 2); ctx.scale(s, s); ctx.translate(-W / 2, -H / 2); }
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
@@ -181,7 +185,7 @@ export function HeartbeatHero() {
         }
         ctx.stroke(); ctx.globalAlpha = 1;
       }
-      const sceneAlpha = opening ? clamp01((openT - 1) / 0.9) : 1;
+      const sceneAlpha = (opening ? clamp01((openT - 1) / 0.9) : 1) * (1 - fadeT);
       ctx.globalAlpha = sceneAlpha;
 
       // Line.
@@ -263,6 +267,7 @@ export function HeartbeatHero() {
         const gap = r * 2 + 4;
         ctx.globalAlpha = alpha; ctx.strokeStyle = LINE; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(peak.x, peak.y - 2); ctx.lineTo(peak.x, cy + r); ctx.stroke();
+        ctx.globalAlpha = sceneAlpha; // logos are never greyed by distance
         for (let k = 0; k < total; k++) {
           const x = peak.x + (k - (total - 1) / 2) * gap;
           const img = ready[k];
@@ -310,13 +315,47 @@ export function HeartbeatHero() {
         }
       }
       ctx.globalAlpha = 1;
-      if (m < 1) ctx.restore();
+      ctx.restore();
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (fadeT >= 1) nextHits.length = 0;
+
+      // Flat timeline of the next 35 days, drawn left to right behind a plum dot.
+      if (drawT > 0) {
+        const head = HORIZON * drawT;
+        ctx.globalAlpha = 1; ctx.strokeStyle = INK; ctx.lineWidth = 1.5; ctx.beginPath();
+        for (let d = 0; d <= head; d += 0.02) { const x = flatX(d), y = flatY(heightAt(d, allBeats)); if (d === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y); }
+        ctx.stroke();
+        let dotD = head;
+        if (drawT >= 1) dotD = (((t - started) % 7000) / 7000) * HORIZON;
+        const dotX = flatX(dotD);
+        ctx.fillStyle = ACCENT; ctx.beginPath(); ctx.arc(dotX, flatY(heightAt(dotD, allBeats)), 3.5, 0, Math.PI * 2); ctx.fill();
+        const dateY = flatY(0) + (phone ? 26 : 34); const dates: number[] = [];
+        for (const b of beats) {
+          if (b.day > head) break;
+          const fx = flatX(b.day), fy = flatY(heightAt(b.day, allBeats));
+          let rf = phone ? 8 : 11; if (drawT >= 1 && Math.abs(fx - dotX) < 18) rf *= 1.15;
+          const cy = fy - rf - 12;
+          const ready: HTMLImageElement[] = [];
+          for (const src of beatLogos.get(b) ?? []) { if (ready.length >= 3) break; const img = src ? image(src) : null; if (img) ready.push(img); }
+          const extra = b.items.length - ready.length, total = ready.length ? ready.length + (extra > 0 ? 1 : 0) : 0, gap = rf * 2 + 4;
+          for (let k = 0; k < total; k++) {
+            const x = fx + (k - (total - 1) / 2) * gap, img = ready[k];
+            ctx.globalAlpha = 1; circle(ctx, x, cy, rf, TILE, LINE);
+            if (img) { ctx.save(); ctx.beginPath(); ctx.arc(x, cy, rf * 0.78, 0, Math.PI * 2); ctx.clip(); const sz = rf * 1.4; ctx.drawImage(img, x - sz / 2, cy - sz / 2, sz, sz); ctx.restore(); }
+            else { ctx.fillStyle = INK; ctx.font = `${Math.max(9, rf * 0.7)}px ${body}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(`+${extra}`, x, cy); }
+          }
+          nextHits.push({ x: fx, y: total ? cy : fy, r: Math.max(total * gap / 2, 14), beat: b });
+          if (dates.some(x => Math.abs(x - fx) < 40)) continue;
+          dates.push(fx); ctx.globalAlpha = 1; ctx.fillStyle = SOFT; ctx.font = `11px ${body}`; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+          ctx.fillText(dateFor(b.day), fx, dateY);
+        }
+      }
       hits.current = nextHits;
 
       // HTML overlays.
-      if (finale.current) { const f = reduced ? 1 : clamp01((p - 0.84) / 0.06); finale.current.style.opacity = String(f); finale.current.style.pointerEvents = f > 0.5 ? 'auto' : 'none'; finale.current.style.top = `${flatY(0) + (phone ? 56 : 68)}px`; }
-      if (passing.current) passing.current.style.opacity = String(1 - clamp01(m * 2));
+      if (finale.current) { const f = reduced ? 1 : clamp01((drawT - 0.85) / 0.15); finale.current.style.opacity = String(f); finale.current.style.pointerEvents = f > 0.5 ? 'auto' : 'none'; finale.current.style.top = `${flatY(0) + (phone ? 56 : 68)}px`; }
+      if (passing.current) passing.current.style.opacity = String(1 - fadeT);
+      if (nextEl) { nextEl.style.opacity = String(1 - fadeT); nextEl.style.pointerEvents = fadeT > 0.5 ? 'none' : 'auto'; }
       // Close the gap after the unroll: pull the next section up to 100px below the button.
       if (finale.current && !reduced) {
         const btnBottom = flatY(0) + (phone ? 56 : 68) + finale.current.offsetHeight;

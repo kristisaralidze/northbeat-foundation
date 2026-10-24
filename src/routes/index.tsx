@@ -12,7 +12,6 @@ export const Route = createFileRoute("/")({
     context.queryClient.ensureQueryData(livingCellsQuery),
   ]),
   head: () => ({
-    links: [{ rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600&display=swap" }],
     meta: [
       { title: "Northbeat: The heartbeat of Nordic health innovation." },
       { name: "description", content: "The reference hub for Nordic health ventures: companies, investors, programmes, funding, events and jobs." },
@@ -37,7 +36,7 @@ function useWordmarkIntro() {
       setDone(true);
       try { sessionStorage.setItem('nb-wordmark-played', '1'); } catch { /* private mode */ }
     };
-    const timer = window.setTimeout(finish, 4300);
+    const timer = window.setTimeout(finish, 6200);
     window.addEventListener('scroll', finish, { once: true, passive: true });
     window.addEventListener('pointerdown', finish, { once: true });
     window.addEventListener('keydown', finish, { once: true });
