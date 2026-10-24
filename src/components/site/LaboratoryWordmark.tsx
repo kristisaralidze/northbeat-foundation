@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 const LETTERS = Array.from("NORTHBEAT");
-const DOT_LETTER = 3; // the O
+const DOT_LETTER = 1; // the O
 const FONT_SIZE = 200;
 const TRACKING = 0.06 * FONT_SIZE;
 
