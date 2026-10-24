@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { heartbeatQuery } from '@/lib/heartbeat.query';
-import { buildBeats, clamp01, heightAt, HORIZON, localKey, restingBeats, smoothstep, type Beat, type HeartbeatItem } from '@/lib/heartbeat';
+import { buildBeats, clamp01, heightAt, HORIZON, localKey, restingBeats, smoothstep, warpedDay, type Beat, type HeartbeatItem } from '@/lib/heartbeat';
 import { chosenLogoSrc } from '@/components/site/OrganisationLogo';
 import { publicTitle } from '@/lib/profiles';
 
@@ -82,7 +82,7 @@ export function HeartbeatHero() {
     resize();
     const ro = new ResizeObserver(resize); ro.observe(el);
 
-    const lastBeat = beats.length ? beats[beats.length - 1].day : 0;
+    const lastBeat = beats.length ? (beats[beats.length - 1]?.day ?? 0) : 0;
     const flightEnd = Math.max(6, lastBeat - 4);
     let idle = -0.6, cur = reduced ? 0 : -0.6, prevCur = cur;
     let mx = 0.5, my = 0.5, smx = 0.5, smy = 0.5;
@@ -104,7 +104,7 @@ export function HeartbeatHero() {
     };
 
     let visible = true;
-    const io = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; });
+    const io = new IntersectionObserver(([entry]) => { visible = entry?.isIntersecting ?? false; });
     io.observe(host);
     let raf = 0, last = performance.now(), started = last;
     let lastAhead = -1, lastDate = '';
@@ -119,8 +119,8 @@ export function HeartbeatHero() {
       if (opening && openT > 3.4) opening = false;
 
       if (p < 0.01 && !reduced) idle = Math.min(2.4, idle + 0.3 * dt);
-      const target = reduced ? 0 : idle + Math.min(1, p / FLIGHT_END) * (flightEnd - idle);
-      prevCur = cur; cur += (target - cur) * Math.min(1, dt * 6);
+      const target = reduced ? 0 : warpedDay(Math.min(1, p / FLIGHT_END), idle, flightEnd, beats);
+      prevCur = cur; cur += (target - cur) * Math.min(1, dt * 3.5);
       smx += (mx - smx) * Math.min(1, dt * 3); smy += (my - smy) * Math.min(1, dt * 3);
 
       const F = phone ? Math.min(0.75 * H, 1.35 * W) : Math.min(0.85 * H, 0.9 * W);
@@ -143,7 +143,7 @@ export function HeartbeatHero() {
         for (const b of beats) if (b.day > prevCur && b.day <= cur) {
           const big = b.items.length >= 3; pulseScale = big ? 1.024 : 1.011; pulseLen = big ? 240 : 140; pulseUntil = t + pulseLen;
           liveDot.current?.animate([{ transform: 'scale(1)' }, { transform: 'scale(2)' }, { transform: 'scale(1)' }], { duration: 500 });
-          if (caption.current) caption.current.textContent = `${dateFor(b.day, true)}, ${publicTitle(b.items[0].title)}${b.items.length > 1 ? ` and ${b.items.length - 1} more` : ''}`;
+          if (caption.current) caption.current.textContent = `${dateFor(b.day, true)}, ${publicTitle(b.items[0]?.title ?? "")}${b.items.length > 1 ? ` and ${b.items.length - 1} more` : ''}`;
           captionUntil = t + 2400;
         }
       }
@@ -193,7 +193,7 @@ export function HeartbeatHero() {
       }
       for (let i = 0; i < pts.length - 1; i += 10) {
         const chunk = pts.slice(i, i + 11); const mid = chunk[Math.floor(chunk.length / 2)];
-        if (mid.a <= 0.01) continue;
+        if (!mid || mid.a <= 0.01) continue;
         ctx.globalAlpha = sceneAlpha * mid.a; ctx.lineWidth = mid.w; ctx.beginPath();
         chunk.forEach((q, j) => j ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y)); ctx.stroke();
       }
@@ -256,7 +256,7 @@ export function HeartbeatHero() {
           }
         } else if (pp && mi < 0.3 && pp.z < 14 && !phone) {
           const titleSize = Math.max(13, Math.min(22, F / pp.z * 0.22));
-          const title = publicTitle(b.items[0].title) + (b.items.length > 1 ? ` +${b.items.length - 1}` : '');
+          const title = publicTitle(b.items[0]?.title ?? "") + (b.items.length > 1 ? ` +${b.items.length - 1}` : '');
           ctx.font = `${titleSize}px ${display}`; const tw = Math.min(ctx.measureText(title).width, W * 0.5);
           const box = { x: peak.x - tw / 2, y: cy - r - titleSize - 26, w: tw, h: titleSize + 22 };
           if (![headBox, ...labels].some(l => box.x < l.x + l.w && box.x + box.w > l.x && box.y < l.y + l.h && box.y + box.h > l.y)) {
@@ -303,7 +303,7 @@ export function HeartbeatHero() {
   const onCanvasClick = (e: React.MouseEvent) => {
     const hit = hitAt(e.clientX, e.clientY);
     if (!hit) { setCard(null); return; }
-    if (hit.beat.items.length === 1) { void navigate({ to: itemPath(hit.beat.items[0]) as '/' }); return; }
+    if (hit.beat.items.length === 1 && hit.beat.items[0]) { void navigate({ to: itemPath(hit.beat.items[0]) as '/' }); return; }
     setCard({ beat: hit.beat, x: hit.x, y: hit.y, pinned: true });
   };
   const skip = () => {

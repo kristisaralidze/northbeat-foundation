@@ -55,3 +55,17 @@ export function heightAt(day: number, beats: { day: number; amp: number }[]) {
 }
 export const smoothstep = (x: number) => { const t = Math.max(0, Math.min(1, x)); return t * t * (3 - 2 * t); };
 export const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
+/** Maps scroll fraction (0..1) to a day between from and to; time moves at `slow` speed when a beat is within `ahead` days. */
+export function warpedDay(f: number, from: number, to: number, beats: { day: number }[], slow = 0.4, ahead = 1.5, steps = 240) {
+  if (to <= from) return from;
+  const step = (to - from) / steps, cost: number[] = [0];
+  for (let i = 0; i < steps; i++) {
+    const mid = from + (i + 0.5) * step;
+    const near = beats.some(b => b.day >= mid && b.day - mid <= ahead);
+    cost.push(cost[i]! + step / (near ? slow : 1));
+  }
+  const goal = clamp01(f) * cost[steps]!;
+  let i = 0; while (i < steps && cost[i + 1]! < goal) i++;
+  const seg = cost[i + 1]! - cost[i]!;
+  return from + (i + (seg > 0 ? (goal - cost[i]!) / seg : 0)) * step;
+}
