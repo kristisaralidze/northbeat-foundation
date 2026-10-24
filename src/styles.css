@@ -479,8 +479,8 @@ html.lenis, html.lenis body { height: auto; }
 .nb-public-page { --public-tint: 0%; --intro-scale: 1; --intro-size: 3.5rem; min-height: 60svh; background: color-mix(in oklab, var(--snow), var(--frost) var(--public-tint)); }
 .nb-public-page :is(section, header, footer, hr, fieldset, details, nav, p, div.border-b, div.border-y).border-hairline { border-top-width: 0; border-bottom-width: 0; }
 .nb-public-page [role='presentation'] { display: none; }
-.nb-public-page .nb-card { transition: none; }
-.nb-public-page .nb-card:hover { box-shadow: none; }
+.nb-public-page .nb-card { transition: transform .18s ease, box-shadow .18s ease; }
+.nb-public-page .nb-card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px -16px color-mix(in oklab, var(--berry) 32%, transparent); }
 .nb-public-title, .nb-public-page h1 { font-size: var(--intro-size, 3.5rem); transform: scale(var(--intro-scale, 1)); transform-origin: left center; line-height: 1.15; letter-spacing: 0; overflow-wrap: anywhere; }
 .nb-public-page .nb-eyebrow { text-transform: none; letter-spacing: 0; }
 .nb-compact-bar { position: fixed; top: 64px; inset-inline: 0; z-index: 30; background: var(--snow); visibility: hidden; opacity: 0; }
