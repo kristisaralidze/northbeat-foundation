@@ -1503,7 +1503,13 @@ html, body { overflow-x: clip; }
 
 /* Scroll reveals: hidden only while armed, revealed with a staggered transition */
 @media (prefers-reduced-motion: no-preference) {
-  .nb-motion-armed :is(section, .nb-card, [data-reveal]) { opacity: 0; transform: translateY(22px); }
-  .nb-motion-armed :is(section, .nb-card, [data-reveal]).nb-revealed { opacity: 1; transform: none; transition: opacity .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1); transition-delay: var(--reveal-delay, 0ms); }
+  .nb-motion-armed :is(section, .nb-card, [data-reveal], .nb-cover-banner, .nb-cover-strip) { opacity: 0; transform: translateY(22px); }
+  .nb-motion-armed :is(section, .nb-card, [data-reveal], .nb-cover-banner, .nb-cover-strip).nb-revealed { opacity: 1; transform: none; transition: opacity .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1); transition-delay: var(--reveal-delay, 0ms); }
+  .nb-motion-armed hr { transform: scaleX(0); transform-origin: left; }
+  .nb-motion-armed hr.nb-revealed { transform: scaleX(1); transition: transform .9s cubic-bezier(.22,1,.36,1); }
+  .nb-motion-armed section h2 { opacity: 0; transform: translateY(24px); }
+  .nb-motion-armed section.nb-revealed h2 { opacity: 1; transform: none; transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); }
+  .nb-motion-armed .nb-cover-banner img, .nb-motion-armed .nb-cover-strip img { clip-path: inset(100% 0 0 0); transform: scale(1.08); }
+  .nb-motion-armed .nb-cover-banner.nb-revealed img, .nb-motion-armed .nb-cover-strip.nb-revealed img { clip-path: inset(0 0 0 0); transform: scale(1); transition: clip-path .9s cubic-bezier(.22,1,.36,1), transform 1.4s cubic-bezier(.22,1,.36,1); }
   .nb-motion-armed .nb-motion-word { opacity: 0; }
 }
