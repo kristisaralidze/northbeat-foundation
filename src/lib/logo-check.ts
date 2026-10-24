@@ -1,5 +1,5 @@
 import { brandfetchLogoUrl } from './organisation-logo';
-export type LogoResult = { logo_resolved_url: string | null; logo_tone: 'dark' | 'light'; logo_status: 'ok' | 'light' | 'missing'; logo_check_error: string | null };
+export type LogoResult = { logo_resolved_url: string | null; logo_tone: 'dark' | 'light'; logo_status: 'ok' | 'light' | 'missing'; logo_check_error: string | null; unreadable?: boolean };
 export function analyseLogoPixels(pixels: ArrayLike<number>) {
   const total = pixels.length / 4; let visible = 0, light = 0, dark = 0;
   for (let i=0;i<pixels.length;i+=4) {
