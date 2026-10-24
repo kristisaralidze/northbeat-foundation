@@ -16,7 +16,7 @@ async function loadBySlug(client: SupabaseClient, entity: ImportEntity, slugs: s
   for (let i = 0; i < slugs.length; i += 100) {
     const { data, error } = await client.from(entity).select(`id, ${PASTE_COLUMNS[entity].join(', ')}`).in('slug', slugs.slice(i, i + 100));
     if (error) throw new Error('Could not load existing entries.');
-    for (const row of data ?? []) map.set(String((row as Existing).slug), row as Existing);
+    for (const row of (data ?? []) as unknown as Existing[]) map.set(String(row.slug), row);
   }
   return map;
 }
@@ -66,7 +66,7 @@ export const applyPasteRows = createServerFn({ method: 'POST' })
       if (preview.errors.length || !preview.id) { summary.errors.push({ row: preview.number, message: preview.errors.join('; ') || 'Not found' }); continue; }
       if (!preview.changes.length) { summary.skipped++; continue; }
       const update = Object.fromEntries(preview.changes.map(c => [c.column, c.value]));
-      const { error } = await context.supabase.from(data.entity).update(update).eq('id', preview.id);
+      const { error } = await context.supabase.from(data.entity).update(update as never).eq('id', preview.id);
       if (error) { summary.errors.push({ row: preview.number, message: 'Could not save this row. Check its values and try again.' }); continue; }
       summary.updated++;
     }
