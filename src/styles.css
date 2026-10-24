@@ -1465,3 +1465,22 @@ html, body { overflow-x: clip; }
 .nb-apply-steps li+li {margin-top:16px;}
 .theme-site .nb-heartbeat-next .nb-org-logo {width:40px;height:40px;}
 .theme-site .nb-heartbeat-next .nb-org-logo img {width:100%;height:100%;}
+
+/* Learn journey: one thin ink heartbeat line with 8 beats, vertical on phones */
+.theme-site .nb-journey-line { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 32px; position: relative; }
+.theme-site .nb-journey-line::before { content: ""; position: absolute; left: 11px; top: 8px; bottom: 8px; width: 2px; background: var(--ink); opacity: .85; }
+.theme-site .nb-journey-stop { position: relative; padding-left: 40px; }
+.theme-site .nb-journey-link { display: grid; gap: 4px; color: inherit; text-decoration: none; }
+.theme-site .nb-journey-beat { position: absolute; left: 0; top: 2px; width: 24px; height: 24px; color: var(--ink); transition: transform 150ms ease, color 150ms ease; }
+.theme-site .nb-journey-link:hover .nb-journey-beat, .theme-site .nb-journey-link:focus-visible .nb-journey-beat { transform: scale(1.2); color: var(--berry); }
+.theme-site .nb-journey-number { font-family: var(--font-display); font-size: 28px; line-height: 1; }
+.theme-site .nb-journey-name { font-family: var(--font-display); font-size: 20px; }
+.theme-site .nb-journey-text { font-size: 14px; color: var(--muted-foreground); max-width: 56ch; }
+@media (min-width: 768px) {
+  .theme-site .nb-journey-line { flex-direction: row; gap: 0; }
+  .theme-site .nb-journey-line::before { left: 0; right: 0; top: 11px; bottom: auto; width: auto; height: 2px; }
+  .theme-site .nb-journey-stop { flex: 1 1 0; padding-left: 0; padding-top: 36px; min-width: 0; }
+  .theme-site .nb-journey-stop .nb-journey-beat { top: 0; }
+  .theme-site .nb-journey-link { padding-right: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .theme-site .nb-journey-beat { transition: none; } }
