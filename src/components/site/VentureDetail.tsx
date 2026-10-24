@@ -44,8 +44,8 @@ function OpenNow({ items, now }: { items: DetailItem[]; now: string }) {
       <div className="flex flex-wrap items-center gap-3"><Countdown date={item.date} now={now} />{cal && <CalendarMenu event={cal} slug={item.slug} />}</div></li>;
   })}</ul></section>;
 }
-const LastLine = ({ checked, isOrg, title, slug }: { checked: string | null; isOrg: boolean; title: string; slug: string }) =>
-  <p className="nb-small text-muted-foreground nb-detail-lastline">{checked ? `Last checked ${dateLabel(checked)}. ` : ''}Something wrong? <Link className="nb-link" to="/submit" search={{ tab: isOrg ? 'company' : 'event', edit: title, entryUrl: `${SITE}/${isOrg ? 'org' : 'event'}/${encodeURIComponent(slug)}` }}>Suggest an edit.</Link></p>;
+const LastLine = ({ isOrg, title, slug }: { isOrg: boolean; title: string; slug: string }) =>
+  <p className="nb-small text-muted-foreground nb-detail-lastline">Something wrong? <Link className="nb-link" to="/submit" search={{ tab: isOrg ? 'company' : 'event', edit: title, entryUrl: `${SITE}/${isOrg ? 'org' : 'event'}/${encodeURIComponent(slug)}` }}>Suggest an edit.</Link></p>;
 
 export function VentureDetail({ profile }: { profile: PublicProfile }) {
   const { row, terms, detail } = profile; const isOrg = profile.kind === 'organisations';
@@ -63,7 +63,7 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
   const website = safeWebUrl(text(row, 'website')); const description = text(row, 'description');
   const video = officialVideo(text(row, 'video_url'), text(row, 'video_source_url'));
   const accent = isOrg ? brandColour(row['brand_accent']) : null;
-  const logo = <OrganisationLogo name={profile.title} uploaded={isOrg ? text(row,'logo_url') : officialLogo(text(row,'logo_url'), text(row,'registration_url') ?? text(row,'source_url'), text(row,'logo_image_source'), text(row,'logo_image_source_url'))} website={text(row,isOrg ? 'website' : 'registration_url') ?? text(row,'source_url')} choice={isOrg ? (text(row,'logo_choice') ?? 'icon') : 'verified'} large eager />;
+  const logo = <OrganisationLogo name={profile.title} uploaded={isOrg ? text(row,'logo_url') : officialLogo(text(row,'logo_url'), text(row,'registration_url') ?? text(row,'source_url'), text(row,'logo_image_source'), text(row,'logo_image_source_url'))} website={isOrg ? text(row,'website') : text(row,'registration_url') ?? text(row,'source_url')} choice={isOrg ? (text(row,'logo_choice') ?? 'icon') : 'verified'} large eager />;
   const organisers = connections.flatMap(group => group.entries);
   const organiser = organisers.find(entry => entry.roles.some(role => /organi[sz]er|host/i.test(role))) ?? organisers[0];
   const register = safeWebUrl(text(row, 'registration_url')); const eventSite = safeWebUrl(text(row, 'source_url'));
@@ -101,7 +101,9 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
     {actions}
     {isOrg && detail && <OpenNow items={detail.coming} now={now} />}
     {!isOrg && steps.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">Who it is for</h2><ul className="nb-detail-chips">{steps.map(step => <li key={step.id} className="nb-reason-chip">{journeySentence(step.name).replace(/\.$/, '')}</li>)}</ul></section>}
-    {description && description !== profile.summary && <p className="nb-body nb-detail-description">{description}</p>}
+    {isOrg && !detail?.coming.length && !connections.length && !detail?.guides.length && (description ?? profile.summary)
+      ? <section className="nb-detail-section"><h2 className="nb-h2 mb-5">About</h2><p className="nb-body nb-detail-description whitespace-pre-line">{description ?? profile.summary}</p></section>
+      : description && description !== profile.summary && <p className="nb-body nb-detail-description">{description}</p>}
     {isOrg && connections.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2">Connections</h2><RelationshipMap profile={connectionProfile} link={(kind, entry) => <DetailLink item={{ ...entry, kind }}>{entry.title}</DetailLink>} /><div className="nb-connection-lists">{connections.map(group => <div key={group.label}><h3 className="nb-h3 mb-4">{group.label === 'Partners' ? 'Partners' : group.label}</h3><ul className="space-y-3">{group.entries.map(entry => <li key={entry.id} className="flex items-center gap-3"><OrganisationLogo name={entry.title} slug={entry.slug} /><DetailLink item={{ ...entry, kind: group.kind }}>{entry.title}</DetailLink></li>)}</ul></div>)}</div></section>}
     {isOrg && Boolean(detail?.similar.length) && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">Close to them</h2><div className="nb-close-grid">{detail?.similar.map(entry => <article key={entry.id} className="nb-card"><OrganisationLogo name={entry.title} slug={entry.slug} /><h3 className="nb-h3 mt-4"><DetailLink item={{ ...entry, kind: 'organisations' }}>{entry.title}</DetailLink></h3>{entry.roles[0] && <p className="mt-3"><span className="nb-reason-chip">{entry.roles[0]}</span></p>}</article>)}</div></section>}
     {Boolean(detail?.guides.length) && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">{isOrg ? 'Learn' : 'Prepare'}</h2><ul className="space-y-5">{detail?.guides.map(guide => <li key={guide.slug}><h3 className="nb-h3"><Link to="/learn/$slug" params={{ slug: guide.slug }} className="nb-link">{guide.title}</Link></h3>{guide.summary && <p className="nb-small mt-2">{guide.summary}</p>}</li>)}</ul></section>}
@@ -111,7 +113,7 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
     <TrialsSection trials={trials} />
     <NewsSection items={news} />
     {otherGroups.map(group => <section className="nb-detail-section" key={group.label}><h2 className="nb-h2 mb-5">{group.label}</h2><ul className="space-y-3">{group.entries.map(entry => <li key={entry.id}>{group.kind === 'episodes' ? <Link to="/podcast/$slug" params={{ slug: entry.slug }} className="nb-link">{entry.title}</Link> : <DetailLink item={{ ...entry, kind: group.kind }}>{entry.title}</DetailLink>}</li>)}</ul></section>)}
-    <LastLine checked={text(row, 'last_checked')} isOrg={isOrg} title={profile.title} slug={row.slug} />
+    <LastLine isOrg={isOrg} title={profile.title} slug={row.slug} />
   </article>;
 }
 function journeySentence(name: string) {

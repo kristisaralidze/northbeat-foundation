@@ -6,7 +6,6 @@ import { livingCellsQuery } from "@/lib/ecosystem.query";
 import { HeartbeatHero } from "@/components/site/HeartbeatHero";
 import { heartbeatQuery } from "@/lib/heartbeat.query";
 import { StartCards } from "@/components/site/StartCards";
-import { SystoleTeaser } from "@/components/site/SystoleTeaser";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => Promise.all([
@@ -122,7 +121,6 @@ function Index() {
         <p>From your first idea to funding and validation. Guides and a glossary for building in health.</p>
         <Link to="/learn" search={{}} className="nb-link">Explore Learn</Link>
       </section>
-      <SystoleTeaser />
     </div>
   );
 }

@@ -1,11 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { issuesQuery } from "@/lib/newsletter.query";
-import { issueLabel, sortIssues } from "@/lib/newsletter";
+import { issueLabel, issuePreview, sortIssues } from "@/lib/newsletter";
+import { directoryQuery } from "@/lib/directory.query";
+import { opportunitiesQuery } from "@/lib/opportunities.query";
+import { eventsQuery } from "@/lib/events.query";
+import { friendlyDate } from "@/lib/opportunities";
+import { dateLabel } from "@/lib/events";
+import { OrganisationLogo } from "@/components/site/OrganisationLogo";
+import { publicCopy } from "@/lib/profiles";
 import { NewsletterSignup } from "@/components/site/NewsletterSignup";
 
 export const Route = createFileRoute("/newsletter/")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(issuesQuery),
+  loader: ({ context }) => Promise.all([issuesQuery, directoryQuery, opportunitiesQuery, eventsQuery].map((q) => context.queryClient.ensureQueryData(q as never))),
   head: () => ({
     meta: [
       { title: "Newsletter: Northbeat" },
@@ -30,6 +37,11 @@ export const Route = createFileRoute("/newsletter/")({
 function NewsletterPage() {
   const { data } = useSuspenseQuery(issuesQuery);
   const issues = sortIssues(data.issues);
+  const { data: dir } = useSuspenseQuery(directoryQuery);
+  const { data: opps } = useSuspenseQuery(opportunitiesQuery);
+  const { data: evs } = useSuspenseQuery(eventsQuery);
+  const preview = issuePreview(dir.organisations, opps.opportunities, evs.events, evs.now);
+  const hasPreview = preview.startups.length + preview.calls.length + preview.events.length > 0;
   return (
     <div className="nb-page">
       <header className="nb-page-header">
@@ -38,13 +50,26 @@ function NewsletterPage() {
       </header>
       <section aria-labelledby="nl-promise" className="max-w-xl">
         <h2 id="nl-promise" className="nb-h3">In every issue</h2>
-        <ul className="nb-check-list nb-body">
-          <li>New open calls</li>
-          <li>Deadlines coming up</li>
-          <li>Events worth going to</li>
-        </ul>
+        <dl className="mt-4 space-y-5 nb-body">
+          <div><dt className="font-medium">New in Nordic health</dt><dd className="mt-1 text-muted-foreground">The most interesting new startups, products and research, each explained in plain words: what it does, why it matters, who is behind it.</dd></div>
+          <div><dt className="font-medium">Open calls and deadlines</dt><dd className="mt-1 text-muted-foreground">What you can apply for now, and what closes soon.</dd></div>
+          <div><dt className="font-medium">Events worth going to</dt><dd className="mt-1 text-muted-foreground">The ones we would go to ourselves, and why.</dd></div>
+        </dl>
         <p className="nb-body mt-6">Once a week, free, unsubscribe any time.</p>
       </section>
+      {hasPreview && <section aria-labelledby="nl-preview" className="nb-card mt-8 max-w-xl">
+        <h2 id="nl-preview" className="nb-h3">What an issue looks like</h2>
+        {preview.startups.length > 0 && <div className="mt-6"><h3 className="nb-eyebrow mb-3">New in Nordic health</h3><ul className="space-y-4">
+          {preview.startups.map((o) => <li key={o.slug} className="flex items-start gap-3"><OrganisationLogo name={o.name} slug={o.slug} uploaded={o.logo_url} website={o.website} choice={o.logo_choice ?? null} />
+            <div className="min-w-0"><Link to="/org/$slug" params={{ slug: o.slug }} className="nb-org-link nb-body font-medium">{o.name}</Link>{o.short_description && <p className="nb-small mt-1 line-clamp-2 text-muted-foreground">{publicCopy(o.short_description)}</p>}</div></li>)}
+        </ul></div>}
+        {preview.calls.length > 0 && <div className="mt-6"><h3 className="nb-eyebrow mb-3">Open calls and deadlines</h3><ul className="space-y-3">
+          {preview.calls.map((c) => <li key={c.slug}><Link to="/opportunity/$slug" params={{ slug: c.slug }} className="nb-org-link nb-body font-medium">{c.title}</Link><p className="nb-small text-muted-foreground">Closes {friendlyDate(c.deadline_at!, opps.now)}</p></li>)}
+        </ul></div>}
+        {preview.events.length > 0 && <div className="mt-6"><h3 className="nb-eyebrow mb-3">Events worth going to</h3><ul className="space-y-3">
+          {preview.events.map((e) => <li key={e.slug}><Link to="/event/$slug" params={{ slug: e.slug }} className="nb-org-link nb-body font-medium">{e.title}</Link><p className="nb-small text-muted-foreground">{dateLabel(e.starts_at!, e.timezone)}{e.city ? `, ${e.city}` : e.format === 'online' ? ', Online' : ''}</p></li>)}
+        </ul></div>}
+      </section>}
       <section aria-label="Sign up" className="nb-card mt-8 max-w-xl">
         <h2 className="nb-h3">Sign up</h2>
         <NewsletterSignup source="newsletter" />

@@ -60,7 +60,7 @@ const strip = ({ slug, title, summary }: HubItem): HubItem => ({ slug, title, su
 
 export const getLearnHub = createServerFn({ method: 'GET' }).handler(async (): Promise<LearnHub> => {
   const c = publicClient();
-  const [list, guideRows, glossary] = await Promise.all([terms(c, ['area', 'journey_step']), guides(c), c.from('glossary_terms').select('id', { count: 'exact', head: true }).eq('status', 'published')]);
+  const [list, guideRows, glossary, preview] = await Promise.all([terms(c, ['area', 'journey_step']), guides(c), c.from('glossary_terms').select('id', { count: 'exact', head: true }).eq('status', 'published'), c.from('glossary_terms').select('slug,term,short_definition').eq('status', 'published').order('term').limit(6)]);
   const stepTerms = list.filter((t) => t.kind === 'journey_step');
   const stepIds = stepTerms.map((t) => t.id);
   const stepOrder = new Map(stepTerms.map((t, i) => [t.id, i]));
@@ -71,6 +71,7 @@ export const getLearnHub = createServerFn({ method: 'GET' }).handler(async (): P
       organisations: orgs.filter((o) => o.termIds.includes(s.id)).map(strip), opportunities: opps.filter((o) => o.termIds.includes(s.id)).map(strip), events: events.filter((o) => o.termIds.includes(s.id)).map(strip) })),
     areas: list.filter((t) => t.kind === 'area').map((a) => ({ ...pick(a), guides: orderGuides(guideRows.filter((g) => g.area_id === a.id), stepOrder) })),
     glossaryCount: glossary.count ?? 0,
+    glossaryPreview: (preview.data ?? []).map((t) => ({ ...t, term: publicTitle(t.term) })),
   };
 });
 

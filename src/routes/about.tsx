@@ -62,13 +62,17 @@ function AboutPage() {
         <ul className="nb-check-list nb-body">
           <li>We use official sources only: the organisation's own website, public registers and official channels.</li>
           <li>Every entry is checked by hand before it goes live.</li>
-          <li>Every page shows the date we last checked it.</li>
+          <li>We review every entry regularly and fix anything that changes.</li>
         </ul>
       </section>
 
       <section aria-labelledby="contact-heading" className="nb-about-section max-w-2xl">
         <h2 id="contact-heading" className="nb-h2">Contact</h2>
         {data.contactEmail && <p className="nb-body">Email us at <a href={`mailto:${data.contactEmail}`} className="nb-link">{data.contactEmail}</a>.</p>}
+        {(data.linkedinUrl || data.instagramUrl) && <p className="nb-body mt-4 flex flex-wrap gap-6">
+          {data.linkedinUrl && <a href={data.linkedinUrl} target="_blank" rel="noopener noreferrer" className="nb-link">LinkedIn</a>}
+          {data.instagramUrl && <a href={data.instagramUrl} target="_blank" rel="noopener noreferrer" className="nb-link">Instagram</a>}
+        </p>}
         <p className="nb-body mt-4"><Link to="/submit" className="nb-link">Suggest an entry</Link> if we've missed a company, event or opportunity.</p>
       </section>
     </div>

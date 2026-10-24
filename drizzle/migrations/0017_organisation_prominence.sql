@@ -1,0 +1,2 @@
+ALTER TABLE public.organisations ADD COLUMN IF NOT EXISTS prominence integer NOT NULL DEFAULT 0;
+COMMENT ON COLUMN public.organisations.prominence IS 'Admin-set importance for the Featured sort on Explore. Higher shows first.';

@@ -1216,6 +1216,7 @@ export type Database = {
           news_items: Json | null
           openalex_id: string | null
           openalex_name: string | null
+          prominence: number
           published_at: string | null
           registration_date: string | null
           registry_fetched_at: string | null
@@ -1284,6 +1285,7 @@ export type Database = {
           news_items?: Json | null
           openalex_id?: string | null
           openalex_name?: string | null
+          prominence?: number
           published_at?: string | null
           registration_date?: string | null
           registry_fetched_at?: string | null
@@ -1352,6 +1354,7 @@ export type Database = {
           news_items?: Json | null
           openalex_id?: string | null
           openalex_name?: string | null
+          prominence?: number
           published_at?: string | null
           registration_date?: string | null
           registry_fetched_at?: string | null

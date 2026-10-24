@@ -3,7 +3,7 @@ export const FACETS = ["group", "country", "field", "stage", "type", "sub_area"]
 /** Facets shown as filter chips; type and sub_area still work from shared links. */
 export const VISIBLE_FACETS = ["group", "country", "field", "stage"] as const;
 export type Facet = (typeof FACETS)[number];
-export type ExploreSort = "az" | "recent";
+export type ExploreSort = "featured" | "az" | "recent";
 export type ExploreSearch = { q: string; sort: ExploreSort } & Record<Facet, string[]>;
 export const groupSlug = (index: number) => (CELL_GROUPS[index]?.name ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 export const GROUP_OPTIONS = CELL_GROUPS.map((group, index) => ({ value: groupSlug(index), label: group.name }));
@@ -12,13 +12,13 @@ export type DirectoryTerm = { id: string; kind: string; name: string; slug: stri
 export type DirectoryOrganisation = {
   id: string; slug: string; name: string; type: string; short_description: string | null;
   logo_url: string | null; cover_image_url?: string | null; published_at?: string | null; website: string | null; city: string | null; termIds: string[];
-  logo_choice?: string | null; logo_image_source?: string | null; logo_image_source_url?: string | null; image_source_url?: string | null;
+  logo_choice?: string | null; prominence?: number; connections?: number; logo_image_source?: string | null; logo_image_source_url?: string | null; image_source_url?: string | null;
 };
 export type DirectoryData = { organisations: DirectoryOrganisation[]; terms: DirectoryTerm[] };
-export const EMPTY_SEARCH: ExploreSearch = { q: "", sort: "az", group: [], type: [], field: [], sub_area: [], country: [], stage: [] };
+export const EMPTY_SEARCH: ExploreSearch = { q: "", sort: "featured", group: [], type: [], field: [], sub_area: [], country: [], stage: [] };
 
 export function parseExploreSearch(raw: Record<string, unknown>): ExploreSearch {
-  const result: ExploreSearch = { ...EMPTY_SEARCH, q: typeof raw["q"] === "string" ? raw["q"] : "", sort: raw["sort"] === "recent" ? "recent" : "az" };
+  const result: ExploreSearch = { ...EMPTY_SEARCH, q: typeof raw["q"] === "string" ? raw["q"] : "", sort: raw["sort"] === "recent" || raw["sort"] === "az" ? raw["sort"] : "featured" };
   for (const facet of FACETS) {
     const value = raw[facet];
     result[facet] = Array.isArray(value) ? [...new Set(value.filter((v): v is string => typeof v === "string"))] : typeof value === "string" ? [value] : [];
@@ -64,11 +64,13 @@ export function cardTags(org: DirectoryOrganisation, terms: DirectoryTerm[]) {
 export function cleanExploreSearch(search: ExploreSearch): Partial<ExploreSearch> {
   const out: Partial<ExploreSearch> = {};
   if (search.q) out.q = search.q;
-  if (search.sort === "recent") out.sort = "recent";
+  if (search.sort !== "featured") out.sort = search.sort;
   for (const facet of FACETS) if (search[facet]?.length) out[facet] = search[facet];
   return out;
 }
 
+/** Featured: prominence first, then most connections, then A to Z. */
 export function sortOrganisations(rows: DirectoryOrganisation[], sort: ExploreSort) {
+  if (sort === "featured") return [...rows].sort((a, b) => (b.prominence ?? 0) - (a.prominence ?? 0) || (b.connections ?? 0) - (a.connections ?? 0) || a.name.localeCompare(b.name));
   return [...rows].sort(sort === "recent" ? (a, b) => (Date.parse(b.published_at ?? "") || 0) - (Date.parse(a.published_at ?? "") || 0) || a.name.localeCompare(b.name) : (a, b) => a.name.localeCompare(b.name));
 }

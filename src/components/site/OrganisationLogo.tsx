@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { directoryQuery } from '@/lib/directory.query';
-import { acceptableLogoShape, brandfetchLogoUrl } from '@/lib/organisation-logo';
+import { acceptableLogoShape, brandfetchLogoUrl, organisationDomain } from '@/lib/organisation-logo';
 import { isMediaUpload, ownDomain } from '@/lib/brand';
 
 // A browser cannot read an <img>'s file type, so photos (JPEG) are detected by their pixels:
@@ -20,6 +20,8 @@ function looksLikePhoto(image: HTMLImageElement) {
 /** Resolves the logo the admin chose: an upload/own-domain file, or a hotlinked Brandfetch version (icon by default). */
 export function chosenLogoSrc(choice: string | null | undefined, uploaded: string | null | undefined, website: string | null | undefined) {
   if (choice === 'verified') return uploaded ?? null;
+  // Organisations without their own website show their name only, never a guessed logo.
+  if (!organisationDomain(website)) return null;
   if (choice === 'upload') return uploaded && (isMediaUpload(uploaded) || ownDomain(uploaded, website)) ? uploaded : null;
   return brandfetchLogoUrl(website, choice ?? 'icon');
 }
@@ -29,7 +31,7 @@ export function OrganisationLogo({ name, slug, uploaded, website, eager = false,
 }) {
   const { data } = useQuery({ ...directoryQuery, enabled: Boolean(slug && (choice === undefined || website === undefined)) });
   const org = data?.organisations.find(org => org.slug === slug);
-  const src = chosenLogoSrc(choice ?? org?.logo_choice, uploaded ?? org?.logo_url, website ?? org?.website);
+  const src = chosenLogoSrc(choice ?? org?.logo_choice, uploaded ?? org?.logo_url, website === undefined ? org?.website : website);
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
   if (!src || src === failedSrc) return null;
@@ -37,4 +39,13 @@ export function OrganisationLogo({ name, slug, uploaded, website, eager = false,
   return <span className={`${large ? 'nb-org-logo nb-official-logo-large' : 'nb-org-logo'}${loadedSrc === src ? '' : ' nb-logo-loading'}`} data-organisation-logo={slug}>
     <img crossOrigin={src.startsWith('https://cdn.brandfetch.io/') ? 'anonymous' : undefined} ref={image => { if (image?.complete && loadedSrc !== src) { if (image.naturalWidth === 0) setFailedSrc(src); else settle(image); } }} src={src} alt={`${name} logo`} width={128} height={128} loading={eager ? 'eager' : 'lazy'} decoding="async" onLoad={e => settle(e.currentTarget)} onError={() => setFailedSrc(src)} />
   </span>;
+}
+
+/** Where a logo comes from, for the admin Logo check. */
+export function logoSource(choice: string | null | undefined, uploaded: string | null | undefined, website: string | null | undefined) {
+  if (!organisationDomain(website)) return 'No website: name only';
+  const src = chosenLogoSrc(choice, uploaded, website);
+  if (!src) return 'None: name only';
+  if (src.startsWith('https://cdn.brandfetch.io/')) return `Brandfetch (${choice ?? 'icon'})`;
+  return isMediaUpload(src) ? 'Admin upload' : 'Own website file';
 }
