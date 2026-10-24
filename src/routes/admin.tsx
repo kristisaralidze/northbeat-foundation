@@ -50,6 +50,7 @@ const items = [
   { title: "Guides", to: "/admin/guides" },
   { title: "Glossary", to: "/admin/glossary" },
   { title: "Newsletter", to: "/admin/newsletter" },
+  { title: "Site and founders", to: "/admin/site" },
   { title: "Submissions", to: "/admin/submissions" },
   { title: "Tags", to: "/admin/tags" },
 ] as const;
