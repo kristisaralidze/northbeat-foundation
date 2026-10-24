@@ -111,19 +111,6 @@ export function createCellScene(canvas: HTMLCanvasElement, data: CellData, reduc
       ctx.globalAlpha = alpha * (reduced ? 1 : easeBurst((opening - cells.findIndex(c => c.group === label.group) * .06) / .35)); ctx.fillStyle = colours['ink'] ?? ''; ctx.textAlign = label.align;
       label.lines.forEach((line, i) => ctx.fillText(line, label.x + (label.align === 'right' ? label.width : 0), label.y + i * (phone ? 11 : 13)));
     }
-    if (selected && !selected.orgId) {
-      const occupied: Rect[] = [...labels, ...cells.map(c => ({ x: c.x - c.radius * 1.2, y: c.y - c.radius * 1.2, width: c.radius * 2.4, height: c.radius * 2.4 }))];
-      // Leave the top-right card clear, then reveal only non-overlapping sentence pills.
-      occupied.push({ x: phone ? 8 : w - 290, y: phone ? h - 166 : 8, width: phone ? w - 16 : 282, height: phone ? 158 : 340 });
-      ctx.font = `${phone ? 9 : 11}px ${font}`;
-      for (const link of links.filter(l => l.from.group === selected.group || l.to.group === selected.group)) {
-        const p = curvePoint(link, .5), width = ctx.measureText(link.sentence).width + 14;
-        const rect = { x: p.x - width / 2, y: p.y - 10, width, height: 20 };
-        if (rect.x < 4 || rect.x + width > w - 4 || occupied.some(r => rectOverlap(r, rect, 4))) continue;
-        occupied.push(rect); ctx.globalAlpha = 1; ctx.fillStyle = white; ctx.beginPath(); ctx.roundRect(rect.x, rect.y, width, 20, 10); ctx.fill();
-        ctx.fillStyle = colours['money'] ?? ''; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(link.sentence, p.x, p.y);
-      }
-    }
     ctx.globalAlpha = 1; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.font = `${phone ? 8 : 10}px ${font}`;
     let x = 8;
     for (const [label, tone] of [['MONEY', 'money'], ['SCIENCE AND CARE', 'science'], ['SUPPORT', 'support']]) {
