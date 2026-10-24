@@ -1354,3 +1354,13 @@ html, body { overflow-x: clip; }
 .nb-404-content h1 { font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-weight: 400; }
 .nb-404-links { display: flex; flex-wrap: wrap; gap: 8px 24px; }
 .nb-404-links a { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* Learn: founder journey as the hero */
+.theme-site .nb-learn-steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+@media (min-width: 768px) { .theme-site .nb-learn-steps { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; } }
+.theme-site .nb-learn-step { display: flex; min-height: 44px; height: 100%; flex-direction: column; gap: 8px; padding: 16px; border: 1px solid var(--hairline); border-radius: 12px; background: var(--background); transition: border-color 150ms ease, background-color 150ms ease; }
+.theme-site a.nb-learn-step:hover { border-color: var(--primary); }
+.theme-site .nb-learn-step[data-current="true"] { border-color: var(--primary); background: color-mix(in oklab, var(--primary) 8%, var(--background)); }
+.theme-site .nb-learn-step[data-disabled="true"] { opacity: 0.55; }
+.theme-site .nb-learn-step-number { font-family: var(--font-display); font-size: 48px; line-height: 1; color: var(--primary); }
+.theme-site .nb-learn-step-name { font-family: var(--font-display); font-size: 20px; line-height: 1.2; color: var(--ink); }
