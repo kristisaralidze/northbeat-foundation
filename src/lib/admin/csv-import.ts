@@ -4,6 +4,7 @@ import { ENTITIES, EVENT_FORMATS, slugify } from './entities';
 import { parsePasteValue } from './paste';
 
 /** Rich organisation profile columns, parsed into typed values and safe to fill on update. */
+type CsvValues = Record<string, string | number | boolean | null | string[] | Record<string, string>[]>;
 const RICH_COLUMNS = new Set(['story', 'scale_facts', 'our_take', 'offer_chips', 'how_to_get_involved', 'sources']);
 const ORG_UPDATE_COLUMNS = ['founded_year', 'story', 'scale_facts', 'our_take', 'offer_chips', 'how_to_get_involved', 'sources'];
 
@@ -72,7 +73,7 @@ export function prepareRow(entity: ImportEntity, row: CsvRow, snapshot: Snapshot
       else if (parsed.value !== undefined) updates[column] = parsed.value;
     }
     const noChanges = Object.keys(updates).length === 0;
-    return { name: existing.name, values: {}, tags: [], organisationId: null, duplicate: noChanges && !errors.length, update: noChanges ? undefined : { id: existing.id, values: updates }, errors, warnings };
+    return { name: existing.name, values: {} as CsvValues, tags: [], organisationId: null, duplicate: noChanges && !errors.length, update: noChanges ? undefined : { id: existing.id, values: updates }, errors, warnings };
   }
   const duplicate = snapshot.entries.some(e => normalize(e.name) === normalize(name) || (entity === 'organisations' && websiteDomain(row['website'] ?? '') !== '' && websiteDomain(e.website ?? '') === websiteDomain(row['website'] ?? '')));
   const values: Record<string, string | number | boolean | null | string[] | Record<string, string>[]> = { status: 'draft', last_checked: today, slug: slugify(slugValue || name), [cfg.titleField]: name };
