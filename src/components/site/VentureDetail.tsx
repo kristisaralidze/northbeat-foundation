@@ -99,7 +99,7 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
       </div>
     </header>
     {isOrg && row['logo_shared_from'] && profile.related.some(g=>g.label==='Part of') && <p className="nb-small">Part of {profile.related.filter(g=>g.label==='Part of').flatMap(g=>g.entries).filter(e=>e.id===row['logo_shared_from']).map(e=><DetailLink key={e.id} item={{...e,kind:'organisations'}}>{e.title}</DetailLink>)}</p>}
-    {isOrg && offerChips(text(row,'type') ?? '',row['offer_chips']).length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">How they can help you</h2><ul className="nb-detail-chips">{offerChips(text(row,'type') ?? '',row['offer_chips']).map(chip=><li key={chip} className="nb-reason-chip">{chip}</li>)}</ul></section>}
+    {isOrg && <OrgProfile row={row} />}
     {actions}
     {isOrg && detail && <OpenNow items={detail.coming} now={now} />}
     {!isOrg && steps.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">Who it is for</h2><ul className="nb-detail-chips">{steps.map(step => <li key={step.id} className="nb-reason-chip">{journeySentence(step.name).replace(/\.$/, '')}</li>)}</ul></section>}
