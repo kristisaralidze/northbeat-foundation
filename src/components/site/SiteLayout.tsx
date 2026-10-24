@@ -10,6 +10,7 @@ import { PublicScrollFrame } from './PublicScrollFrame';
 import { AtmosphericImage } from './AtmosphericImage';
 import { SiteSearch } from './SiteSearch';
 import { SavedLink } from './SavedLink';
+import { SystoleHeart } from './SystoleHeart';
 
 const NAV = [
   { to: "/explore", label: "Explore" },
@@ -138,6 +139,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       </a>
       <Header isHome={isHome} pathname={pathname} />
       <main id="main" className="flex-1">{isHome ? children : <PublicScrollFrame key={pathname} pathname={pathname}>{children}</PublicScrollFrame>}</main>
+      <SystoleHeart pathname={pathname} />
       <Footer hideSignup={pathname === '/newsletter' || pathname === '/newsletter/'} />
     </div>
   );
