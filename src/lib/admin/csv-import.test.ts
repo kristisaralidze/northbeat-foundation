@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { autoMapping, mapCsvRows, parseCsv, prepareRow, unknownTags, type Snapshot } from './csv-import';
 
-const snapshot: Snapshot = { entries: [{ id: '1', name: 'Existing', website: 'https://www.existing.fi/about' }], organisations: [{ id: '2', name: 'Partner' }], terms: [{ id: '3', kind: 'field', name: 'Digital health' }] };
+const snapshot: Snapshot = { entries: [{ id: '1', slug: 'existing', name: 'Existing', website: 'https://www.existing.fi/about' }], organisations: [{ id: '2', name: 'Partner' }], terms: [{ id: '3', kind: 'field', name: 'Digital health' }] };
 describe('CSV import rules', () => {
   it('parses quoted commas and newlines and auto-matches column names', () => {
     const csv = parseCsv('Name,Type,Short Description\r\nExample,startup,"A, B\nC"');
