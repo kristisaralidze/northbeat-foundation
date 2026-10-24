@@ -28,6 +28,7 @@ import { Route as AdminCoverImagesRouteImport } from './routes/admin.cover-image
 import { Route as AdminLogoCheckRouteImport } from './routes/admin.logo-check'
 import { Route as AdminMissingAssetsRouteImport } from './routes/admin.missing-assets'
 import { Route as AdminNewsletterRouteImport } from './routes/admin.newsletter'
+import { Route as AdminSiteRouteImport } from './routes/admin.site'
 import { Route as AdminTagsRouteImport } from './routes/admin.tags'
 import { Route as AdminWebsiteHealthRouteImport } from './routes/admin.website-health'
 import { Route as AdminLoginRouteImport } from './routes/admin_.login'
@@ -154,6 +155,11 @@ const AdminMissingAssetsRoute = AdminMissingAssetsRouteImport.update({
 const AdminNewsletterRoute = AdminNewsletterRouteImport.update({
   id: '/newsletter',
   path: '/newsletter',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSiteRoute = AdminSiteRouteImport.update({
+  id: '/site',
+  path: '/site',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminTagsRoute = AdminTagsRouteImport.update({
@@ -336,6 +342,7 @@ export interface FileRoutesByFullPath {
   '/admin/logo-check': typeof AdminLogoCheckRoute
   '/admin/missing-assets': typeof AdminMissingAssetsRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
+  '/admin/site': typeof AdminSiteRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/website-health': typeof AdminWebsiteHealthRoute
   '/admin/login': typeof AdminLoginRoute
@@ -387,6 +394,7 @@ export interface FileRoutesByTo {
   '/admin/logo-check': typeof AdminLogoCheckRoute
   '/admin/missing-assets': typeof AdminMissingAssetsRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
+  '/admin/site': typeof AdminSiteRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/website-health': typeof AdminWebsiteHealthRoute
   '/admin/login': typeof AdminLoginRoute
@@ -441,6 +449,7 @@ export interface FileRoutesById {
   '/admin/logo-check': typeof AdminLogoCheckRoute
   '/admin/missing-assets': typeof AdminMissingAssetsRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
+  '/admin/site': typeof AdminSiteRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/website-health': typeof AdminWebsiteHealthRoute
   '/admin_/login': typeof AdminLoginRoute
@@ -496,6 +505,7 @@ export interface FileRouteTypes {
     | '/admin/logo-check'
     | '/admin/missing-assets'
     | '/admin/newsletter'
+    | '/admin/site'
     | '/admin/tags'
     | '/admin/website-health'
     | '/admin/login'
@@ -547,6 +557,7 @@ export interface FileRouteTypes {
     | '/admin/logo-check'
     | '/admin/missing-assets'
     | '/admin/newsletter'
+    | '/admin/site'
     | '/admin/tags'
     | '/admin/website-health'
     | '/admin/login'
@@ -600,6 +611,7 @@ export interface FileRouteTypes {
     | '/admin/logo-check'
     | '/admin/missing-assets'
     | '/admin/newsletter'
+    | '/admin/site'
     | '/admin/tags'
     | '/admin/website-health'
     | '/admin_/login'
@@ -796,6 +808,13 @@ declare module '@tanstack/react-router' {
       path: '/newsletter'
       fullPath: '/admin/newsletter'
       preLoaderRoute: typeof AdminNewsletterRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/site': {
+      id: '/admin/site'
+      path: '/site'
+      fullPath: '/admin/site'
+      preLoaderRoute: typeof AdminSiteRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/tags': {
@@ -1031,6 +1050,7 @@ interface AdminRouteChildren {
   AdminLogoCheckRoute: typeof AdminLogoCheckRoute
   AdminMissingAssetsRoute: typeof AdminMissingAssetsRoute
   AdminNewsletterRoute: typeof AdminNewsletterRoute
+  AdminSiteRoute: typeof AdminSiteRoute
   AdminTagsRoute: typeof AdminTagsRoute
   AdminWebsiteHealthRoute: typeof AdminWebsiteHealthRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1058,6 +1078,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLogoCheckRoute: AdminLogoCheckRoute,
   AdminMissingAssetsRoute: AdminMissingAssetsRoute,
   AdminNewsletterRoute: AdminNewsletterRoute,
+  AdminSiteRoute: AdminSiteRoute,
   AdminTagsRoute: AdminTagsRoute,
   AdminWebsiteHealthRoute: AdminWebsiteHealthRoute,
   AdminIndexRoute: AdminIndexRoute,
