@@ -176,6 +176,13 @@
       "when": 1792881672050,
       "tag": "0024_logo_status_unchecked_default",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792881778645,
+      "tag": "0025_rich_organisation_fields_and_step_picks",
+      "breakpoints": true
     }
   ]
 }
