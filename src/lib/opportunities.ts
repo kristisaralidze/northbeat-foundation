@@ -5,6 +5,7 @@ export type OpportunityRow = {
   location: string | null; employment_type: string | null; remote_ok: boolean | null;
   termIds: string[];
   description?: string | null;
+  apply_url?: string | null;
 };
 export type OpportunityTerm = { id: string; kind: string; name: string; slug: string; parent_id: string | null; sort_order: number };
 export type OpportunitiesData = { opportunities: OpportunityRow[]; terms: OpportunityTerm[]; now: string };

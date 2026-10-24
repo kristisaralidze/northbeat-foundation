@@ -14,7 +14,7 @@ export const getOpportunities = createServerFn({ method: 'GET' }).handler(async 
   const links: { opportunity_id: string; term_id: string }[] = [];
   for (let offset = 0; ; offset += 1000) {
     const { data, error } = await client.from('opportunities')
-      .select('id,slug,title,type,summary,description,opens_at,deadline_at,amount_min_eur,amount_max_eur,location,employment_type,remote_ok')
+      .select('id,slug,title,type,summary,description,opens_at,deadline_at,amount_min_eur,amount_max_eur,location,employment_type,remote_ok,apply_url')
       .eq('status', 'published').order('id').range(offset, offset + 999);
     if (error) throw new Error('Opportunities could not be loaded.');
     opportunities.push(...(data ?? []).map((item) => ({ ...item, termIds: [] })));
