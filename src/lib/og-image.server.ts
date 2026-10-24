@@ -103,7 +103,8 @@ export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
   ctx.fillStyle = COLOURS.plum; ctx.beginPath(); ctx.arc(905, 546, 8, 0, Math.PI * 2); ctx.fill();
   if (input.home) {
     ctx.fillStyle = COLOURS.ink; ctx.font = '150pt Bodoni';
-    const word = 'NORTHBEAT'; const w = ctx.measureText(word).width; serif(ctx, word, (W - w) / 2, 300, COLOURS.ink);
+    const word = 'NORTHBEAT'; const w = ctx.measureText(word).width; const wx = (W - w) / 2;
+    serif(ctx, word, wx, 300, COLOURS.ink); wordmarkHeart(ctx, wx, 300, 150);
     ctx.font = '40pt Body'; ctx.fillStyle = COLOURS.muted; const t = 'The heartbeat of Nordic health innovation.'; ctx.fillText(t, (W - ctx.measureText(t).width) / 2, 390);
     return encode(img);
   }
@@ -122,7 +123,8 @@ export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
   const lines = wrap(ctx, input.title, W - pad * 2, tile ? 2 : 3);
   lines.forEach((line, i) => serif(ctx, line, textX, top + 84 + i * 80, COLOURS.ink));
   if (input.subtitle) { ctx.font = '30pt Body'; ctx.fillStyle = COLOURS.muted; const sub = wrap(ctx, input.subtitle, W - pad * 2, 1)[0]!; ctx.fillText(sub, textX, top + 84 + lines.length * 80 + 4); }
-  ctx.font = '30pt Bodoni'; ctx.fillStyle = COLOURS.ink; serif(ctx, 'NORTHBEAT', W - pad - ctx.measureText('NORTHBEAT').width, pad + 30, COLOURS.ink);
+  ctx.font = '30pt Bodoni'; ctx.fillStyle = COLOURS.ink; const bx = W - pad - ctx.measureText('NORTHBEAT').width;
+  serif(ctx, 'NORTHBEAT', bx, pad + 30, COLOURS.ink); wordmarkHeart(ctx, bx, pad + 30, 30);
   return encode(img);
 }
 
