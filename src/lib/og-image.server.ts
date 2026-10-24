@@ -64,6 +64,26 @@ function drawLogo(img: ReturnType<typeof PImage.make>, logo: { width: number; he
   }
 }
 
+/** Plum heart centred at (cx, cy); size is the heart's full height. */
+function drawHeart(ctx: Ctx, cx: number, cy: number, size: number) {
+  const s = size / 20; const p = (x: number, y: number) => [cx + x * s, cy + y * s] as const;
+  ctx.fillStyle = COLOURS.plum; ctx.beginPath();
+  ctx.moveTo(...p(0, 7.6));
+  ctx.bezierCurveTo(...p(-9, 1.7), ...p(-9, -4.1), ...p(-9, -4.1));
+  ctx.bezierCurveTo(...p(-9, -6.8), ...p(-6.9, -8.9), ...p(-4.4, -8.9));
+  ctx.bezierCurveTo(...p(-2.6, -8.9), ...p(-1, -7.9), ...p(0, -6.4));
+  ctx.bezierCurveTo(...p(1, -7.9), ...p(2.6, -8.9), ...p(4.4, -8.9));
+  ctx.bezierCurveTo(...p(6.9, -8.9), ...p(9, -6.8), ...p(9, -4.1));
+  ctx.bezierCurveTo(...p(9, 1.7), ...p(0, 7.6), ...p(0, 7.6));
+  ctx.closePath(); ctx.fill();
+}
+
+/** Heart inside the O of a drawn NORTHBEAT: centred in the counter at 53% of the cap height. */
+function wordmarkHeart(ctx: Ctx, x: number, baseline: number, fontPt: number) {
+  const oX = x + ctx.measureText('N').width + ctx.measureText('O').width / 2;
+  drawHeart(ctx, oX, baseline - fontPt * 0.7 * 0.53, fontPt * 0.17);
+}
+
 function roundRect(ctx: Ctx, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath(); ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y); ctx.quadraticCurveTo(x + w, y, x + w, y + r); ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h); ctx.lineTo(x + r, y + h); ctx.quadraticCurveTo(x, y + h, x, y + h - r); ctx.lineTo(x, y + r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.closePath(); ctx.fill();
 }
@@ -83,7 +103,8 @@ export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
   ctx.fillStyle = COLOURS.plum; ctx.beginPath(); ctx.arc(905, 546, 8, 0, Math.PI * 2); ctx.fill();
   if (input.home) {
     ctx.fillStyle = COLOURS.ink; ctx.font = '150pt Bodoni';
-    const word = 'NORTHBEAT'; const w = ctx.measureText(word).width; serif(ctx, word, (W - w) / 2, 300, COLOURS.ink);
+    const word = 'NORTHBEAT'; const w = ctx.measureText(word).width; const wx = (W - w) / 2;
+    serif(ctx, word, wx, 300, COLOURS.ink); wordmarkHeart(ctx, wx, 300, 150);
     ctx.font = '40pt Body'; ctx.fillStyle = COLOURS.muted; const t = 'The heartbeat of Nordic health innovation.'; ctx.fillText(t, (W - ctx.measureText(t).width) / 2, 390);
     return encode(img);
   }
@@ -102,7 +123,8 @@ export async function renderOgPng(input: OgInput): Promise<Uint8Array> {
   const lines = wrap(ctx, input.title, W - pad * 2, tile ? 2 : 3);
   lines.forEach((line, i) => serif(ctx, line, textX, top + 84 + i * 80, COLOURS.ink));
   if (input.subtitle) { ctx.font = '30pt Body'; ctx.fillStyle = COLOURS.muted; const sub = wrap(ctx, input.subtitle, W - pad * 2, 1)[0]!; ctx.fillText(sub, textX, top + 84 + lines.length * 80 + 4); }
-  ctx.font = '30pt Bodoni'; ctx.fillStyle = COLOURS.ink; serif(ctx, 'NORTHBEAT', W - pad - ctx.measureText('NORTHBEAT').width, pad + 30, COLOURS.ink);
+  ctx.font = '30pt Bodoni'; ctx.fillStyle = COLOURS.ink; const bx = W - pad - ctx.measureText('NORTHBEAT').width;
+  serif(ctx, 'NORTHBEAT', bx, pad + 30, COLOURS.ink); wordmarkHeart(ctx, bx, pad + 30, 30);
   return encode(img);
 }
 

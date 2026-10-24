@@ -4,6 +4,9 @@ const LETTERS = Array.from("NORTHBEAT");
 const DOT_LETTER = 1; // the O
 const FONT_SIZE = 200;
 const TRACKING = 0.06 * FONT_SIZE;
+/** Plum heart inside the O's counter: 17% of the font size, centred at 53% of the cap height. */
+const HEART_PATH = "M0 7.6C0 7.6-9 1.7-9-4.1-9-6.8-6.9-8.9-4.4-8.9-2.6-8.9-1-7.9 0-6.4 1-7.9 2.6-8.9 4.4-8.9 6.9-8.9 9-6.8 9-4.1 9 1.7 0 7.6 0 7.6Z";
+const HEART_SCALE = (FONT_SIZE * 0.17) / 20;
 
 type Metrics = { cap: number; width: number; positions: number[]; widths: number[] };
 
@@ -34,7 +37,7 @@ export function LaboratoryWordmark({ compact = false }: { compact?: boolean }) {
 
   const Tag = compact ? 'span' : 'h1';
   const dotX = (metrics.positions[DOT_LETTER] ?? 0) + (metrics.widths[DOT_LETTER] ?? 0) / 2;
-  const dotY = metrics.cap * 0.52;
+  const dotY = metrics.cap * 0.53;
   return <Tag ref={host} className="nb-laboratory-wordmark" aria-label="Northbeat">
     <span className="sr-only">Northbeat</span>
     <svg viewBox={`0 0 ${metrics.width} ${metrics.cap}`} className="nb-laboratory-lettering" aria-hidden="true">
@@ -51,7 +54,11 @@ export function LaboratoryWordmark({ compact = false }: { compact?: boolean }) {
           <text key={index} x={metrics.positions[index] ?? 0} y={metrics.cap} style={{ "--i": index } as CSSProperties}>{letter}</text>
         ))}
       </g>
-      <circle className="nb-wordmark-dot" cx={dotX} cy={dotY} r={FONT_SIZE * 0.035} />
+      <g transform={`translate(${dotX} ${dotY}) scale(${HEART_SCALE})`}>
+        <g className="nb-wordmark-heart">
+          <path className={`nb-wordmark-heart-beat${compact ? ' nb-wordmark-heart-soft' : ''}`} d={HEART_PATH} />
+        </g>
+      </g>
     </svg>
   </Tag>;
 }
