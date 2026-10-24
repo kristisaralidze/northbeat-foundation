@@ -1,6 +1,9 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { Menu, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { siteInfoQuery } from "@/lib/site.query";
+import { longDate } from "@/lib/site";
 import { LaboratoryWordmark } from "./LaboratoryWordmark";
 import { NewsletterSignup } from "./NewsletterSignup";
 import { Button } from "@/components/ui/button";
@@ -17,8 +20,9 @@ const NAV = [
   { to: "/podcast", label: "Podcast" },
 ] as const;
 
-function Header({ isHome }: { isHome: boolean }) {
+function Header({ isHome, pathname }: { isHome: boolean; pathname: string }) {
   const [open, setOpen] = useState(false);
+  useEffect(() => { setOpen(false); }, [pathname]);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -60,21 +64,24 @@ function Header({ isHome }: { isHome: boolean }) {
         </div>
       </div>
       {open && (
-        <nav id="mobile-nav" aria-label="Main" className="fixed inset-x-0 bottom-0 top-16 flex flex-col overflow-y-auto bg-background lg:hidden">
-          <ul className="nb-container divide-y divide-hairline py-4">
-            {NAV.map((n) => (
-              <li key={n.to}>
-                <Link to={n.to} onClick={() => setOpen(false)} className="nb-menulink">
-                  {n.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <div id="mobile-nav" role="dialog" aria-modal="true" aria-label="Menu" className="nb-mobile-menu lg:hidden">
+          <div className="nb-container flex h-16 items-center justify-end">
+            <Button type="button" variant="ghost" size="icon" className="min-h-11 min-w-11" aria-label="Close menu" onClick={() => setOpen(false)} autoFocus>
+              <X className="h-5 w-5" aria-hidden />
+            </Button>
+          </div>
+          <div className="nb-container"><SiteSearch variant="field" /></div>
+          <nav aria-label="Main" className="nb-container">
+            <ul className="nb-mobile-menu-list">
+              {[...NAV, { to: "/newsletter", label: "Newsletter" } as const, { to: "/about", label: "About" } as const].map((n) => (
+                <li key={n.to}><Link to={n.to} onClick={() => setOpen(false)} className="nb-mobile-menu-link">{n.label}</Link></li>
+              ))}
+            </ul>
+          </nav>
           <div className="nb-container mt-auto pb-10 pt-6">
             <Button asChild className="nb-header-primary w-full"><Link to="/submit" onClick={() => setOpen(false)}>Add to the hub</Link></Button>
-            <Link to="/newsletter" onClick={() => setOpen(false)} className="nb-header-newsletter mt-4 inline-block">Newsletter</Link>
           </div>
-        </nav>
+        </div>
       )}
     </header>
   );
@@ -91,15 +98,31 @@ function Footer({ hideSignup }: { hideSignup: boolean }) {
           <NewsletterSignup source="footer" />
         </div>
       </section>}
-      <div className="nb-container nb-footer-bottom nb-small text-muted-foreground">
-        <p>© 2026 Northbeat. The heartbeat of Nordic health innovation.</p>
-        <nav aria-label="Footer"><ul className="flex flex-wrap justify-center gap-x-6 gap-y-3">
-          {NAV.filter(n => n.to !== '/podcast').map(n => <li key={n.to}><Link to={n.to} className="nb-link">{n.label}</Link></li>)}
-          <li><Link to="/about" className="nb-link">About</Link></li>
-          <li><Link to="/privacy" className="nb-link">Privacy</Link></li>
-        </ul></nav>
-      </div>
+      <FooterBottom />
     </footer>
+  );
+}
+
+function FooterBottom() {
+  const { data } = useQuery(siteInfoQuery);
+  return (
+    <div className="nb-container nb-footer-main nb-small">
+      <nav aria-label="Footer"><ul className="nb-footer-links">
+        {NAV.map(n => <li key={n.to}><Link to={n.to} className="nb-link">{n.label}</Link></li>)}
+        <li><Link to="/newsletter" className="nb-link">Newsletter</Link></li>
+        <li><Link to="/about" className="nb-link">About</Link></li>
+        <li><Link to="/submit" className="nb-link">Add to the hub</Link></li>
+        <li><Link to="/privacy" className="nb-link">Privacy</Link></li>
+      </ul></nav>
+      <p className="nb-footer-promise">No one pays to be listed or featured.</p>
+      <div className="nb-footer-meta text-muted-foreground">
+        {data?.contactEmail && <a href={`mailto:${data.contactEmail}`} className="nb-link">{data.contactEmail}</a>}
+        {data?.linkedinUrl && <a href={data.linkedinUrl} target="_blank" rel="noopener noreferrer" className="nb-link">LinkedIn</a>}
+        {data?.instagramUrl && <a href={data.instagramUrl} target="_blank" rel="noopener noreferrer" className="nb-link">Instagram</a>}
+        {data?.updatedOn && <span>Updated {longDate(data.updatedOn)}</span>}
+      </div>
+      <p className="text-muted-foreground">© 2026 Northbeat. The heartbeat of Nordic health innovation.</p>
+    </div>
   );
 }
 
@@ -111,7 +134,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 nb-btn nb-btn-primary nb-btn-sm">
         Skip to content
       </a>
-      <Header isHome={isHome} />
+      <Header isHome={isHome} pathname={pathname} />
       <main id="main" className="flex-1">{isHome ? children : <PublicScrollFrame key={pathname} pathname={pathname}>{children}</PublicScrollFrame>}</main>
       <Footer hideSignup={pathname === '/newsletter' || pathname === '/newsletter/'} />
     </div>
