@@ -13,6 +13,8 @@ export type GuidePage = {
   organisations: HubItem[]; opportunities: HubItem[]; events: HubItem[]; previous: GuideNeighbour; next: GuideNeighbour;
 };
 export type GlossaryEntry = { id: string; slug: string; term: string; short_definition: string; explanation: string | null; related: { slug: string; term: string }[]; guides: { slug: string; title: string }[] };
+export type StepPick = { slug: string; title: string; summary: string | null; reason: string | null };
+export type StepPage = { step: LearnTerm; number: number; total: number; guide: GuideCard | null; commonMistakes: string[]; picks: StepPick[]; opportunities: HubItem[]; previous: LearnTerm | null; next: LearnTerm | null };
 
 export const LEVEL_LABELS: Record<string, string> = { beginner: 'Beginner', intermediate: 'Intermediate' };
 export const levelLabel = (level: string) => LEVEL_LABELS[level] ?? level;

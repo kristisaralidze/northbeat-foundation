@@ -650,6 +650,7 @@ export type Database = {
         Row: {
           area_id: string | null
           body: string | null
+          common_mistakes: Json
           cover_url: string | null
           created_at: string
           created_by: string | null
@@ -673,6 +674,7 @@ export type Database = {
         Insert: {
           area_id?: string | null
           body?: string | null
+          common_mistakes?: Json
           cover_url?: string | null
           created_at?: string
           created_by?: string | null
@@ -696,6 +698,7 @@ export type Database = {
         Update: {
           area_id?: string | null
           body?: string | null
+          common_mistakes?: Json
           cover_url?: string | null
           created_at?: string
           created_by?: string | null
@@ -727,6 +730,45 @@ export type Database = {
           {
             foreignKeyName: "guides_journey_step_id_fkey"
             columns: ["journey_step_id"]
+            isOneToOne: false
+            referencedRelation: "terms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journey_step_organisations: {
+        Row: {
+          id: string
+          organisation_id: string
+          reason: string | null
+          sort_order: number
+          term_id: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          reason?: string | null
+          sort_order?: number
+          term_id: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          reason?: string | null
+          sort_order?: number
+          term_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journey_step_organisations_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journey_step_organisations_term_id_fkey"
+            columns: ["term_id"]
             isOneToOne: false
             referencedRelation: "terms"
             referencedColumns: ["id"]
@@ -1300,6 +1342,7 @@ export type Database = {
           description: string | null
           founded_year: number | null
           geocoded_at: string | null
+          how_to_get_involved: Json
           id: string
           image_source: string | null
           image_source_url: string | null
@@ -1329,16 +1372,19 @@ export type Database = {
           offer_chips: string[]
           openalex_id: string | null
           openalex_name: string | null
+          our_take: string | null
           prominence: number
           published_at: string | null
           registration_date: string | null
           registry_fetched_at: string | null
           research: Json | null
           research_fetched_at: string | null
+          scale_facts: Json
           short_description: string | null
           slug: string
           source_url: string | null
           status: Database["public"]["Enums"]["entry_status"]
+          story: string | null
           ticket_max_eur: number | null
           ticket_min_eur: number | null
           trials_fetched_at: string | null
@@ -1377,6 +1423,7 @@ export type Database = {
           description?: string | null
           founded_year?: number | null
           geocoded_at?: string | null
+          how_to_get_involved?: Json
           id?: string
           image_source?: string | null
           image_source_url?: string | null
@@ -1406,16 +1453,19 @@ export type Database = {
           offer_chips?: string[]
           openalex_id?: string | null
           openalex_name?: string | null
+          our_take?: string | null
           prominence?: number
           published_at?: string | null
           registration_date?: string | null
           registry_fetched_at?: string | null
           research?: Json | null
           research_fetched_at?: string | null
+          scale_facts?: Json
           short_description?: string | null
           slug: string
           source_url?: string | null
           status?: Database["public"]["Enums"]["entry_status"]
+          story?: string | null
           ticket_max_eur?: number | null
           ticket_min_eur?: number | null
           trials_fetched_at?: string | null
@@ -1454,6 +1504,7 @@ export type Database = {
           description?: string | null
           founded_year?: number | null
           geocoded_at?: string | null
+          how_to_get_involved?: Json
           id?: string
           image_source?: string | null
           image_source_url?: string | null
@@ -1483,16 +1534,19 @@ export type Database = {
           offer_chips?: string[]
           openalex_id?: string | null
           openalex_name?: string | null
+          our_take?: string | null
           prominence?: number
           published_at?: string | null
           registration_date?: string | null
           registry_fetched_at?: string | null
           research?: Json | null
           research_fetched_at?: string | null
+          scale_facts?: Json
           short_description?: string | null
           slug?: string
           source_url?: string | null
           status?: Database["public"]["Enums"]["entry_status"]
+          story?: string | null
           ticket_max_eur?: number | null
           ticket_min_eur?: number | null
           trials_fetched_at?: string | null

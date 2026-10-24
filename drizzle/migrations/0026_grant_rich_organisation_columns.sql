@@ -1,0 +1,2 @@
+GRANT SELECT (story, scale_facts, our_take, how_to_get_involved) ON public.organisations TO anon;
+GRANT SELECT (story, scale_facts, our_take, how_to_get_involved) ON public.organisations TO authenticated;

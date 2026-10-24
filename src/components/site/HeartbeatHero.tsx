@@ -19,7 +19,7 @@ function dateFor(day: number, long = false) {
 }
 /** One logo per item: the organiser's official logo, else the Brandfetch icon for the event's own website. */
 function itemLogo(item: HeartbeatItem) {
-  for (const o of item.orgs) { const src = (o.logo_choice==='upload'?o.logo_url:o.logo_resolved_url); if (src) return src; }
+  for (const o of item.orgs) { const src = (o.logo_choice==='upload'?o.logo_url:o.logo_resolved_url??brandfetchLogoUrl(o.website)); if (src) return src; }
   return null;
 }
 /** "17 Nov" or "17–18 Nov" for a merged beat. */
@@ -411,7 +411,7 @@ export function HeartbeatHero() {
       <h2 id="heartbeat-heading" className="sr-only">Events and deadlines in the next 35 days</h2>
       <p ref={passing} className="nb-heartbeat-now" aria-hidden="true">Coming up in Nordic health</p>
       {next && nextItem && <button key={next.key} type="button" className="nb-heartbeat-next" onClick={openNext}>
-        <OrganisationLogo name={nextItem.orgs[0]?.name ?? nextItem.title} slug={nextItem.orgs[0]?.slug} uploaded={nextItem.orgs[0]?.logo_url} choice={nextItem.orgs[0]?.logo_choice} resolved={nextItem.orgs[0]?.logo_resolved_url} tone={nextItem.orgs[0]?.logo_tone} status={nextItem.orgs[0]?.logo_status} />
+        <OrganisationLogo name={nextItem.orgs[0]?.name ?? nextItem.title} slug={nextItem.orgs[0]?.slug} website={nextItem.orgs[0]?.website} uploaded={nextItem.orgs[0]?.logo_url} choice={nextItem.orgs[0]?.logo_choice} resolved={nextItem.orgs[0]?.logo_resolved_url} tone={nextItem.orgs[0]?.logo_tone} status={nextItem.orgs[0]?.logo_status} />
         <span className="nb-heartbeat-next-text">
           <span className="nb-heartbeat-next-label">Next up</span>
           <span className="nb-heartbeat-next-title">{beatTitle(next.beat.items.map(i => publicTitle(i.title)))}</span>

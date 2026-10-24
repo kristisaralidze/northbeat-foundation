@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ENTITIES, STATUS, humanize, type EntityKey } from "@/lib/admin/entities";
 import { listEntries, listTerms, type ListFilters } from "@/lib/admin/db";
 import { CsvImport } from './CsvImport';
+import { PasteImport } from './PasteImport';
 
 export const selectClass =
   "h-9 rounded-md border border-input bg-background px-2 text-sm text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
@@ -37,7 +38,7 @@ export function EntityList({ entity, filters }: { entity: EntityKey; filters: Li
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-xl font-semibold text-foreground">{cfg.plural}</h1>
         <div className="flex flex-wrap justify-end gap-2">
-        {(entity === 'organisations' || entity === 'events' || entity === 'opportunities') && <CsvImport entity={entity} />}
+        {(entity === 'organisations' || entity === 'events' || entity === 'opportunities') && <><CsvImport entity={entity} /><PasteImport entity={entity} /></>}
         <Button asChild>
           <Link to={`/admin/${entity}/$id` as never} params={{ id: "new" } as never}>New {cfg.singular.toLowerCase()}</Link>
         </Button>

@@ -26,12 +26,12 @@ export async function detailContext(client: SupabaseClient, kind: 'organisations
   const fields = terms.filter(term => term.kind === 'field').map(term => term.id);
   const steps = terms.filter(term => term.kind === 'journey_step').map(term => term.id);
   if (kind === 'organisations') {
-    const [orgs, tags] = await Promise.all([all(client, 'organisations', 'id,slug,name,short_description,logo_url,city,type,status'), all(client, 'organisation_terms', 'organisation_id,term_id', false)]);
+    const [orgs, tags] = await Promise.all([all(client, 'organisations', 'id,slug,name,short_description,logo_url,city,type,prominence,status'), all(client, 'organisation_terms', 'organisation_id,term_id', false)]);
     const fieldNames = Object.fromEntries(terms.filter(term => term.kind === 'field').map(term => [term.id, term.name]));
     const relations: Record<string, string> = {};
     for (const group of related) if (group.kind === 'organisations') for (const entry of group.entries) relations[entry.id] ??= RELATION_REASON[group.label] ?? 'Connected';
     const countryNames = Object.fromEntries(terms.filter(term => term.kind === 'country').map(term => [term.id, term.name]));
-    const ranked = closeToThem(orgs.map(org => { const ids = tags.filter(tag => tag['organisation_id'] === org.id).map(tag => String(tag['term_id'])); return { ...org, title: String(org['name']), city: text(org, 'city'), type: text(org, 'type'), fieldIds: ids, countryIds: ids }; }), { id: row.id, city: text(row, 'city'), type: text(row, 'type'), fieldNames, countryNames, relations });
+    const ranked = closeToThem(orgs.map(org => { const ids = tags.filter(tag => tag['organisation_id'] === org.id).map(tag => String(tag['term_id'])); return { ...org, title: String(org['name']), slug: String(org['slug']), city: text(org, 'city'), type: text(org, 'type'), prominence: typeof org['prominence'] === 'number' ? org['prominence'] : null, fieldIds: ids, countryIds: ids }; }), { id: row.id, slug: text(row, 'slug') ?? row.id, city: text(row, 'city'), type: text(row, 'type'), fieldNames, countryNames, relations });
     similar = ranked.map(org => ({ ...publicEntry('organisations', org), roles: [org.reason] }));
   }
   // Organisations and events share one guide match: journey step first, then a shared field.

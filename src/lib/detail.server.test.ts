@@ -8,9 +8,10 @@ it('reads link tables by their real composite keys and excludes drafts from reco
     events: [], opportunities: [],
     organisations: [
       { id: 'published', slug: 'published', name: 'Published', status: 'published', city: 'Helsinki' },
+      { id: 'published2', slug: 'published2', name: 'Published 2', status: 'published', city: 'Helsinki' },
       { id: 'draft', slug: 'draft', name: 'Draft', status: 'draft', city: 'Helsinki' },
     ],
-    organisation_terms: [{ organisation_id: 'published', term_id: 'med' }, { organisation_id: 'draft', term_id: 'med' }],
+    organisation_terms: [{ organisation_id: 'published', term_id: 'med' }, { organisation_id: 'published2', term_id: 'med' }, { organisation_id: 'draft', term_id: 'med' }],
   };
   const client = { from(table: string) {
     filters[table] = []; orders[table] = [];
@@ -24,5 +25,5 @@ it('reads link tables by their real composite keys and excludes drafts from reco
   const result = await detailContext(client, 'organisations', { id: 'self', slug: 'self', city: 'Helsinki' }, [{ id: 'med', name: 'Medtech', slug: 'medtech', kind: 'field' }], []);
   expect(orders['organisation_terms']).toEqual(['organisation_id', 'term_id']);
   expect(filters['organisations']).toContainEqual(['status', 'published']);
-  expect(result.similar.map(row => row.id)).toEqual(['published']);
+  expect(new Set(result.similar.map(row => row.id))).toEqual(new Set(['published', 'published2']));
 });

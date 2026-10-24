@@ -99,7 +99,7 @@ export function VentureDetail({ profile }: { profile: PublicProfile }) {
       </div>
     </header>
     {isOrg && row['logo_shared_from'] && profile.related.some(g=>g.label==='Part of') && <p className="nb-small">Part of {profile.related.filter(g=>g.label==='Part of').flatMap(g=>g.entries).filter(e=>e.id===row['logo_shared_from']).map(e=><DetailLink key={e.id} item={{...e,kind:'organisations'}}>{e.title}</DetailLink>)}</p>}
-    {isOrg && offerChips(text(row,'type') ?? '',row['offer_chips']).length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">How they can help you</h2><ul className="nb-detail-chips">{offerChips(text(row,'type') ?? '',row['offer_chips']).map(chip=><li key={chip} className="nb-reason-chip">{chip}</li>)}</ul></section>}
+    {isOrg && <OrgProfile row={row} />}
     {actions}
     {isOrg && detail && <OpenNow items={detail.coming} now={now} />}
     {!isOrg && steps.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">Who it is for</h2><ul className="nb-detail-chips">{steps.map(step => <li key={step.id} className="nb-reason-chip">{journeySentence(step.name).replace(/\.$/, '')}</li>)}</ul></section>}
@@ -125,6 +125,20 @@ function journeySentence(name: string) {
 }
 type Fact = { value: string; label: string; year?: string; source_url?: string };
 const strings = (v: unknown) => Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && x.trim() !== '') : [];
+/** Editorial organisation profile after the header: story, numbers, our take, offer chips, get involved. Each part hides when empty. */
+function OrgProfile({ row }: { row: PublicProfile['row'] }) {
+  const story = text(row, 'story'); const take = text(row, 'our_take');
+  const facts = (Array.isArray(row['scale_facts']) ? row['scale_facts'] as unknown as Fact[] : []).filter(f => f && f.value && f.label);
+  const chips = offerChips(text(row, 'type') ?? '', row['offer_chips']);
+  const involved = strings(row['how_to_get_involved']);
+  return <>
+    {story && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">The story</h2><p className="nb-body max-w-2xl whitespace-pre-line">{story}</p></section>}
+    {facts.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-6">In numbers</h2><dl className="nb-event-facts">{facts.map((f, i) => <div key={i}><dt className="nb-event-fact-value">{f.value}</dt><dd className="nb-small text-muted-foreground">{f.label}{f.year ? `, ${f.year}` : ''}{safeWebUrl(f.source_url ?? null) ? <> <a className="nb-link" href={safeWebUrl(f.source_url ?? null)!} target="_blank" rel="noopener noreferrer">Source</a></> : null}</dd></div>)}</dl></section>}
+    {take && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">Our take</h2><p className="nb-lead max-w-2xl">{take}</p></section>}
+    {chips.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">How they can help you</h2><ul className="nb-detail-chips">{chips.map(chip => <li key={chip} className="nb-reason-chip">{chip}</li>)}</ul></section>}
+    {involved.length > 0 && <section className="nb-detail-section"><h2 className="nb-h2 mb-5">How to get involved</h2><ul className="nb-check-list nb-body max-w-2xl">{involved.map(s => <li key={s}>{s}</li>)}</ul></section>}
+  </>;
+}
 /** Editorial event profile: our take, numbers, story, who you'll meet, price, tips. Each part hides when empty. */
 function EventProfile({ row }: { row: PublicProfile['row'] }) {
   const take = text(row, 'our_take'); const story = text(row, 'story'); const price = text(row, 'price_info'); const free = text(row, 'free_ways_in');
