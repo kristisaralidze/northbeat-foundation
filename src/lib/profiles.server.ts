@@ -30,7 +30,7 @@ export async function loadPublicProfile(client: SupabaseClient, kind: EntityKey,
   const [row] = await readEntries(client, kind, { slug });
   if (!row) return null;
   if (kind === 'organisations' || kind === 'events') {
-    const columns = kind === 'organisations' ? 'offer_chips,logo_resolved_url,logo_tone,logo_status,logo_shared_from,cover_image_url,cover_image_status,image_source_url,logo_url,logo_choice,logo_image_source,logo_image_source_url,brand_accent,video_url,video_source_url,openalex_id,research,business_id,registration_date,company_form,main_business_line,latitude,longitude,news_items' : 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url,video_url,video_source_url,latitude,longitude';
+    const columns: string = kind === 'organisations' ? 'offer_chips,logo_resolved_url,logo_tone,logo_status,logo_shared_from,cover_image_url,cover_image_status,image_source_url,logo_url,logo_choice,logo_image_source,logo_image_source_url,brand_accent,video_url,video_source_url,openalex_id,research,business_id,registration_date,company_form,main_business_line,latitude,longitude,news_items' : 'cover_image_url,cover_image_status,image_source_url,logo_url,logo_image_source,logo_image_source_url,video_url,video_source_url,latitude,longitude';
     const table: string = kind;
     const assetClient: SupabaseClient<any> = client;
     const cover = await assetClient.from(table).select(columns).eq('id', row.id).eq('status', 'published').maybeSingle();
