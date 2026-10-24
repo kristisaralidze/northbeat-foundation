@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+import { ListFilterSelect } from '@/components/site/ListFilterSelect';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
 import { zodValidator, fallback } from '@tanstack/zod-adapter';
@@ -34,25 +36,28 @@ export const Route = createFileRoute('/opportunities')({
     { name: 'twitter:card', content: 'summary' },
   ], links: [{ rel: 'canonical', href: '/opportunities' }] }),
   component: Opportunities,
-  errorComponent: ({ reset }) => { const client = useQueryClient(); return <div className="nb-container nb-section"><h1 className="nb-h2">Opportunities couldn’t be loaded</h1><p className="nb-body mt-4 text-danger" role="alert">Please try again in a moment.</p><Button variant="ghost" className="nb-btn nb-btn-primary mt-6" onClick={async () => { await client.resetQueries({ queryKey: ['public-opportunities'] }); reset(); }}>Try again</Button></div>; },
-  notFoundComponent: () => <div className="nb-container nb-section"><h1 className="nb-h2">Opportunities not found</h1></div>,
+  errorComponent: ({ reset }) => { const client = useQueryClient(); return <div className="nb-container nb-section nb-opportunities-page"><h1 className="nb-h2">Opportunities couldn’t be loaded</h1><p className="nb-body mt-4 text-danger" role="alert">Please try again in a moment.</p><Button variant="ghost" className="nb-btn nb-btn-primary mt-6" onClick={async () => { await client.resetQueries({ queryKey: ['public-opportunities'] }); reset(); }}>Try again</Button></div>; },
+  notFoundComponent: () => <div className="nb-container nb-section nb-opportunities-page"><h1 className="nb-h2">Opportunities not found</h1></div>,
 });
 
 function Opportunities() {
   const { data } = useSuspenseQuery(opportunitiesQuery);
   const search = Route.useSearch();
   const navigate = useNavigate({ from: '/opportunities' });
-  const filters = { type: search.type, field: search.field, stage: search.stage, archive: search.archive };
-  const opportunities = filterOpportunities(data, filters);
-  const open = splitOpen(opportunities);
-  const has = (patch: Partial<typeof filters>) => filterOpportunities(data, { ...filters, ...patch }).length > 0;
-  const types = OPP_TYPES.filter((type) => has({ type }));
-  const fields = data.terms.filter((term) => term.kind === 'field' && has({ field: term.slug }));
-  const stages = data.terms.filter((term) => term.kind === 'stage' && has({ stage: term.slug }));
-  const update = (patch: Partial<typeof search>) => navigate({ search: (prev) => ({ ...prev, ...patch }) });
+  const { opportunities, open, types, fields, stages } = useMemo(() => {
+    const filters = { type: search.type, field: search.field, stage: search.stage, archive: search.archive };
+    const opportunities = filterOpportunities(data, filters);
+    const has = (patch: Partial<typeof filters>) => filterOpportunities(data, { ...filters, ...patch }).length > 0;
+    return { opportunities, open: splitOpen(opportunities),
+      types: OPP_TYPES.filter(type => has({ type }) || type === search.type),
+      fields: data.terms.filter(term => term.kind === 'field' && (has({ field: term.slug }) || term.slug === search.field)),
+      stages: data.terms.filter(term => term.kind === 'stage' && (has({ stage: term.slug }) || term.slug === search.stage)),
+    };
+  }, [data, search.type, search.field, search.stage, search.archive]);
+  const update = (patch: Partial<typeof search>) => navigate({ search: (prev) => ({ ...prev, ...patch }), resetScroll: false });
   const hasFilters = search.type || search.field || search.stage;
 
-  return <div className="nb-container nb-section">
+  return <div className="nb-container nb-section nb-opportunities-page">
     <header className="mb-8 flex flex-wrap items-end justify-between gap-6">
       <div><h1 className="nb-h1">Opportunities</h1></div>
       <div className="flex gap-2" aria-label="Opportunity period">
@@ -61,24 +66,9 @@ function Opportunities() {
       </div>
     </header>
     <div className="flex flex-wrap items-end gap-4 border-b border-hairline pb-6">
-      <label className="min-w-0 flex-1 basis-40"><span className="nb-small mb-2 block text-muted-foreground">Type</span>
-        <select aria-label="Opportunity type" className="nb-input" value={search.type} onChange={(e) => update({ type: e.target.value })}>
-          <option value="">All types</option>
-          {types.map((type) => <option key={type} value={type}>{humanize(type)}</option>)}
-          {search.type && !OPP_TYPES.some((type) => type === search.type) && <option value={search.type}>{humanize(search.type)}</option>}
-        </select></label>
-      <label className="min-w-0 flex-1 basis-40"><span className="nb-small mb-2 block text-muted-foreground">Field</span>
-        <select aria-label="Field" className="nb-input" value={search.field} onChange={(e) => update({ field: e.target.value })}>
-          <option value="">All fields</option>
-          {fields.map((term) => <option key={term.id} value={term.slug}>{term.name}</option>)}
-          {search.field && !fields.some((term) => term.slug === search.field) && <option value={search.field}>{humanize(search.field)}</option>}
-        </select></label>
-      <label className="min-w-0 flex-1 basis-40"><span className="nb-small mb-2 block text-muted-foreground">Stage</span>
-        <select aria-label="Stage" className="nb-input" value={search.stage} onChange={(e) => update({ stage: e.target.value })}>
-          <option value="">All stages</option>
-          {stages.map((term) => <option key={term.id} value={term.slug}>{term.name}</option>)}
-          {search.stage && !stages.some((term) => term.slug === search.stage) && <option value={search.stage}>{humanize(search.stage)}</option>}
-        </select></label>
+      <ListFilterSelect label="Type" ariaLabel="Opportunity type" allLabel="All types" value={search.type} options={types.map(type => ({ value: type, label: humanize(type) }))} onValueChange={type => { void update({ type }); }} />
+      <ListFilterSelect label="Field" allLabel="All fields" value={search.field} options={fields.map(f => ({ value: f.slug, label: f.name }))} onValueChange={field => { void update({ field }); }} />
+      <ListFilterSelect label="Stage" allLabel="All stages" value={search.stage} options={stages.map(f => ({ value: f.slug, label: f.name }))} onValueChange={stage => { void update({ stage }); }} />
       {hasFilters && <Button variant="ghost" className="nb-btn nb-btn-quiet" onClick={() => update({ type: '', field: '', stage: '' })}>Clear filters</Button>}
     </div>
     <p className="nb-small my-6 text-muted-foreground" role="status">{opportunities.length} {search.archive ? 'closed' : 'open'} {opportunities.length === 1 ? 'opportunity' : 'opportunities'}</p>
