@@ -1217,3 +1217,4 @@ html.lenis, html.lenis body { height: auto; }
 @media (prefers-reduced-motion: reduce) { .nb-heartbeat-next { animation: none; } }
 .nb-heartbeat-next-text { flex: 1; }
 @media (max-width: 639px) { .nb-heartbeat-next { width: calc(100vw - 2 * var(--gutter, 1.25rem)); bottom: 1rem; } .nb-heartbeat-next-org { max-width: 5rem; } }
+.nb-heartbeat-next { width: max-content; } @media (max-width: 639px) { .theme-site .nb-heartbeat-next { width: calc(100vw - 2.5rem); } }
