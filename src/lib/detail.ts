@@ -49,30 +49,49 @@ export function registrationClosed(applyBy: string | null, start: string | null,
   const limit = applyBy ?? start;
   return Boolean(limit && Number.isFinite(Date.parse(limit)) && Date.parse(now) > Date.parse(limit));
 }
-export type CloseCandidate = { id: string; title: string; city: string | null; type?: string | null; fieldIds: string[]; countryIds?: string[] };
+export type CloseCandidate = { id: string; slug?: string | undefined; title: string; city: string | null; type?: string | null; prominence?: number | null | undefined; fieldIds: string[]; countryIds?: string[] };
 const typeLabel = (type: string) => { const word = type.replace(/_/g, ' '); return `Also ${/^[aeiou]/i.test(word) ? 'an' : 'a'} ${word}`; };
-/** At most four, prioritising relations and fields; city is the final fallback, once. */
-export function closeToThem<T extends CloseCandidate>(rows: T[], self: { id: string; city: string | null; type?: string | null; fieldNames: Record<string, string>; countryNames?: Record<string, string>; relations: Record<string, string> }, limit = 4) {
+const RESEARCH_TYPES = new Set(['university', 'research_group']);
+const VENTURE_TYPES = new Set(['startup', 'community']);
+/** Stable tie-break hash of both slugs, never alphabetical. */
+export function slugPairHash(a: string, b: string) {
+  const key = [a, b].sort().join('~'); let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  return h;
+}
+/**
+ * "Close to them": only organisations sharing at least two of same type, same city, a shared field
+ * or a direct relation. Ranked by direct relation, then same type and same city, then prominence;
+ * ties break on a stable hash of both slugs. Universities and research groups never sit next to
+ * startups or communities unless directly related. At most four; hidden when fewer than two qualify.
+ */
+export function closeToThem<T extends CloseCandidate>(rows: T[], self: { id: string; slug?: string | undefined; city: string | null; type?: string | null; fieldNames: Record<string, string>; countryNames?: Record<string, string>; relations: Record<string, string> }, limit = 4) {
+  const selfSlug = self.slug ?? self.id;
   const candidates = rows.filter(row => row.id !== self.id).map(row => {
-    const fields = row.fieldIds.filter(id => self.fieldNames[id]);
-    const country = (row.countryIds ?? []).find(id => self.countryNames?.[id]);
-    const reasons: [number, string][] = [];
-    const relation = self.relations[row.id]; if (relation) reasons.push([100, relation]);
-    for (const field of fields) reasons.push([80, `Same field: ${self.fieldNames[field]}`]);
-    if (self.type && row.type === self.type) reasons.push([60, typeLabel(row.type)]);
-    if (country) reasons.push([40, `Also in ${self.countryNames?.[country]}`]);
-    if (self.city && row.city?.toLowerCase() === self.city.toLowerCase()) reasons.push([10, `Also in ${row.city}`]);
-    return { row, reasons };
-  }).filter(c => c.reasons.length).sort((a,b) => (b.reasons[0]?.[0] ?? 0) - (a.reasons[0]?.[0] ?? 0) || a.row.title.localeCompare(b.row.title));
-  const picked: (T & { reason: string; score: number })[] = []; const used = new Set<string>(); let cityUsed = false;
-  for (const varied of [true, false]) for (const c of candidates) {
-    if (picked.length >= Math.min(limit,4) || picked.some(p => p.id === c.row.id)) continue;
-    const reason = c.reasons.find(([,r]) => (!r.startsWith('Also in ') || r !== `Also in ${c.row.city}` || !cityUsed) && (!varied || !used.has(r)));
+    const relation = self.relations[row.id] ?? null;
+    const sameType = Boolean(self.type && row.type === self.type);
+    const sameCity = Boolean(self.city && row.city?.toLowerCase() === self.city.toLowerCase());
+    const sharedField = row.fieldIds.find(id => self.fieldNames[id]) ?? null;
+    const signals = Number(Boolean(relation)) + Number(sameType) + Number(sameCity) + Number(Boolean(sharedField));
+    return { row, relation, sameType, sameCity, sharedField, signals };
+  }).filter(c => {
+    if (c.signals < 2) return false;
+    const cross = (RESEARCH_TYPES.has(self.type ?? '') && VENTURE_TYPES.has(c.row.type ?? '')) || (VENTURE_TYPES.has(self.type ?? '') && RESEARCH_TYPES.has(c.row.type ?? ''));
+    return cross ? Boolean(c.relation) : true;
+  });
+  const rank = (c: (typeof candidates)[number]) => (c.relation ? 0 : c.sameType && c.sameCity ? 1 : 2);
+  candidates.sort((a, b) => rank(a) - rank(b)
+    || (a.row.prominence || 99) - (b.row.prominence || 99)
+    || slugPairHash(selfSlug, a.row.slug ?? a.row.id) - slugPairHash(selfSlug, b.row.slug ?? b.row.id));
+  const picked: (T & { reason: string; score: number })[] = []; let cityUsed = false;
+  for (const c of candidates.slice(0, Math.min(limit, 4))) {
+    const cityReason = c.sameCity ? `Also in ${c.row.city}` : null;
+    const reason = c.relation ?? (c.sharedField ? `Same field: ${self.fieldNames[c.sharedField]}` : null) ?? (c.sameType && c.row.type ? typeLabel(c.row.type) : null) ?? (cityReason && !cityUsed ? cityReason : null) ?? (c.sameType && c.row.type ? typeLabel(c.row.type) : cityReason);
     if (!reason) continue;
-    const [score,label] = reason; picked.push({...c.row, reason:label, score}); used.add(label);
-    if (label === `Also in ${c.row.city}`) cityUsed = true;
+    if (reason === cityReason) cityUsed = true;
+    picked.push({ ...c.row, reason, score: c.signals });
   }
-  return picked;
+  return picked.length < 2 ? [] : picked;
 }
 export function urgencyLevel(days: number | null): 'filled' | 'outline' | 'plain' {
   if (days === null || days < 0 || days > 14) return 'plain';
