@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { heartbeatQuery } from '@/lib/heartbeat.query';
-import { buildBeats, clamp01, heightAt, HORIZON, localKey, restingBeats, smoothstep, warpedDay, type Beat, type HeartbeatItem } from '@/lib/heartbeat';
+import { buildBeats, clamp01, heightAt, HORIZON, localKey, restingBeats, smoothstep, beatHeight, buildStops, dayAtProgress, sectionHeightVh, heightScale, REST_HEIGHT, type Beat, type HeartbeatItem } from '@/lib/heartbeat';
 import { chosenLogoSrc } from '@/components/site/OrganisationLogo';
 import { publicTitle } from '@/lib/profiles';
 import { brandfetchLogoUrl } from '@/lib/organisation-logo';
@@ -30,21 +30,22 @@ export function HeartbeatHero() {
   const canvas = useRef<HTMLCanvasElement>(null);
   const finale = useRef<HTMLDivElement>(null);
   const passing = useRef<HTMLParagraphElement>(null);
-  const caption = useRef<HTMLParagraphElement>(null);
   const [beats, setBeats] = useState<Beat[]>([]);
   const [reduced, setReduced] = useState(false);
   const [card, setCard] = useState<Card | null>(null);
   const [now, setNow] = useState('');
+  const [next, setNext] = useState<{ beat: Beat; key: string } | null>(null);
+  const [nextLogoFailed, setNextLogoFailed] = useState(false);
   const navigate = useNavigate();
   const hits = useRef<Hit[]>([]);
   const cardRef = useRef<Card | null>(null);
   cardRef.current = card;
 
   useEffect(() => {
-    setBeats(buildBeats(data.items, todayKey()));
+    setBeats(buildBeats(data.items, todayKey()).map(b => ({ ...b, amp: beatHeight(b.items) })));
     setReduced(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   }, [data]);
-  const rest = useMemo(() => restingBeats(beats), [beats]);
+  const rest = useMemo(() => restingBeats(beats).map(b => ({ ...b, amp: REST_HEIGHT })), [beats]);
   const allBeats = useMemo(() => [...beats, ...rest], [beats, rest]);
 
   useEffect(() => {
@@ -84,7 +85,9 @@ export function HeartbeatHero() {
     const flightEnd = Math.max(6, lastBeat - 4);
     let idle = -0.6, cur = reduced ? 0 : -0.6, prevCur = cur;
     let mx = 0.5, my = 0.5, smx = 0.5, smy = 0.5;
-    let pulseUntil = 0, pulseScale = 1, pulseLen = 1, captionUntil = 0;
+    let pulseUntil = 0, pulseScale = 1, pulseLen = 1;
+    const maxAmp = Math.max(REST_HEIGHT, ...beats.map(b => b.amp));
+    let lastNext = '';
     let opening = false, openStart = 0;
     if (!reduced) {
       try { if (!sessionStorage.getItem(OPENING_KEY)) { opening = true; sessionStorage.setItem(OPENING_KEY, '1'); } } catch { /* storage blocked */ }
@@ -117,22 +120,23 @@ export function HeartbeatHero() {
       if (opening && openT > 3.4) opening = false;
 
       if (p < 0.01 && !reduced) idle = Math.min(2.4, idle + 0.3 * dt);
-      const target = reduced ? 0 : warpedDay(Math.min(1, p / FLIGHT_END), idle, flightEnd, beats);
+      const target = reduced ? 0 : dayAtProgress(Math.min(1, p / FLIGHT_END), buildStops(beats, idle, flightEnd));
       prevCur = cur; cur += (target - cur) * Math.min(1, dt * 3.5);
       smx += (mx - smx) * Math.min(1, dt * 3); smy += (my - smy) * Math.min(1, dt * 3);
 
       const F = phone ? Math.min(0.75 * H, 1.35 * W) : Math.min(0.85 * H, 0.9 * W);
-      const CX = (phone ? 0.12 : 0.38) * W, HY = (phone ? 0.46 : 0.42) * H;
-      const camX = (phone ? -1.2 : -1.8) + (smx - 0.5) * 2;
+      const CX = (phone ? 0.5 : 0.38) * W, HY = (phone ? 0.46 : 0.42) * H;
+      const camX = phone ? -0.6 : -1.8 + (smx - 0.5) * 2;
+      const k = heightScale(maxAmp, H, F, 6);
       const rise = openT < 1 ? 0 : clamp01((openT - 1) / 2.4);
       const camH = (opening ? 1 + 1.6 * smoothstep(rise) : 2.6) + (0.5 - smy) * 0.7;
       const m = reduced ? 1 : smoothstep((p - FLIGHT_END) / (UNROLL_END - FLIGHT_END));
       const pad = phone ? 20 : 56;
       const flatX = (d: number) => pad + (d / HORIZON) * (W - 2 * pad);
-      const flatY = (h: number) => (phone ? 0.5 * H - h * 5.5 : 0.56 * H - h * 9);
+      const flatY = (h: number) => (phone ? 0.5 * H - h * 8 : 0.56 * H - h * 13);
       const proj = (d: number, y: number) => {
         const z = 3.6 + (d - cur) * 3.0; if (z < 0.4) return null;
-        return { x: CX + (0 - camX) * F / z, y: HY + (camH - y) * F / z, z };
+        return { x: CX + (0 - camX) * F / z, y: HY + (camH - y * k) * F / z, z };
       };
       const mixFor = (d: number) => smoothstep(m * 1.6 - clamp01((d - cur) / 12) * 0.6);
 
@@ -140,11 +144,12 @@ export function HeartbeatHero() {
       if (!reduced && m === 0 && cur > prevCur) {
         for (const b of beats) if (b.day > prevCur && b.day <= cur) {
           const big = b.items.length >= 3; pulseScale = big ? 1.024 : 1.011; pulseLen = big ? 240 : 140; pulseUntil = t + pulseLen;
-          if (caption.current) caption.current.textContent = `${dateFor(b.day, true)}, ${publicTitle(b.items[0]?.title ?? "")}${b.items.length > 1 ? ` and ${b.items.length - 1} more` : ''}`;
-          captionUntil = t + 2400;
         }
       }
-      if (caption.current) caption.current.style.opacity = t < captionUntil && m < 0.2 ? String(Math.min(1, (captionUntil - t) / 400)) : '0';
+      const ahead = beats.find(b => b.day > cur + 0.05) ?? null;
+      const nk = m > 0.05 || !ahead ? '' : String(ahead.day);
+      if (nk !== lastNext) { lastNext = nk; setNext(ahead && nk ? { beat: ahead, key: nk } : null); }
+      const nearestBeat = beats.find(b => b.day >= cur - 0.3) ?? null;
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
@@ -217,7 +222,8 @@ export function HeartbeatHero() {
         const fp = { x: flatX(b.day), y: flatY(h) };
         const mi = m > 0 ? mixFor(b.day) : 0;
         if (!pp && mi <= 0) continue;
-        const r3 = pp ? Math.max(6, Math.min(28, F / pp.z * 0.36)) : 0;
+        const minR = b === nearestBeat ? (phone ? 22 : 28) : 6;
+        const r3 = pp ? Math.max(minR, Math.min(phone ? 26 : 32, F / pp.z * 0.36)) : 0;
         let rf = phone ? 8 : 11;
         if (Math.abs(fp.x - sweepX) < 18) rf *= 1.15;
         const peak = pp && mi < 1 ? { x: pp.x + (fp.x - pp.x) * mi, y: pp.y + (fp.y - pp.y) * mi } : fp;
@@ -261,19 +267,20 @@ export function HeartbeatHero() {
           flatDates.push(q.fp.x); ctx.globalAlpha = sceneAlpha * clamp01((m - 0.6) / 0.4); ctx.fillStyle = SOFT; ctx.font = `11px ${body}`;
           ctx.fillText(dateFor(q.b.day), q.fp.x, dateY);
         }
-      } else if (!phone) {
+      } else {
         ctx.textBaseline = 'alphabetic';
-        const nearest = placed.filter(q => q.pp && q.mi < 0.3 && q.pp.z < 14 && q.b.day >= cur).sort((a, b) => (a.pp?.z ?? 0) - (b.pp?.z ?? 0)).slice(0, 2);
+        const nearest = placed.filter(q => q.b === nearestBeat && q.pp && q.mi < 0.3);
         for (const q of nearest) {
           const pp = q.pp!;
-          const titleSize = Math.max(13, Math.min(22, F / pp.z * 0.22));
+          const titleSize = phone ? 15 : Math.max(16, Math.min(22, F / pp.z * 0.22));
           const title = publicTitle(q.b.items[0]?.title ?? '') + (q.b.items.length > 1 ? ` +${q.b.items.length - 1}` : '');
-          ctx.font = `${titleSize}px ${display}`; const tw = Math.min(ctx.measureText(title).width, W * 0.5);
-          const box = { x: q.peak.x - tw / 2, y: q.cy - q.r - titleSize - 30, w: tw, h: titleSize + 22 };
-          if (box.y < 72 || overlaps(box, [...logoBoxes, ...labels])) continue;
+          const maxW = phone ? W - 40 : W * 0.5; ctx.font = `${titleSize}px ${display}`; const tw = Math.min(ctx.measureText(title).width, maxW);
+          const lx = Math.max(20 + tw / 2, Math.min(W - 20 - tw / 2, q.peak.x));
+          const box = { x: lx - tw / 2, y: q.cy - q.r - titleSize - 30, w: tw, h: titleSize + 22 };
+          if (box.y < 96 || overlaps(box, [...logoBoxes, ...labels])) continue;
           labels.push(box); ctx.globalAlpha = q.alpha * (1 - q.mi / 0.3);
-          ctx.fillStyle = SOFT; ctx.font = `12px ${body}`; ctx.fillText(dateFor(q.b.day), q.peak.x, box.y + 10);
-          ctx.fillStyle = INK; ctx.font = `${titleSize}px ${display}`; ctx.fillText(title, q.peak.x, box.y + 12 + titleSize, W * 0.5);
+          ctx.fillStyle = SOFT; ctx.font = `12px ${body}`; ctx.fillText(dateFor(q.b.day), lx, box.y + 10);
+          ctx.fillStyle = INK; ctx.font = `${titleSize}px ${display}`; ctx.fillText(title, lx, box.y + 12 + titleSize, maxW);
         }
       }
       ctx.globalAlpha = 1;
@@ -282,7 +289,7 @@ export function HeartbeatHero() {
       // HTML overlays.
       if (finale.current) { const f = reduced ? 1 : clamp01((p - 0.84) / 0.06); finale.current.style.opacity = String(f); finale.current.style.pointerEvents = f > 0.5 ? 'auto' : 'none'; finale.current.style.top = `${flatY(0) + (phone ? 56 : 68)}px`; }
       if (passing.current) passing.current.style.opacity = String(1 - clamp01(m * 2));
-      const date = dateFor(Math.max(0, cur));
+      const date = dateFor(Math.max(0, cur + 0.8));
       if (date !== lastDate) { lastDate = date; setNow(date); }
     };
     raf = requestAnimationFrame(frame);
@@ -310,12 +317,35 @@ export function HeartbeatHero() {
     if (hit.beat.items.length === 1 && hit.beat.items[0]) { void navigate({ to: itemPath(hit.beat.items[0]) as '/' }); return; }
     setCard({ beat: hit.beat, x: hit.x, y: hit.y, pinned: true });
   };
-  return <section ref={section} className={`nb-heartbeat${reduced ? ' nb-heartbeat-reduced' : ''}`} aria-labelledby="heartbeat-heading">
+  useEffect(() => setNextLogoFailed(false), [next?.key]);
+  const openNext = () => {
+    if (!next) return;
+    const items = next.beat.items;
+    if (items.length === 1 && items[0]) { void navigate({ to: itemPath(items[0]) as '/' }); return; }
+    const W = canvas.current?.clientWidth ?? 0, H = canvas.current?.clientHeight ?? 0;
+    setCard({ beat: next.beat, x: W / 2, y: H - 120, pinned: true });
+  };
+  const nextItem = next?.beat.items[0];
+  const nextLogo = nextItem ? itemLogo(nextItem) : null;
+  const nextDays = next ? Math.floor(next.beat.day) : 0;
+  const deadline = next?.beat.items.some(i => i.kind === 'opportunity') ?? false;
+  const when = nextDays <= 0 ? 'Today' : nextDays === 1 ? 'Tomorrow' : `In ${nextDays} days`;
+  const whenText = deadline ? (nextDays <= 0 ? 'Deadline today' : nextDays === 1 ? 'Deadline tomorrow' : `Deadline in ${nextDays} days`) : when;
+  return <section ref={section} className={`nb-heartbeat${reduced ? ' nb-heartbeat-reduced' : ''}`} style={reduced ? undefined : { height: `${sectionHeightVh(beats.length)}vh` }} aria-labelledby="heartbeat-heading">
     <div className="nb-heartbeat-sticky">
       <canvas ref={canvas} className="nb-heartbeat-canvas" aria-hidden="true" onPointerMove={onCanvasMove} onPointerLeave={() => !cardRef.current?.pinned && setCard(null)} onClick={onCanvasClick} />
       <h2 id="heartbeat-heading" className="sr-only">Events and deadlines in the next 35 days</h2>
-      <p ref={passing} className="nb-heartbeat-date" aria-hidden="true">{now}</p>
-      <p ref={caption} className="nb-heartbeat-caption" aria-hidden="true" />
+      <p ref={passing} className="nb-heartbeat-now" aria-hidden="true">Coming up in Nordic health, {now}</p>
+      {next && nextItem && <button key={next.key} type="button" className="nb-heartbeat-next" onClick={openNext}>
+        {nextLogo && !nextLogoFailed
+          ? <img src={nextLogo} alt="" width={32} height={32} onError={() => setNextLogoFailed(true)} />
+          : nextItem.orgs[0] && <span className="nb-heartbeat-next-org">{nextItem.orgs[0].name}</span>}
+        <span className="nb-heartbeat-next-text">
+          <span className="nb-heartbeat-next-label">Next up</span>
+          <span className="nb-heartbeat-next-title">{publicTitle(nextItem.title)}{next.beat.items.length > 1 ? ` + ${next.beat.items.length - 1} more` : ''}</span>
+          <span className="nb-heartbeat-next-meta">{dateFor(next.beat.day, true)}, <span className={deadline ? 'nb-heartbeat-next-deadline' : undefined}>{whenText}</span></span>
+        </span>
+      </button>}
       <div ref={finale} className="nb-heartbeat-finale">
         <Link to="/events" className="nb-btn nb-btn-primary">See all events and deadlines</Link>
       </div>
