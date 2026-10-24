@@ -1,5 +1,6 @@
 # Living cells ecosystem
 # Site-wide value pass
+- [ ] Logo follow-up: stored icon/logo canvas checks, tone-aware shared display, parent relations, admin grid and one full check; apply attached round-two entry fixes.
 - [ ] Apply all ten polish requests, uploaded prominence rankings and three draft playbooks.
 - [ ] Verify public pages at 390px and 1440px, editorial admin readback and rule tests.
 
