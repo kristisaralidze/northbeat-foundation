@@ -27,7 +27,7 @@ export function PublicScrollFrame({ children, pathname }: { children: ReactNode;
       gsap.registerPlugin(ScrollTrigger);
       const media = gsap.matchMedia();
       media.add('(prefers-reduced-motion: no-preference)', () => {
-        const lenis = new Lenis({ duration: 1.05, anchors: true, prevent: node => node.id === 'mobile-nav' || node.closest('[data-native-scroll]') !== null, virtualScroll: () => document.body.style.overflow !== 'hidden' });
+        const lenis = new Lenis({ lerp: 0.08, anchors: true, prevent: node => node.id === 'mobile-nav' || node.closest('[data-native-scroll]') !== null, virtualScroll: () => document.body.style.overflow !== 'hidden' });
         lenis.on('scroll', ScrollTrigger.update);
         const tick = (seconds: number) => lenis.raf(seconds * 1000);
         gsap.ticker.add(tick);

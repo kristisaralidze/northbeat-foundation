@@ -136,7 +136,6 @@ export function enhancePageMotion(page: HTMLElement): () => void {
     if (!match) continue;
     const [, prefix, num, suffix] = match;
     const decimals = num.includes('.') ? (num.split('.')[1] ?? '').length : 0;
-    const target = Number(num.replace(/[.,]/g, decimals ? '' : '')) ;
     const parsed = decimals ? Number(num.replace(/,/g, '')) : Number(num.replace(/[.,]/g, ''));
     if (!Number.isFinite(parsed) || parsed <= 0) continue;
     const render = (v: number) => {
@@ -151,7 +150,6 @@ export function enhancePageMotion(page: HTMLElement): () => void {
     }, { rootMargin: '0px 0px -15% 0px' });
     io.observe(el);
     cleanups.push(() => { io.disconnect(); el.textContent = original; });
-    void target;
   }
 
   // Editorial rows: a small image preview follows the cursor (desktop only).
