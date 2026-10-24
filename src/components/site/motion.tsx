@@ -119,18 +119,75 @@ export function enhancePageMotion(page: HTMLElement): () => void {
   late.observe(page, { childList: true, subtree: true });
   cleanups.push(() => late.disconnect());
 
-  // Cover images: gentle parallax while they cross the viewport.
-  const images = [...page.querySelectorAll<HTMLElement>('.nb-cover-banner img, .nb-cover-strip img, [data-parallax]')];
-  for (const img of images) {
-    img.style.scale = '1.12';
-    const stop = scroll(animate(img, { y: ['-5%', '5%'] }), {
-      target: img.parentElement ?? img,
-      offset: ['start end', 'end start'],
-    });
+  // Large images: subtle parallax, 40px of travel at most.
+  const heroes = [...page.querySelectorAll<HTMLElement>('.nb-cover-banner, .nb-cover-strip, [data-parallax]')];
+  for (const el of heroes) {
+    const stop = scroll(animate(el, { y: [-20, 20] }), { target: el, offset: ['start end', 'end start'] });
     cleanups.push(() => {
       stop();
-      img.style.scale = '';
-      img.style.transform = '';
+      el.style.transform = '';
+    });
+  }
+
+  // Big numbers: count up once when they become visible.
+  for (const el of page.querySelectorAll<HTMLElement>('.nb-event-fact-value')) {
+    const original = el.textContent ?? '';
+    const match = original.match(/^([^\d]*)([\d][\d.,]*)(.*)$/);
+    if (!match) continue;
+    const [, prefix, num, suffix] = match;
+    const decimals = num.includes('.') ? (num.split('.')[1] ?? '').length : 0;
+    const target = Number(num.replace(/[.,]/g, decimals ? '' : '')) ;
+    const parsed = decimals ? Number(num.replace(/,/g, '')) : Number(num.replace(/[.,]/g, ''));
+    if (!Number.isFinite(parsed) || parsed <= 0) continue;
+    const render = (v: number) => {
+      el.textContent = `${prefix}${decimals ? v.toFixed(decimals) : Math.round(v).toLocaleString('en-GB')}${suffix}`;
+    };
+    render(0);
+    const io = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        io.disconnect();
+        void animate(0, parsed, { duration: 1.2, ease: EASE, onUpdate: render });
+      }
+    }, { rootMargin: '0px 0px -15% 0px' });
+    io.observe(el);
+    cleanups.push(() => { io.disconnect(); el.textContent = original; });
+    void target;
+  }
+
+  // Editorial rows: a small image preview follows the cursor (desktop only).
+  if (window.matchMedia('(pointer: fine)').matches) {
+    const preview = document.createElement('span');
+    preview.className = 'nb-row-preview';
+    preview.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(preview);
+    let current: HTMLImageElement | null = null;
+    const move = (event: PointerEvent) => {
+      preview.style.transform = `translate(${event.clientX + 20}px, ${event.clientY - 56}px)`;
+    };
+    const over = (event: PointerEvent) => {
+      const link = (event.target as HTMLElement).closest?.('a');
+      const img = link?.querySelector('img');
+      if (link && img instanceof HTMLImageElement && img.src && link.closest('.nb-card, .nb-compact-list, .nb-card-grid, .nb-close-grid')) {
+        if (current !== img) {
+          current = img;
+          const clone = document.createElement('img');
+          clone.src = img.currentSrc || img.src;
+          clone.alt = '';
+          preview.replaceChildren(clone);
+        }
+        preview.classList.add('is-visible');
+        move(event);
+      } else if (current) {
+        current = null;
+        preview.classList.remove('is-visible');
+      }
+    };
+    page.addEventListener('pointermove', move, { passive: true });
+    page.addEventListener('pointerover', over, { passive: true });
+    cleanups.push(() => {
+      page.removeEventListener('pointermove', move);
+      page.removeEventListener('pointerover', over);
+      preview.remove();
     });
   }
 
