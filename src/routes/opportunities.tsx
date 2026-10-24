@@ -8,7 +8,8 @@ import { opportunitiesQuery } from '@/lib/opportunities.query';
 import { compactSearch } from '@/lib/search-params';
 import { amountLabel, filterOpportunities, friendlyDate, isRolling, splitOpen, type OpportunityRow } from '@/lib/opportunities';
 import { publicTitle, publicCopy, safeWebUrl } from '@/lib/profiles';
-import { CardGrid, EntryCard } from '@/components/site/EntryCard';
+import { CardGrid } from '@/components/site/EntryCard';
+import { OpportunityCard } from '@/components/site/ListItems';
 import { CalendarMenu } from '@/components/site/CalendarMenu';
 import { daysUntil, type CalendarEvent } from '@/lib/detail';
 
@@ -36,18 +37,6 @@ export const Route = createFileRoute('/opportunities')({
   errorComponent: ({ reset }) => { const client = useQueryClient(); return <div className="nb-container nb-section"><h1 className="nb-h2">Opportunities couldn’t be loaded</h1><p className="nb-body mt-4 text-danger" role="alert">Please try again in a moment.</p><Button variant="ghost" className="nb-btn nb-btn-primary mt-6" onClick={async () => { await client.resetQueries({ queryKey: ['public-opportunities'] }); reset(); }}>Try again</Button></div>; },
   notFoundComponent: () => <div className="nb-container nb-section"><h1 className="nb-h2">Opportunities not found</h1></div>,
 });
-
-function OpportunityCard({ opportunity: o, now }: { opportunity: OpportunityRow; now: string }) {
-  const amount = amountLabel(o); const days = o.deadline_at ? daysUntil(o.deadline_at, now) : null;
-  const apply = safeWebUrl(o.apply_url ?? null) ?? `https://nordic-heartbeat.lovable.app/opportunity/${encodeURIComponent(o.slug)}`;
-  const cal: CalendarEvent | null = o.deadline_at && days !== null && days >= 0 ? { id: o.id, title: `Deadline: ${publicTitle(o.title)}`, start: o.deadline_at, end: null, allDay: true, location: '', description: `Apply: ${apply}`, url: apply } : null;
-  const when = o.deadline_at ? (days !== null && days < 0 ? `Closed ${friendlyDate(o.deadline_at, now)}` : `Closes ${friendlyDate(o.deadline_at, now)}`) : isRolling(o) ? 'Open all year' : 'Next call to be announced';
-  return <EntryCard id={o.id} kind="opportunity" slug={o.slug} title={publicTitle(o.title)}
-    link={<Link to="/opportunity/$slug" params={{ slug: o.slug }} className="nb-org-link">{publicTitle(o.title)}</Link>}
-    line={o.summary ? publicCopy(o.summary) : null}
-    facts={[humanize(o.type), amount || (o.type === 'job' ? o.location : null), when]}
-    footer={(cal || (days !== null && days >= 0)) && <>{days !== null && days >= 0 && <span className={`nb-countdown${days < 14 ? ' nb-countdown-signal' : ''}`}>{days === 0 ? 'Closes today' : days === 1 ? 'Closes tomorrow' : `In ${days} days`}</span>}{cal && <CalendarMenu event={cal} slug={o.slug} label="Add deadline to calendar" compact />}</>} />;
-}
 
 function Opportunities() {
   const { data } = useSuspenseQuery(opportunitiesQuery);

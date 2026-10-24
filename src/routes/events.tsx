@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { CalendarDays, List, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EventCalendar } from '@/components/site/EventViews';
+import { EventRowItem } from '@/components/site/ListItems';
 import { CalendarMenu } from '@/components/site/CalendarMenu';
 import { SaveButton } from '@/components/site/SaveButton';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -31,19 +32,6 @@ export const Route = createFileRoute('/events')({
   errorComponent: ({ reset }) => { const client = useQueryClient(); return <div className="nb-container nb-section"><h1 className="nb-h2">Events couldn’t be loaded</h1><p className="nb-body mt-4 text-danger" role="alert">Please try again in a moment.</p><Button variant="ghost" className="nb-btn nb-btn-primary mt-6" onClick={async () => { await client.resetQueries({ queryKey: ['public-events'] }); reset(); }}>Try again</Button></div>; },
   notFoundComponent: () => <div className="nb-container nb-section"><h1 className="nb-h2">Events not found</h1></div>,
 });
-function EventRowItem({ event, now }: { event: EventRow; now: string }) {
-  const tz = event.timezone ?? 'Europe/Helsinki';
-  const part = (o: Intl.DateTimeFormatOptions) => event.starts_at ? new Intl.DateTimeFormat('en-GB', { timeZone: tz, ...o }).format(new Date(event.starts_at)) : '';
-  const online = event.format === 'online';
-  const cal: CalendarEvent | null = event.starts_at ? { id: event.id, title: event.title, start: event.starts_at, end: event.ends_at, location: online ? 'Online' : [event.venue, event.city].filter(Boolean).join(', '), description: event.summary ?? '', url: `https://nordic-heartbeat.lovable.app/event/${encodeURIComponent(event.slug)}` } : null;
-  const countdown = countdownLabel(event.starts_at, now, tz); const days = daysUntil(event.starts_at, now, tz);
-  return <li className="nb-event-row" data-this-week={isThisWeek(event.starts_at, now, tz)}>
-    <div className="nb-event-date" aria-hidden>{event.starts_at ? <><strong>{part({ day: 'numeric' })}</strong><span>{part({ month: 'short' })}, {part({ weekday: 'short' })}</span></> : <span>Date to be announced</span>}</div>
-    <div className="min-w-0"><h3 className="nb-h3 break-words"><Link to="/event/$slug" params={{ slug: event.slug }} className="nb-org-link">{event.title}</Link></h3>
-      <p className="nb-event-meta">{event.starts_at ? dateLabel(event.starts_at, event.timezone) : ''}{event.starts_at ? ', ' : ''}{humanize(event.event_type)}, {online ? 'Online' : event.city ?? 'Venue to be announced'}</p></div>
-    <div className="nb-event-actions">{countdown && <span className={`nb-countdown${days !== null && days < 14 ? ' nb-countdown-signal' : ''}`}>{countdown}</span>}{cal && Date.parse(event.ends_at ?? event.starts_at ?? '') >= Date.parse(now) && <CalendarMenu event={cal} slug={event.slug} compact />}<SaveButton kind="event" slug={event.slug} title={event.title} /></div>
-  </li>;
-}
 function MonthList({ events, now, label }: { events: EventRow[]; now: string; label?: string }) {
   return <div>{label && <h2 className="nb-h2 mt-12">{label}</h2>}{groupByMonth(events).map(g => <section key={g.month || 'tba'} aria-label={g.month ? monthLabel(g.month) : 'Dates to be announced'}><h2 className="nb-month-heading">{g.month ? monthLabel(g.month) : 'Dates to be announced'}</h2><ul>{g.events.map(e => <EventRowItem key={e.id} event={e} now={now} />)}</ul></section>)}</div>;
 }
