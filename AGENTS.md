@@ -15,7 +15,7 @@
 - Official covers require provenance and approval; failed logos hide. Brand imports are admin-only and quota-bounded; forms use uncached browser search copying only confirmed name/website. Why: authentic assets and search retention compliance.
 - Relationship maps use published links, network tokens and measured node lines; timelines use tested date helpers and URL filters. Why: preserve real connections across screen sizes.
 - The home ecosystem groups the paginated published reader into fixed group anchors and one cloud dot per entry; group links use Explore's canonical type search and separate conceptual edges. Why: group browsing stays distinct from individual database relationships.
-- The home globe uses local R3F geometry, a still, fixed canvas measurement and wrapper transforms; scroll events drive framing/zoom with endpoint snaps, touch pointers pinch, and OrbitControls recovers rotation after dragging. Why: scroll stays uncaptured and fast jumps settle correctly.
+- The home Heartbeat hero draws one 2D canvas from pure, tested line maths in heartbeat.ts and reads scroll position itself inside a sticky section; GSAP only pins the ecosystem after it. Why: one shared line function for flight and flat views without a second scroll owner.
 - LaboratoryWordmark uses local assets and measured serif fallbacks in public headers. Why: readable if images fail.
 - Mobile filters reuse FilterSheet with existing URL state. Why: accessible controls without divergent browsing logic.
 - Use publicTitle for title punctuation and publicCopy for broad health-startup prose; preserve stored values, type names and URLs. Why: copy reviews never mutate editorial data.
