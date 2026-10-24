@@ -81,6 +81,13 @@ export function prepareRow(entity: ImportEntity, row: CsvRow, snapshot: Snapshot
   for (const column of CSV_COLUMNS[entity]) {
     const value = row[column]?.trim() ?? '';
     if (!value) continue;
+    if (column === 'slug') continue;
+    if (RICH_COLUMNS.has(column)) {
+      const parsed = parsePasteValue(entity, column, value);
+      if (parsed.error) errors.push(parsed.error);
+      else if (parsed.value !== undefined) values[column] = parsed.value as string[];
+      continue;
+    }
     const kind = TAG_COLUMNS[column];
     if (kind) {
       for (const name of splitTags(value)) {
