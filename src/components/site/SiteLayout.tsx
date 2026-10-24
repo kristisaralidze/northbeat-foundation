@@ -6,6 +6,8 @@ import { NewsletterSignup } from "./NewsletterSignup";
 import { Button } from "@/components/ui/button";
 import { PublicScrollFrame } from './PublicScrollFrame';
 import { AtmosphericImage } from './AtmosphericImage';
+import { SiteSearch } from './SiteSearch';
+import { SavedLink } from './SavedLink';
 
 const NAV = [
   { to: "/explore", label: "Explore" },
@@ -39,6 +41,8 @@ function Header({ isHome }: { isHome: boolean }) {
           </ul>
         </nav>
         <div className="flex items-center gap-2">
+          <SiteSearch />
+          <SavedLink />
           <div className="nb-header-actions hidden lg:flex">
             <Link to="/newsletter" className="nb-header-newsletter">Newsletter</Link>
             <Button asChild className="nb-header-primary"><Link to="/submit">Add to the hub</Link></Button>
