@@ -37,8 +37,8 @@ function SiteAdmin() {
   useEffect(() => { void load(); }, []);
 
   const saveSettings = async () => {
-    if (settings.contact_email && !/^\S+@\S+\.\S+$/.test(settings.contact_email)) return toast.error('Check the contact email.');
-    if (!httpsOrEmpty(settings.linkedin_url) || !httpsOrEmpty(settings.instagram_url)) return toast.error('Links must start with https://');
+    if (settings.contact_email && !/^\S+@\S+\.\S+$/.test(settings.contact_email)) { toast.error('Check the contact email.'); return; }
+    if (!httpsOrEmpty(settings.linkedin_url) || !httpsOrEmpty(settings.instagram_url)) { toast.error('Links must start with https://'); return; }
     setBusy(true);
     const clean = (v: string) => v.trim() || null;
     const { error } = await db.from('site_settings').upsert({ id: 1, contact_email: clean(settings.contact_email), linkedin_url: clean(settings.linkedin_url), instagram_url: clean(settings.instagram_url), updated_at: new Date().toISOString() });
@@ -47,8 +47,8 @@ function SiteAdmin() {
   };
 
   const saveFounder = async (f: Founder, i: number) => {
-    if (!f.name.trim()) return toast.error('Add a name.');
-    if (!httpsOrEmpty(f.linkedin_url)) return toast.error('LinkedIn link must start with https://');
+    if (!f.name.trim()) { toast.error('Add a name.'); return; }
+    if (!httpsOrEmpty(f.linkedin_url)) { toast.error('LinkedIn link must start with https://'); return; }
     setBusy(true);
     const row = { name: f.name.trim(), one_line: f.one_line.trim() || null, photo_url: f.photo_url.trim() || null, linkedin_url: f.linkedin_url.trim() || null, sort_order: i };
     const { error } = f.id ? await db.from('founders').update(row).eq('id', f.id) : await db.from('founders').insert(row);
@@ -67,7 +67,7 @@ function SiteAdmin() {
     const rows: { email: string; created_at: string }[] = [];
     for (let from = 0; ; from += 1000) {
       const { data, error } = await db.from('systole_waitlist').select('email,created_at').order('created_at').range(from, from + 999);
-      if (error) return toast.error(error.message);
+      if (error) { toast.error(error.message); return; }
       rows.push(...(data ?? [])); if (!data || data.length < 1000) break;
     }
     const blob = new Blob([toCsv(['email', 'created_at'], rows.map(r => [r.email, r.created_at]))], { type: 'text/csv;charset=utf-8' });

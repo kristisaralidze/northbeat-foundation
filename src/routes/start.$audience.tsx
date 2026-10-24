@@ -5,6 +5,7 @@ import { eventsQuery } from '@/lib/events.query';
 import { opportunitiesQuery } from '@/lib/opportunities.query';
 import { learnHubQuery } from '@/lib/learn.query';
 import { AUDIENCE_COPY, CALL_TYPES, ORG_SECTIONS, isAudience, openCalls, orgsOfTypes, upcomingEvents, type Audience } from '@/lib/start';
+import { EMPTY_SEARCH } from '@/lib/explore';
 import { CardGrid } from '@/components/site/EntryCard';
 import { OrganisationCard } from '@/components/site/OrganisationCard';
 import { OpportunityCard, EventRowItem } from '@/components/site/ListItems';
@@ -73,7 +74,7 @@ function StartPage() {
     {ORG_SECTIONS[audience].map(section => {
       const orgs = orgsOfTypes(dir.organisations, section.types);
       if (!orgs.length) return null;
-      return <Section key={section.heading} heading={section.heading} more={orgs.length > LIMIT ? <Link to="/explore" search={{ type: section.types }} className="nb-link">See all {orgs.length}</Link> : undefined}>
+      return <Section key={section.heading} heading={section.heading} more={orgs.length > LIMIT ? <Link to="/explore" search={{ ...EMPTY_SEARCH, type: section.types }} className="nb-link">See all {orgs.length}</Link> : undefined}>
         <CardGrid>{orgs.slice(0, LIMIT).map(o => <OrganisationCard key={o.id} organisation={o} terms={dir.terms} />)}</CardGrid>
       </Section>;
     })}

@@ -52,7 +52,7 @@ export const Route = createFileRoute('/api/public/og/$kind/$slug')({
         const input = await inputFor(params.kind, params.slug).catch(() => null);
         if (!input) return new Response('Not found', { status: 404 });
         const png = await renderOgPng(input);
-        return new Response(png, { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=3600, s-maxage=86400' } });
+        return new Response(png as unknown as BodyInit, { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=3600, s-maxage=86400' } });
       },
     },
   },

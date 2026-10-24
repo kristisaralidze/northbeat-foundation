@@ -28,7 +28,7 @@ function NotFoundComponent() {
         <h1 className="nb-h1">This page has no pulse.</h1>
         <p className="nb-body">We couldn't find what you were looking for.</p>
         <ul className="nb-404-links">
-          <li><Link to="/explore" className="nb-link">Explore</Link></li>
+          <li><Link to="/explore" search={{}} className="nb-link">Explore</Link></li>
           <li><Link to="/events" className="nb-link">Events</Link></li>
           <li><Link to="/" className="nb-link">Homepage</Link></li>
         </ul>
