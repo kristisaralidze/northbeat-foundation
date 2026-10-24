@@ -10,6 +10,7 @@ import { directoryQuery } from '@/lib/directory.query';
 import { EMPTY_SEARCH, FACETS, GROUP_OPTIONS, cleanExploreSearch, filterOrganisations, parseExploreSearch, sortOrganisations, type ExploreSearch, type Facet } from "@/lib/explore";
 import { humanize } from "@/lib/admin/entities";
 import { FilterSheet } from '@/components/site/FilterSheet';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 export const Route = createFileRoute("/explore")({
@@ -51,15 +52,18 @@ function Explore() {
   return <div className="nb-container py-12 md:py-16">
     <header className="mb-8 flex flex-col gap-6">
       <h1 className="nb-h1">Explore</h1>
-      <div className="relative min-w-0">
-        <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
-        <input type="search" aria-label="Search organisations" placeholder="Search organisations" value={search.q} onChange={(event) => { void navigate({ search: (prev) => ({ ...prev, q: event.target.value }), replace: true, resetScroll: false }); }} className="nb-input pl-12" />
+      <div className="nb-explore-search relative min-w-0">
+        <Search className="pointer-events-none absolute left-2 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" aria-hidden />
+        <input type="search" aria-label="Search organisations" placeholder="Search organisations" value={search.q} onChange={(event) => { void navigate({ search: (prev) => ({ ...prev, q: event.target.value }), replace: true, resetScroll: false }); }} className="nb-input" />
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <div className="hidden md:block"><FilterChipRow data={data} search={search} onToggle={toggle} /></div>
-        <div className="md:hidden"><Button variant="ghost" className="nb-filter-chip" onClick={() => setFiltersOpen(true)}><SlidersHorizontal className="h-4 w-4" />Filters{selected.length ? ` (${selected.length})` : ''}</Button></div>
-        <label className="ml-auto flex items-center gap-2 nb-small"><span className="text-muted-foreground">Sort</span>
-          <select className="nb-input h-11 w-auto py-0" value={search.sort} onChange={(e) => { void navigate({ search: (prev) => ({ ...prev, sort: e.target.value === 'recent' ? 'recent' : e.target.value === 'az' ? 'az' : 'featured' }), resetScroll: false }); }}><option value="featured">Featured</option><option value="az">A to Z</option><option value="recent">Recently added</option></select></label>
+        <div className="md:hidden"><Button variant="ghost" className="nb-explore-filter-trigger" data-active={selected.length > 0} onClick={() => setFiltersOpen(true)}><SlidersHorizontal className="h-4 w-4" />Filters{selected.length ? ` (${selected.length})` : ''}</Button></div>
+        <div className="ml-auto flex items-center gap-2 nb-small"><span id="explore-sort-label" className="text-muted-foreground">Sort</span>
+          <Select value={search.sort} onValueChange={(value) => { void navigate({ search: (prev) => ({ ...prev, sort: value === 'recent' ? 'recent' : value === 'az' ? 'az' : 'featured' }), resetScroll: false }); }}>
+            <SelectTrigger aria-labelledby="explore-sort-label" className="nb-explore-filter-trigger"><SelectValue /></SelectTrigger>
+            <SelectContent className="theme-site nb-explore-menu"><SelectItem className="nb-explore-select-option" value="featured">Featured</SelectItem><SelectItem className="nb-explore-select-option" value="az">A to Z</SelectItem><SelectItem className="nb-explore-select-option" value="recent">Recently added</SelectItem></SelectContent>
+          </Select></div>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <p className="nb-small mr-2" aria-live="polite"><strong className="font-medium">{results.length}</strong> {results.length === 1 ? 'organisation' : 'organisations'}</p>
