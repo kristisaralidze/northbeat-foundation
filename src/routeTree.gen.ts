@@ -41,6 +41,7 @@ import { Route as OpportunitySlugRouteImport } from './routes/opportunity.$slug'
 import { Route as OrgSlugRouteImport } from './routes/org.$slug'
 import { Route as PersonSlugRouteImport } from './routes/person.$slug'
 import { Route as PodcastSlugRouteImport } from './routes/podcast_.$slug'
+import { Route as StartAudienceRouteImport } from './routes/start.$audience'
 import { Route as AdminEpisodesIndexRouteImport } from './routes/admin.episodes.index'
 import { Route as AdminEpisodesIdRouteImport } from './routes/admin.episodes.$id'
 import { Route as AdminEventsIndexRouteImport } from './routes/admin.events.index'
@@ -219,6 +220,11 @@ const PodcastSlugRoute = PodcastSlugRouteImport.update({
   path: '/podcast/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StartAudienceRoute = StartAudienceRouteImport.update({
+  id: '/start/$audience',
+  path: '/start/$audience',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminEpisodesIndexRoute = AdminEpisodesIndexRouteImport.update({
   id: '/episodes/',
   path: '/episodes/',
@@ -335,6 +341,7 @@ export interface FileRoutesByFullPath {
   '/org/$slug': typeof OrgSlugRoute
   '/person/$slug': typeof PersonSlugRoute
   '/podcast/$slug': typeof PodcastSlugRoute
+  '/start/$audience': typeof StartAudienceRoute
   '/admin/': typeof AdminIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/newsletter/': typeof NewsletterIndexRoute
@@ -384,6 +391,7 @@ export interface FileRoutesByTo {
   '/org/$slug': typeof OrgSlugRoute
   '/person/$slug': typeof PersonSlugRoute
   '/podcast/$slug': typeof PodcastSlugRoute
+  '/start/$audience': typeof StartAudienceRoute
   '/admin': typeof AdminIndexRoute
   '/learn': typeof LearnIndexRoute
   '/newsletter': typeof NewsletterIndexRoute
@@ -436,6 +444,7 @@ export interface FileRoutesById {
   '/org/$slug': typeof OrgSlugRoute
   '/person/$slug': typeof PersonSlugRoute
   '/podcast_/$slug': typeof PodcastSlugRoute
+  '/start/$audience': typeof StartAudienceRoute
   '/admin/': typeof AdminIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/newsletter/': typeof NewsletterIndexRoute
@@ -489,6 +498,7 @@ export interface FileRouteTypes {
     | '/org/$slug'
     | '/person/$slug'
     | '/podcast/$slug'
+    | '/start/$audience'
     | '/admin/'
     | '/learn/'
     | '/newsletter/'
@@ -538,6 +548,7 @@ export interface FileRouteTypes {
     | '/org/$slug'
     | '/person/$slug'
     | '/podcast/$slug'
+    | '/start/$audience'
     | '/admin'
     | '/learn'
     | '/newsletter'
@@ -589,6 +600,7 @@ export interface FileRouteTypes {
     | '/org/$slug'
     | '/person/$slug'
     | '/podcast_/$slug'
+    | '/start/$audience'
     | '/admin/'
     | '/learn/'
     | '/newsletter/'
@@ -633,6 +645,7 @@ export interface RootRouteChildren {
   OrgSlugRoute: typeof OrgSlugRoute
   PersonSlugRoute: typeof PersonSlugRoute
   PodcastSlugRoute: typeof PodcastSlugRoute
+  StartAudienceRoute: typeof StartAudienceRoute
   LearnIndexRoute: typeof LearnIndexRoute
   ApiPublicJobsEnrichRoute: typeof ApiPublicJobsEnrichRoute
 }
@@ -863,6 +876,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PodcastSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/start/$audience': {
+      id: '/start/$audience'
+      path: '/start/$audience'
+      fullPath: '/start/$audience'
+      preLoaderRoute: typeof StartAudienceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/episodes/': {
       id: '/admin/episodes/'
       path: '/episodes'
@@ -1077,6 +1097,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrgSlugRoute: OrgSlugRoute,
   PersonSlugRoute: PersonSlugRoute,
   PodcastSlugRoute: PodcastSlugRoute,
+  StartAudienceRoute: StartAudienceRoute,
   LearnIndexRoute: LearnIndexRoute,
   ApiPublicJobsEnrichRoute: ApiPublicJobsEnrichRoute,
 }
