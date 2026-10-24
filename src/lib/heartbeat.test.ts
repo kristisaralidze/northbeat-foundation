@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { beatAmplitude, buildBeats, heightAt, pqrst, restingBeats, type HeartbeatItem } from './heartbeat';
+import { beatAmplitude, buildBeats, heightAt, pqrst, restingBeats, warpedDay, type HeartbeatItem } from './heartbeat';
 const item = (id: string, kind: 'event' | 'opportunity', date: string): HeartbeatItem => ({ id, slug: id, kind, title: id, date, city: null, orgs: [] });
 describe('heartbeat line', () => {
   it('uses 4.6 for an event and 5.4 for a deadline', () => {
