@@ -1,7 +1,7 @@
 # Living cells ecosystem
-- [ ] Replace home grid with one interactive canvas, published organisation dots and real organisation relations.
-- [ ] Add specified group links, membrane motion, pulses, hover/tap cards and accessible navigation.
-- [ ] Test rules and verify populated 390px/1440px views, reduced motion and off-screen pausing.
+- [x] Replace home grid with one interactive canvas, published organisation dots and real organisation relations.
+- [x] Add specified group links, membrane motion, pulses, hover/tap cards and accessible navigation.
+- [x] Test rules and verify populated 390px/1440px views, reduced motion and off-screen pausing; 28 tests passed, 59 to 61 fps sampled, Explore and organisation navigation checked.
 
 # Official brand assets
 - [x] Add uncached Brandfetch name autocomplete to both forms, 300ms debounce from 2 characters, maximum 5, editable name/website and attribution.
