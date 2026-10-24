@@ -20,6 +20,7 @@ export function OpportunityDetail({profile}:{profile:PublicProfile}) {
   const cal:CalendarEvent|null=deadline&&!closed?{id:row.id,title:`Deadline: ${profile.title}`,start:deadline,end:null,allDay:true,location:'',description:apply?`Apply: ${apply}`:profile.summary??'',url:apply??`https://nordic-heartbeat.lovable.app/opportunity/${row.slug}`}:null;
   const {saved,toggle}=useSaved('opportunity',row.slug,profile.title);const [copied,setCopied]=useState(false);
   const who=lines(row['who_can_apply']);const steps=lines(row['how_to_apply_steps']);const tips=lines(row['tips']).slice(0,3);const benefit=text(row,'what_you_get');
+  const eligibility=text(row,'description');const rich=Boolean(who.length||benefit||steps.length||tips.length);
   const fields=profile.terms.filter(t=>t.kind==='field').map(t=>t.id);
   const similar=data.opportunities.filter(o=>o.id!==row.id&&!isClosed(o,now)&&(o.type===row['type']||o.termIds.some(id=>fields.includes(id)))).sort((a,b)=>Number(b.type===row['type'])-Number(a.type===row['type'])||(Date.parse(a.deadline_at??'')||Infinity)-(Date.parse(b.deadline_at??'')||Infinity)).slice(0,3);
   const providers=profile.related.filter(g=>g.kind==='organisations').flatMap(g=>g.entries);
