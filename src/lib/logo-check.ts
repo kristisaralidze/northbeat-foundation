@@ -23,7 +23,6 @@ export async function checkLogoUrl(url: string): Promise<LogoResult> {
 }
 /** True when the image could not be read at all (CORS, network, timeout): not a real "missing" result, never stored. */
 export function isUnreadable(r: LogoResult) { return Boolean((r as {unreadable?:boolean}).unreadable); }
-}
 export async function resolveOrganisationLogo(row: {website:string|null;logo_url:string|null;logo_choice:string|null;logo_image_source?:string|null;logo_manual_required?:boolean}): Promise<LogoResult> {
   if(row.logo_url && (row.logo_choice==='upload'||row.logo_image_source==='admin_upload')) return checkLogoUrl(row.logo_url);
   if(row.logo_manual_required)return {logo_resolved_url:null,logo_tone:'dark',logo_status:'missing',logo_check_error:'Official upload requested'};
