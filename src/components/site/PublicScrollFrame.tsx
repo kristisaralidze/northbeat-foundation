@@ -89,11 +89,11 @@ export function PublicScrollFrame({ children, pathname }: { children: ReactNode;
     };
     window.addEventListener('scroll', updateLetters, { passive: true });
     updateLetters();
-    return () => { disposed = true; motionCleanup(); clean(); window.removeEventListener('scroll', updateLetters); };
+    return () => { disposed = true; window.clearTimeout(quietTimer); quiet.disconnect(); motionCleanup(); clean(); window.removeEventListener('scroll', updateLetters); };
     }
     return () => { window.clearTimeout(timer); teardown(); };
   }, [pathname]);
-  return <div ref={root} className="nb-public-page">
+  return <div ref={root} className="nb-public-page nb-motion-armed">
     <div ref={bar} className={`nb-compact-bar${pathname === '/explore' ? ' hidden' : ''}`} aria-hidden="true">
       <div className="nb-container nb-compact-identity">
         {identity.detail && (identity.image ? <img src={identity.image} alt="" /> : <span className="nb-compact-monogram">{identity.title.charAt(0)}</span>)}
