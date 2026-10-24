@@ -23,7 +23,7 @@ export const getDirectory = createServerFn({ method: "GET" }).handler(async (): 
   // Page each table to avoid silently truncating the directory at the API row limit.
   for (let offset = 0; ; offset += 1000) {
     const { data, error } = await client.from("organisations")
-      .select("id, slug, name, type, short_description, logo_url, logo_choice, logo_image_source, logo_image_source_url, image_source_url, cover_image_url, cover_image_status, website, city")
+      .select("id, slug, name, type, short_description, logo_url, logo_choice, logo_image_source, logo_image_source_url, image_source_url, cover_image_url, cover_image_status, website, city, published_at")
       .eq("status", "published").order("name").order("id").range(offset, offset + 999);
     if (error) throw new Error("The organisations could not be loaded. Please try again.");
     organisations.push(...(data ?? []).map((org) => ({ ...org, cover_image_url: approvedCover(org.cover_image_url, org.cover_image_status), termIds: [] })));

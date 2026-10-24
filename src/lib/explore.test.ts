@@ -43,3 +43,17 @@ describe("Explore cards and URLs", () => {
   });
   it("drops empty URL params", () => expect(cleanExploreSearch({ ...EMPTY_SEARCH, country: ["finland"] })).toEqual({ country: ["finland"] }));
 });
+import { describe as d2, it as i2, expect as e2 } from 'vitest';
+import { parseExploreSearch as pe, filterOrganisations as fo, sortOrganisations, groupSlug } from './explore';
+d2('explore groups and sort', () => {
+  const org = (id: string, type: string, published_at: string) => ({ id, slug: id, name: id, type, short_description: null, logo_url: null, website: null, city: null, termIds: [], published_at });
+  const data = { organisations: [org('B', 'investor', '2026-01-01'), org('A', 'startup', '2026-05-01'), org('C', 'accelerator', '2026-03-01')], terms: [] };
+  i2('filters by ecosystem group from the URL', () => {
+    e2(groupSlug(3)).toBe('incubators-and-accelerators');
+    e2(fo(data, pe({ group: 'incubators-and-accelerators' })).map(o => o.id)).toEqual(['C']);
+  });
+  i2('sorts A to Z or recently added', () => {
+    e2(sortOrganisations(data.organisations, 'az').map(o => o.id)).toEqual(['A', 'B', 'C']);
+    e2(sortOrganisations(data.organisations, 'recent').map(o => o.id)).toEqual(['A', 'C', 'B']);
+  });
+});

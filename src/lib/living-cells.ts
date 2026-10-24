@@ -35,7 +35,7 @@ export function safeCellData(data: CellData): CellData {
   const ids = new Set(organisations.map(o => o.id));
   return { organisations, relations: data.relations.filter(r => r.from_org_id !== r.to_org_id && ids.has(r.from_org_id) && ids.has(r.to_org_id)) };
 }
-export const cellHref = (group: number) => `/explore?type=${encodeURIComponent(JSON.stringify(CELL_GROUPS[group]?.types ?? []))}`;
+export const cellHref = (group: number) => `/explore?group=${(CELL_GROUPS[group]?.name ?? '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 export interface Point { x: number; y: number }
 export interface Cell extends Point { group: number; radius: number; dotRadius: number; orgs: CellOrganisation[] }
 export function layoutCells(data: CellData, width: number, height: number): Cell[] {

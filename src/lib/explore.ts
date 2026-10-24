@@ -1,17 +1,24 @@
-export const FACETS = ["type", "field", "sub_area", "country", "stage"] as const;
+import { CELL_GROUPS, cellGroup } from "./living-cells";
+export const FACETS = ["group", "country", "field", "stage", "type", "sub_area"] as const;
+/** Facets shown as filter chips; type and sub_area still work from shared links. */
+export const VISIBLE_FACETS = ["group", "country", "field", "stage"] as const;
 export type Facet = (typeof FACETS)[number];
-export type ExploreSearch = { q: string } & Record<Facet, string[]>;
+export type ExploreSort = "az" | "recent";
+export type ExploreSearch = { q: string; sort: ExploreSort } & Record<Facet, string[]>;
+export const groupSlug = (index: number) => (CELL_GROUPS[index]?.name ?? "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+export const GROUP_OPTIONS = CELL_GROUPS.map((group, index) => ({ value: groupSlug(index), label: group.name }));
+const orgGroup = (type: string) => { const i = cellGroup(type); return i >= 0 ? groupSlug(i) : ""; };
 export type DirectoryTerm = { id: string; kind: string; name: string; slug: string; parent_id: string | null; sort_order: number };
 export type DirectoryOrganisation = {
   id: string; slug: string; name: string; type: string; short_description: string | null;
-  logo_url: string | null; cover_image_url?: string | null; website: string | null; city: string | null; termIds: string[];
+  logo_url: string | null; cover_image_url?: string | null; published_at?: string | null; website: string | null; city: string | null; termIds: string[];
   logo_choice?: string | null; logo_image_source?: string | null; logo_image_source_url?: string | null; image_source_url?: string | null;
 };
 export type DirectoryData = { organisations: DirectoryOrganisation[]; terms: DirectoryTerm[] };
-export const EMPTY_SEARCH: ExploreSearch = { q: "", type: [], field: [], sub_area: [], country: [], stage: [] };
+export const EMPTY_SEARCH: ExploreSearch = { q: "", sort: "az", group: [], type: [], field: [], sub_area: [], country: [], stage: [] };
 
 export function parseExploreSearch(raw: Record<string, unknown>): ExploreSearch {
-  const result = { ...EMPTY_SEARCH, q: typeof raw["q"] === "string" ? raw["q"] : "" };
+  const result: ExploreSearch = { ...EMPTY_SEARCH, q: typeof raw["q"] === "string" ? raw["q"] : "", sort: raw["sort"] === "recent" ? "recent" : "az" };
   for (const facet of FACETS) {
     const value = raw[facet];
     result[facet] = Array.isArray(value) ? [...new Set(value.filter((v): v is string => typeof v === "string"))] : typeof value === "string" ? [value] : [];
@@ -28,6 +35,7 @@ export function filterOrganisations(data: DirectoryData, search: ExploreSearch, 
     if (q && !haystack.includes(q)) return false;
     return FACETS.every((facet) => facet === omit || search[facet].length === 0 || (facet === "type"
       ? search.type.includes(org.type)
+      : facet === "group" ? search.group.includes(orgGroup(org.type))
       : tags.some((tag) => tag.kind === facet && search[facet].includes(tag.slug))));
   });
 }
@@ -37,7 +45,7 @@ export function facetCounts(data: DirectoryData, search: ExploreSearch, facet: F
   const counts: Record<string, number> = {};
   const terms = new Map(data.terms.filter((t) => t.kind === facet).map((t) => [t.id, t.slug]));
   for (const org of filterOrganisations(data, search, facet)) {
-    const values = facet === "type" ? [org.type] : org.termIds.flatMap((id) => { const slug = terms.get(id); return slug ? [slug] : []; });
+    const values = facet === "type" ? [org.type] : facet === "group" ? [orgGroup(org.type)] : org.termIds.flatMap((id) => { const slug = terms.get(id); return slug ? [slug] : []; });
     for (const value of new Set(values)) counts[value] = (counts[value] ?? 0) + 1;
   }
   return counts;
@@ -56,6 +64,11 @@ export function cardTags(org: DirectoryOrganisation, terms: DirectoryTerm[]) {
 export function cleanExploreSearch(search: ExploreSearch): Partial<ExploreSearch> {
   const out: Partial<ExploreSearch> = {};
   if (search.q) out.q = search.q;
+  if (search.sort === "recent") out.sort = "recent";
   for (const facet of FACETS) if (search[facet]?.length) out[facet] = search[facet];
   return out;
+}
+
+export function sortOrganisations(rows: DirectoryOrganisation[], sort: ExploreSort) {
+  return [...rows].sort(sort === "recent" ? (a, b) => (Date.parse(b.published_at ?? "") || 0) - (Date.parse(a.published_at ?? "") || 0) || a.name.localeCompare(b.name) : (a, b) => a.name.localeCompare(b.name));
 }
