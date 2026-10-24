@@ -17,5 +17,15 @@ export const getEvents = createServerFn({ method: 'GET' }).handler(async (): Pro
     const { data, error } = await client.from('opportunities').select('id,slug,title,deadline_at').eq('status', 'published').not('deadline_at', 'is', null).order('id').range(offset, offset + 999);
     if (error) throw new Error('Deadlines could not be loaded.'); opportunities.push(...(data ?? [])); if (!data || data.length < 1000) break;
   }
-  return { events, opportunities, now: new Date().toISOString() };
+  const links: { event_id: string; term_id: string }[] = [];
+  for (let offset = 0; ; offset += 1000) {
+    const { data, error } = await client.from('event_terms').select('event_id,term_id').order('event_id').order('term_id').range(offset, offset + 999);
+    if (error) throw new Error('Event tags could not be loaded.'); links.push(...(data ?? [])); if (!data || data.length < 1000) break;
+  }
+  const { data: fieldRows, error: fieldError } = await client.from('terms').select('id,name,slug').eq('kind', 'field').order('sort_order').order('name');
+  if (fieldError) throw new Error('Event fields could not be loaded.');
+  const tags = new Map<string, string[]>(); for (const l of links) tags.set(l.event_id, [...(tags.get(l.event_id) ?? []), l.term_id]);
+  const withTags = events.map(e => ({ ...e, termIds: tags.get(e.id) ?? [] }));
+  const used = new Set(withTags.flatMap(e => e.termIds));
+  return { events: withTags, opportunities, now: new Date().toISOString(), fields: (fieldRows ?? []).filter(f => used.has(f.id)) };
 });
