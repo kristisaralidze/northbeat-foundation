@@ -104,6 +104,41 @@ export const getGuide = createServerFn({ method: 'GET' }).inputValidator(z.objec
   };
 });
 
+/** One journey step page: its guide, common mistakes, hand-picked organisations and open opportunities. */
+export const getJourneyStep = createServerFn({ method: 'GET' }).inputValidator(z.object({ slug: z.string().min(1).max(200) })).handler(async ({ data }): Promise<StepPage | null> => {
+  const c = publicClient();
+  const list = await terms(c, ['journey_step']);
+  const index = list.findIndex((s) => s.slug === data.slug);
+  if (index < 0) return null;
+  const step = list[index]!;
+  const guideRows = (await guides(c)).filter((g) => g.journey_step_id === step.id);
+  const main = guideRows[0] ?? null;
+  let commonMistakes: string[] = [];
+  if (main) {
+    const { data: row, error } = await c.from('guides').select('common_mistakes').eq('id', main.id).single();
+    if (error) throw new Error('This step could not be loaded. Please try again.');
+    commonMistakes = (Array.isArray(row?.common_mistakes) ? row.common_mistakes : []).filter((m): m is string => typeof m === 'string' && Boolean(m.trim())).slice(0, 2);
+  }
+  const { data: pickRows, error: pickError } = await c.from('journey_step_organisations').select('organisation_id,reason').eq('term_id', step.id).order('sort_order').order('id').limit(4);
+  if (pickError) throw new Error('This step could not be loaded. Please try again.');
+  const pickIds = (pickRows ?? []).map((p) => p.organisation_id);
+  const { data: orgRows, error: orgError } = pickIds.length
+    ? await c.from('organisations').select('id,slug,name,short_description').eq('status', 'published').in('id', pickIds)
+    : { data: [], error: null };
+  if (orgError) throw new Error('This step could not be loaded. Please try again.');
+  const picks = (pickRows ?? []).flatMap((p) => {
+    const org = (orgRows ?? []).find((o) => o.id === p.organisation_id);
+    return org ? [{ slug: org.slug, title: publicTitle(org.name), summary: org.short_description, reason: p.reason }] : [];
+  });
+  const opportunities = (await tagged(c, 'opportunities', [step.id])).slice(0, 3).map(strip);
+  const pick = (t: LearnTerm | undefined): LearnTerm | null => (t ? { id: t.id, name: t.name, slug: t.slug, sort_order: t.sort_order } : null);
+  return {
+    step: pick(step)!, number: index + 1, total: list.length,
+    guide: main ? cleanGuide(main) : null, commonMistakes, picks, opportunities,
+    previous: pick(list[index - 1]), next: pick(list[index + 1]),
+  };
+});
+
 export const getGlossary = createServerFn({ method: 'GET' }).handler(async (): Promise<GlossaryEntry[]> => {
   const c = publicClient();
   const [rows, rels, guideLinks, guideRows] = await Promise.all([
