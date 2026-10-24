@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { animate, inView, motion, scroll, stagger, useReducedMotion } from 'framer-motion';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -104,20 +104,4 @@ export function enhancePageMotion(page: HTMLElement): () => void {
   }
 
   return () => cleanups.forEach(fn => fn());
-}
-
-/** Re-run the enhancement when the page content settles (fonts, images). */
-export function usePageMotion(root: React.RefObject<HTMLElement | null>, pathname: string) {
-  useEffect(() => {
-    const page = root.current;
-    if (!page) return;
-    const timer = window.setTimeout(() => {
-      const cleanup = enhancePageMotion(page);
-      page.addEventListener('northbeat:page-motion-cleanup', () => cleanup(), { once: true });
-    }, 60);
-    return () => {
-      window.clearTimeout(timer);
-      page.dispatchEvent(new Event('northbeat:page-motion-cleanup'));
-    };
-  }, [root, pathname]);
 }
