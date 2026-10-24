@@ -20,9 +20,10 @@ export function OrganisationLogo({name,slug,uploaded,website,eager=false,large=f
   const {data}=useQuery({...directoryQuery,enabled:Boolean(slug)});
   const org=data?.organisations.find(o=>o.slug===slug);
   const upload=(choice==='upload'||org?.logo_choice==='upload'||org?.logo_image_source==='admin_upload'||isMediaUpload(uploaded))?(uploaded??org?.logo_url):null;
-  const storedStatus=status??org?.logo_status??null;
-  const storedResolved=resolved===undefined?org?.logo_resolved_url:resolved;
-  const storedTone=tone??org?.logo_tone??null;
+  const rawStatus=status??org?.logo_status??null;
+  const storedStatus=rawStatus==='unchecked'?null:rawStatus;
+  const storedResolved=storedStatus?(resolved===undefined?org?.logo_resolved_url:resolved):null;
+  const storedTone=storedStatus?(tone??org?.logo_tone??null):null;
   const brandfetch=brandfetchLogoUrl(website??org?.website??null,choice&&choice!=='upload'&&choice!=='verified'?choice:'icon');
   const src=upload??(storedStatus==='missing'?null:storedResolved??brandfetch);
   const [failed,setFailed]=useState<string|null>(null);
