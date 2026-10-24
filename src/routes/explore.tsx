@@ -57,7 +57,7 @@ function Explore() {
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <div className="hidden md:block"><FilterChipRow data={data} search={search} onToggle={toggle} /></div>
-        <Button variant="ghost" className="nb-filter-chip md:hidden" onClick={() => setFiltersOpen(true)}><SlidersHorizontal className="h-4 w-4" />Filters{selected.length ? ` (${selected.length})` : ''}</Button>
+        <div className="md:hidden"><Button variant="ghost" className="nb-filter-chip" onClick={() => setFiltersOpen(true)}><SlidersHorizontal className="h-4 w-4" />Filters{selected.length ? ` (${selected.length})` : ''}</Button></div>
         <label className="ml-auto flex items-center gap-2 nb-small"><span className="text-muted-foreground">Sort</span>
           <select className="nb-input h-11 w-auto py-0" value={search.sort} onChange={(e) => { void navigate({ search: (prev) => ({ ...prev, sort: e.target.value === 'recent' ? 'recent' : 'az' }), resetScroll: false }); }}><option value="az">A to Z</option><option value="recent">Recently added</option></select></label>
       </div>

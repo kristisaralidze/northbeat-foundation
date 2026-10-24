@@ -75,7 +75,7 @@ function Events() {
     </div></section>}
     <div className="nb-container nb-section nb-events-page"><header className="mb-6 flex flex-wrap items-end justify-between gap-4"><h1 className="nb-h1">Events</h1>
       <div className="flex gap-1" aria-label="Event view"><Button variant="ghost" className={`nb-btn ${!calendar ? 'nb-btn-primary' : 'nb-btn-quiet'}`} aria-pressed={!calendar} onClick={() => update({ view: 'list' })}><List className="h-4 w-4" />List</Button><Button variant="ghost" className={`nb-btn ${calendar ? 'nb-btn-primary' : 'nb-btn-quiet'}`} aria-pressed={calendar} onClick={() => update({ view: 'calendar' })}><CalendarDays className="h-4 w-4" />Calendar</Button></div></header>
-      <Button variant="ghost" className="nb-filter-chip md:hidden" onClick={() => setFiltersOpen(true)}><SlidersHorizontal className="h-4 w-4" />Filters</Button>
+      <div className="md:hidden"><Button variant="ghost" className="nb-filter-chip" onClick={() => setFiltersOpen(true)}><SlidersHorizontal className="h-4 w-4" />Filters</Button></div>
       <FilterSheet open={filtersOpen} onOpenChange={setFiltersOpen}>{controls}</FilterSheet>
       <div className="hidden md:block">{controls}</div>
       <div className="my-6 flex flex-wrap items-center justify-between gap-4"><p className="nb-small" role="status"><strong className="font-medium">{upcoming.length}</strong> upcoming {upcoming.length === 1 ? 'event' : 'events'}</p>
