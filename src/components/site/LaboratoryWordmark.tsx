@@ -1,46 +1,20 @@
-import { useEffect, useRef, useState } from "react";
-import petri from "@/assets/wordmark-petri.png.asset.json";
-import syringe from "@/assets/wordmark-syringe.png.asset.json";
-import flask from "@/assets/wordmark-flask.png.asset.json";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 const LETTERS = Array.from("NORTHBEAT");
-const OBJECTS = [
-  { index: 1, name: "Petri dish", src: petri.url, ratio: 896 / 910 },
-  { index: 3, name: "Syringe", src: syringe.url, ratio: 254 / 1091 },
-  { index: 7, name: "Conical flask", src: flask.url, ratio: 578 / 891 },
-];
+const DOT_LETTER = 1; // the O
+const FONT_SIZE = 200;
+const TRACKING = 0.06 * FONT_SIZE;
+
 type Metrics = { cap: number; width: number; positions: number[]; widths: number[] };
 
-/** Serif letters remain visible until each object has successfully loaded. */
+/**
+ * "NORTHBEAT" in Bodoni Moda, one text element per letter, with a plum dot in the O.
+ * The writing animation is pure CSS, scoped to the .nb-wordmark-animated class on the
+ * home hero section; everywhere else (navbar, after the intro) it renders finished.
+ */
 export function LaboratoryWordmark({ compact = false }: { compact?: boolean }) {
   const host = useRef<HTMLHeadingElement>(null);
-  const [loaded, setLoaded] = useState<number[]>([]);
-  const [phone, setPhone] = useState(false);
   const [metrics, setMetrics] = useState<Metrics>({ cap: 144, width: 1293, positions: LETTERS.map((_, i) => i * 144), widths: LETTERS.map(() => 141) });
-
-  useEffect(() => {
-    let cancelled = false;
-    const images = OBJECTS.map((object) => {
-      const image = new Image();
-      image.onload = () => {
-        if (!cancelled) setLoaded((current) => current.includes(object.index) ? current : [...current, object.index]);
-      };
-      image.src = object.src;
-      return image;
-    });
-    return () => {
-      cancelled = true;
-      images.forEach((image) => { image.onload = null; });
-    };
-  }, []);
-
-  useEffect(() => {
-    const query = window.matchMedia('(max-width: 599px)');
-    const update = () => setPhone(query.matches);
-    update();
-    query.addEventListener('change', update);
-    return () => query.removeEventListener('change', update);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,32 +22,36 @@ export function LaboratoryWordmark({ compact = false }: { compact?: boolean }) {
       if (cancelled || !host.current) return;
       const ctx = document.createElement("canvas").getContext("2d");
       if (!ctx) return;
-      ctx.font = `300 200px ${getComputedStyle(host.current).fontFamily}`;
+      ctx.font = `400 ${FONT_SIZE}px ${getComputedStyle(host.current).fontFamily}`;
       const cap = ctx.measureText("H").actualBoundingBoxAscent || 144;
-      const widths = LETTERS.map((letter, index) => {
-        const object = OBJECTS.find((item) => item.index === index && loaded.includes(index) && !(phone && index === 3));
-        const letterWidth = ctx.measureText(letter).width;
-        return object ? Math.max(cap * object.ratio, letterWidth * (index === 3 ? 0.62 : 1)) : letterWidth;
-      });
+      const widths = LETTERS.map((letter) => ctx.measureText(letter).width);
       let x = 0;
-      const positions = widths.map((width) => { const start = x; x += width + 3; return start; });
-      setMetrics({ cap, width: x - 3, positions, widths });
+      const positions = widths.map((width) => { const start = x; x += width + TRACKING; return start; });
+      setMetrics({ cap, width: x - TRACKING, positions, widths });
     });
     return () => { cancelled = true; };
-  }, [loaded, phone]);
+  }, []);
 
   const Tag = compact ? 'span' : 'h1';
+  const dotX = (metrics.positions[DOT_LETTER] ?? 0) + (metrics.widths[DOT_LETTER] ?? 0) / 2;
+  const dotY = metrics.cap * 0.52;
   return <Tag ref={host} className="nb-laboratory-wordmark" aria-label="Northbeat">
     <span className="sr-only">Northbeat</span>
     <svg viewBox={`0 0 ${metrics.width} ${metrics.cap}`} className="nb-laboratory-lettering" aria-hidden="true">
-      {LETTERS.map((letter, index) => {
-        const object = OBJECTS.find((item) => item.index === index && loaded.includes(index) && !(phone && index === 3));
-        const x = metrics.positions[index] ?? 0;
-        const width = metrics.widths[index] ?? 0;
-        if (!object) return <text key={index} x={x} y={metrics.cap}>{letter}</text>;
-        const imageWidth = metrics.cap * object.ratio;
-        return <foreignObject key={index} x={x + (width - imageWidth) / 2} y={0} width={imageWidth} height={metrics.cap}><img src={object.src} alt="" className="h-full w-full object-contain" onError={() => setLoaded((current) => current.filter((item) => item !== index))} /></foreignObject>;
-      })}
+      <defs>
+        <filter id="nb-wet-ink" x="-5%" y="-20%" width="110%" height="140%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" xChannelSelector="R" yChannelSelector="G">
+            <animate attributeName="scale" from="5" to="0" dur="3.4s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0 0 0.25 1" />
+          </feDisplacementMap>
+        </filter>
+      </defs>
+      <g className="nb-wordmark-letters">
+        {LETTERS.map((letter, index) => (
+          <text key={index} x={metrics.positions[index] ?? 0} y={metrics.cap} style={{ "--i": index } as CSSProperties}>{letter}</text>
+        ))}
+      </g>
+      <circle className="nb-wordmark-dot" cx={dotX} cy={dotY} r={FONT_SIZE * 0.035} />
     </svg>
   </Tag>;
 }
