@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { subscribeToNewsletter } from "@/lib/newsletter.functions";
 import { Button } from '@/components/ui/button';
 
-export function NewsletterSignup({ source = "footer", tag, consentLabel = "Yes, email me the Northbeat newsletter. Unsubscribe any time.", doneMessage = "You're on the list. We'll email you when the next issue is out." }: { source?: string; tag?: "podcast"; consentLabel?: string; doneMessage?: string }) {
+export function NewsletterSignup({ source = "footer", tag, consentLabel = "Yes, email me the Northbeat newsletter.", doneMessage = "You're on the list. We'll email you when the next issue is out." }: { source?: string; tag?: "podcast"; consentLabel?: string; doneMessage?: string }) {
   const subscribe = useServerFn(subscribeToNewsletter);
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
