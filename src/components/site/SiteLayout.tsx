@@ -104,7 +104,11 @@ function Footer({ hideSignup }: { hideSignup: boolean }) {
 }
 
 function FooterBottom() {
-  const { data } = useQuery(siteInfoQuery);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  // Read after hydration so server and browser render the same footer.
+  const { data: info } = useQuery({ ...siteInfoQuery, enabled: mounted });
+  const data = mounted ? info : undefined;
   return (
     <div className="nb-container nb-footer-main nb-small">
       <nav aria-label="Footer"><ul className="nb-footer-links">
