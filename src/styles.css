@@ -1493,6 +1493,19 @@ html, body { overflow-x: clip; }
 }
 @media (prefers-reduced-motion: reduce) { .theme-site .nb-journey-beat { transition: none; } }
 
+/* Learn's own pulse sequence does not share the list reveal scheduler. */
+.theme-site .nb-journey-animated::before { display: none; }
+.nb-journey-track { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.nb-journey-track path { fill: none; stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; }
+@media (prefers-reduced-motion: no-preference) {
+  .nb-journey-animated[data-ready='true'] .nb-journey-track path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: nb-journey-draw 1.2s linear forwards; }
+  .nb-journey-animated[data-ready='true'] .nb-journey-link > span { animation: nb-journey-reveal .5s cubic-bezier(.16,1,.3,1) both; animation-delay: var(--pulse-delay, 0s); }
+  .nb-journey-animated[data-ready='true'] .nb-journey-beat path { transform-box: fill-box; transform-origin: center; animation: nb-journey-pulse .5s cubic-bezier(.16,1,.3,1) both; animation-delay: var(--pulse-delay, 0s); }
+}
+@keyframes nb-journey-draw { to { stroke-dashoffset: 0; } }
+@keyframes nb-journey-reveal { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes nb-journey-pulse { 0%, 100% { transform: scale(1); stroke: var(--ink); } 30% { transform: scale(1.18); stroke: var(--berry); } 60% { transform: scale(1.04); stroke: var(--berry); } }
+
 /* Page motion polish (public pages only; the home owns its own story) */
 .nb-motion-word { display: inline-block; will-change: transform, opacity; }
 .nb-page-skeleton { padding-block: 3rem; display: grid; gap: 20px; }
@@ -1511,14 +1524,14 @@ html, body { overflow-x: clip; }
 
 /* Scroll reveals: hidden only while armed, revealed with a staggered transition */
 @media (prefers-reduced-motion: no-preference) {
-  .nb-motion-armed :is(section, .nb-card, [data-reveal], .nb-cover-banner, .nb-cover-strip) { opacity: 0; transform: translateY(22px); }
-  .nb-motion-armed :is(section, .nb-card, [data-reveal], .nb-cover-banner, .nb-cover-strip).nb-revealed { opacity: 1; transform: none; transition: opacity .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1); transition-delay: var(--reveal-delay, 0ms); }
+  .nb-motion-armed :is(section, .nb-card, .nb-directory-row, .nb-event-row, .nb-entry-card, dl > div, [data-reveal], .nb-cover-banner, .nb-cover-strip) { opacity: 0; transform: translateY(22px); }
+  .nb-motion-armed :is(section, .nb-card, .nb-directory-row, .nb-event-row, .nb-entry-card, dl > div, [data-reveal], .nb-cover-banner, .nb-cover-strip).nb-revealed { opacity: 1; transform: none; transition: opacity .5s cubic-bezier(.16,1,.3,1), transform .5s cubic-bezier(.16,1,.3,1); transition-delay: var(--reveal-delay, 0ms); }
   .nb-motion-armed hr { transform: scaleX(0); transform-origin: left; }
-  .nb-motion-armed hr.nb-revealed { transform: scaleX(1); transition: transform .9s cubic-bezier(.22,1,.36,1); }
+  .nb-motion-armed hr.nb-revealed { transform: scaleX(1); transition: transform .9s cubic-bezier(.16,1,.3,1); }
   .nb-motion-armed section h2 { opacity: 0; transform: translateY(24px); }
-  .nb-motion-armed section.nb-revealed h2 { opacity: 1; transform: none; transition: opacity .9s cubic-bezier(.22,1,.36,1), transform .9s cubic-bezier(.22,1,.36,1); }
+  .nb-motion-armed section.nb-revealed h2 { opacity: 1; transform: none; transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1); }
   .nb-motion-armed .nb-cover-banner img, .nb-motion-armed .nb-cover-strip img { clip-path: inset(100% 0 0 0); transform: scale(1.08); }
-  .nb-motion-armed .nb-cover-banner.nb-revealed img, .nb-motion-armed .nb-cover-strip.nb-revealed img { clip-path: inset(0 0 0 0); transform: scale(1); transition: clip-path .9s cubic-bezier(.22,1,.36,1), transform 1.4s cubic-bezier(.22,1,.36,1); }
+  .nb-motion-armed .nb-cover-banner.nb-revealed img, .nb-motion-armed .nb-cover-strip.nb-revealed img { clip-path: inset(0 0 0 0); transform: scale(1); transition: clip-path .9s cubic-bezier(.16,1,.3,1), transform 1.4s cubic-bezier(.16,1,.3,1); }
   .nb-motion-armed .nb-motion-word { opacity: 0; }
 }
 
@@ -1526,7 +1539,7 @@ html, body { overflow-x: clip; }
 
 /* Buttons: square corners, 1px ink border, plum fill slides in from the left */
 .nb-public-page .nb-btn { position: relative; isolation: isolate; overflow: hidden; border-radius: 2px; border: 1px solid var(--ink); background: transparent; color: var(--ink); transition: color .35s ease, border-color .35s ease; }
-.nb-public-page .nb-btn::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--berry); transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.22,1,.36,1); }
+.nb-public-page .nb-btn::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--berry); transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.16,1,.3,1); }
 .nb-public-page .nb-btn:hover::before, .nb-public-page .nb-btn:focus-visible::before { transform: scaleX(1); }
 .nb-public-page .nb-btn:hover, .nb-public-page .nb-btn:focus-visible { color: var(--snow); border-color: var(--berry); box-shadow: none; }
 .nb-public-page .nb-btn-primary { background: var(--berry); color: var(--snow); border-color: var(--berry); }
@@ -1574,7 +1587,7 @@ html, body { overflow-x: clip; }
 .nb-opportunities-page .nb-entry-card:hover { border-top-color: var(--berry); }
 
 /* Cards become editorial rows: thin top rule, no shadow, shift right on hover */
-.nb-public-page .nb-card { background: transparent; border: 0; border-top: 1px solid var(--hairline); border-radius: 0; padding: 1.25rem 2.5rem 1.25rem 0; position: relative; box-shadow: none; transition: transform .25s cubic-bezier(.22,1,.36,1); }
+.nb-public-page .nb-card { background: transparent; border: 0; border-top: 1px solid var(--hairline); border-radius: 0; padding: 1.25rem 2.5rem 1.25rem 0; position: relative; box-shadow: none; transition: transform .25s cubic-bezier(.16,1,.3,1); }
 .nb-public-page .nb-card::after { content: '\2192'; position: absolute; right: 0.25rem; top: 1.25rem; color: var(--ink-soft); transition: transform .25s ease, color .25s ease; }
 .nb-public-page .nb-card:hover { transform: translateX(8px); box-shadow: none; }
 .nb-public-page .nb-card:hover::after { transform: translateX(4px); color: var(--berry); }

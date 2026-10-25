@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { EMPTY_SEARCH } from "@/lib/explore";
+import { PageTransition } from '@/components/site/motion';
 
 // Admin and auth-helper screens keep the plain look; everything else gets the site layout.
 const isPlainPath = (p: string) => p === "/directions" || p === "/admin" || p.startsWith("/admin/") || p.startsWith("/reset-password");
@@ -142,7 +143,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      {isPlainPath(pathname) ? <Outlet /> : <SiteLayout><Outlet /></SiteLayout>}
+      {isPlainPath(pathname) ? <PageTransition pathname={pathname}><Outlet /></PageTransition> : <SiteLayout><Outlet /></SiteLayout>}
       <Toaster />
     </QueryClientProvider>
   );

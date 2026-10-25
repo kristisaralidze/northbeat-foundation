@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { LearnError, LearnNotFound } from '@/components/site/LearnParts';
 import { learnHubQuery } from '@/lib/learn.query';
+import { LearnJourney } from '@/components/site/LearnJourney';
 
 const TITLE = 'Learn: Northbeat';
 const DESC = 'Plain playbooks for building health in the Nordics, step by step, from first idea to growth.';
@@ -39,7 +40,7 @@ function Learn() {
     </header>
 
     {data.steps.length > 0 && <nav className="mt-16" aria-label="The founder journey">
-      <ol className="nb-journey-line">
+      <LearnJourney>
         {data.steps.map((s, i) => {
           const line = s.guides[0]?.one_sentence ?? null;
           return <li key={s.id} className="nb-journey-stop">
@@ -51,13 +52,13 @@ function Learn() {
             </Link>
           </li>;
         })}
-      </ol>
+      </LearnJourney>
     </nav>}
 
     {data.glossaryCount > 0 && <section className="mt-20" aria-labelledby="glossary-teaser">
       <h2 id="glossary-teaser" className="nb-h2">New to the words?</h2>
       {Boolean(data.glossaryPreview?.length) && <dl className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {data.glossaryPreview!.map((t) => <div key={t.slug}><dt className="nb-h3">{t.term}</dt><dd className="nb-small mt-2 text-muted-foreground">{t.short_definition}</dd></div>)}
+        {data.glossaryPreview?.map((t) => <div key={t.slug}><dt className="nb-h3">{t.term}</dt><dd className="nb-small mt-2 text-muted-foreground">{t.short_definition}</dd></div>)}
       </dl>}
       <Link to="/learn/glossary" className="nb-btn nb-btn-secondary mt-8">See all {data.glossaryCount} terms</Link>
     </section>}

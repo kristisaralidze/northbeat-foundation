@@ -1,17 +1,17 @@
 import type { ReactNode } from 'react';
 import { animate, motion, scroll, stagger, useReducedMotion } from 'framer-motion';
 
-const EASE = [0.22, 1, 0.36, 1] as const;
+const EASE = [0.16, 1, 0.3, 1] as const;
 
-/** Soft 300ms fade every time the public page changes. */
+/** Page entrance; home stays transform-free for its measured sticky scenes. */
 export function PageTransition({ children, pathname }: { children: ReactNode; pathname: string }) {
   const reduce = useReducedMotion();
   return (
     <motion.div
       key={pathname}
-      initial={reduce ? false : { opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3, ease: 'easeOut' }}
+      initial={reduce ? false : { opacity: 0, y: pathname === '/' ? 0 : 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: EASE }}
     >
       {children}
     </motion.div>
@@ -66,7 +66,7 @@ export function enhancePageMotion(page: HTMLElement): () => void {
   // page root, so no hydration mismatch); we only add the revealed class.
   // A scroll-position check (not IntersectionObserver) so anchor jumps and
   // fast scrolling past a section still reveal it.
-  const selector = 'section, .nb-card, [data-reveal], hr, .nb-cover-banner, .nb-cover-strip';
+  const selector = 'section, .nb-card, .nb-directory-row, .nb-event-row, .nb-entry-card, dl > div, [data-reveal], hr, .nb-cover-banner, .nb-cover-strip';
   const pending = new Set<HTMLElement>();
   const seen = new Map<HTMLElement, number>();
   for (const el of page.querySelectorAll<HTMLElement>(selector)) {
@@ -74,13 +74,13 @@ export function enhancePageMotion(page: HTMLElement): () => void {
     const parent = el.parentElement ?? page;
     const order = seen.get(parent) ?? 0;
     seen.set(parent, order + 1);
-    el.style.setProperty('--reveal-delay', `${Math.min(order, 8) * 70}ms`);
+    el.style.setProperty('--reveal-delay', `${Math.min(order, 8) * 80}ms`);
     pending.add(el);
   }
   let ticking = false;
   const revealPassed = () => {
     ticking = false;
-    const line = window.innerHeight * 0.92;
+    const line = window.innerHeight * 0.85;
     for (const el of pending) {
       if (el.getBoundingClientRect().top <= line) {
         el.classList.add('nb-revealed');
