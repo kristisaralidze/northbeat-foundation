@@ -51,7 +51,7 @@ function World({ palette, active, reduced, gesture, onFailure }: Props) {
     <ambientLight intensity={1.8} color={palette.light} />
     <directionalLight position={[0, 4, 3]} intensity={1.2} color={palette.light} />
     <group ref={group}>
-      <mesh><sphereGeometry args={[1, 64, 48]} /><meshStandardMaterial color={palette.sea} emissive={palette.sea} emissiveIntensity={.25} roughness={1} metalness={0} /></mesh>
+      <mesh><sphereGeometry args={[1, 64, 48]} /><meshStandardMaterial color={palette.sea} emissive={palette.sea} emissiveIntensity={.25} roughness={1} metalness={0} toneMapped={false} /></mesh>
       <lineSegments geometry={geometry.lines}><lineBasicMaterial color={palette.plum} transparent opacity={.12} /></lineSegments>
       <points geometry={geometry.land}><pointsMaterial color={palette.land} alphaMap={geometry.disk} alphaTest={.4} size={.014} sizeAttenuation toneMapped={false} /></points>
       <points geometry={geometry.nordic}><pointsMaterial ref={highlight} color={palette.plum} alphaMap={geometry.disk} alphaTest={.4} transparent size={.027} sizeAttenuation toneMapped={false} /></points>
