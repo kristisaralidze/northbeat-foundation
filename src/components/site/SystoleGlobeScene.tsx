@@ -15,7 +15,14 @@ function World({ palette, active, reduced, gesture, onFailure }: Props) {
   const time = useRef(0);
   const geometry = useMemo(() => {
     const land: number[] = [], nordic: number[] = [];
-    samples.forEach(([lat = 0, lng = 0, region]) => (region === 1 ? nordic : land).push(...globePosition(lat, lng, 1.012)));
+    // The source sample holds only 140 Nordic points against 16k elsewhere, so each Nordic
+    // point is repeated with small jitter to give the accent countries a solid mass.
+    let seed = 7;
+    const jitter = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed / 0x7fffffff - .5) * 1.1; };
+    samples.forEach(([lat = 0, lng = 0, region]) => {
+      if (region === 1) for (let i = 0; i < 5; i++) nordic.push(...globePosition(lat + (i ? jitter() : 0), lng + (i ? jitter() : 0), 1.012));
+      else land.push(...globePosition(lat, lng, 1.012));
+    });
     const create = (positions: number[]) => new BufferGeometry().setAttribute('position', new Float32BufferAttribute(positions, 3));
     const lines: number[] = [];
     for (let lat = -60; lat <= 60; lat += 30) for (let lng = -180; lng < 180; lng += 3) lines.push(...globePosition(lat, lng, 1.006), ...globePosition(lat, lng + 3, 1.006));
