@@ -12,7 +12,7 @@
 ## Architecture rules
 - Public directional arrows use PulseArrow and the same pulse-arrow.svg mask for editorial pseudo-elements. Why: one vector source keeps cards, links and CTA marks consistent without replacing disclosure chevrons.
 - ListFilterSelect shares controlled Radix filters across Events and Opportunities using existing menu tokens; derived lists and rows are memoized. Why: consistent keyboard/mobile menus and no repeated filtering on unrelated UI changes.
-- Systole uses a portalled Radix dialog with local styles and browser-only query-link opening; its existing waitlist server function is unchanged. Why: accessible focus containment and a sheet unaffected by page-motion transforms.
+- Systole uses a portalled Radix dialog, query-link opening and an open-only lazy R3F globe using existing geographic samples, visibility-paused frames and native pan-y gestures; waitlist logic is unchanged. Why: accessible sheet, isolated motion and no 3D startup cost while closed.
 - Home uses native scrolling with no Lenis/GSAP; public pages use keyed PublicScrollFrame (the only Lenis/GSAP owner). Why: one scroll owner and no pinning on home.
 - Shared page entrances live in motion.tsx; public scroll reveals stay inside PublicScrollFrame, while home gets only a transform-free fade. LearnJourney measures beat positions for its local sequence. Why: one scroll owner, stable home geometry and synchronized responsive motion.
 - Fabric is the static still image in every placement (Learn circle, footer band; the home hero is plain paper); no shader or animation. Why: the WebGL silk was explicitly removed.
