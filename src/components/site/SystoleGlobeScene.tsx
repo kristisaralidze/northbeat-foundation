@@ -37,7 +37,7 @@ function World({ palette, active, reduced, gesture, onFailure }: Props) {
     group.current.rotation.y += (gesture.current.yaw - group.current.rotation.y) * damping;
     group.current.rotation.x += (gesture.current.pitch - group.current.rotation.x) * damping;
     if (active && !reduced) time.current += dt;
-    if (highlight.current) highlight.current.size = reduced ? .021 : .021 + .003 * Math.sin(time.current * 1.4);
+    if (highlight.current) highlight.current.size = reduced ? .025 : .025 + .003 * Math.sin(time.current * 1.4);
     const host = gl.domElement.closest<HTMLElement>('.nb-systole-globe');
     if (host) { host.dataset['rotation'] = group.current.rotation.y.toFixed(4); host.dataset['drawCalls'] = String(gl.info.render.calls); host.dataset['triangles'] = String(gl.info.render.triangles); }
   });
@@ -45,8 +45,8 @@ function World({ palette, active, reduced, gesture, onFailure }: Props) {
     <ambientLight intensity={1.1} color={palette.light} />
     <directionalLight position={[0, 4, 3]} intensity={2.2} color={palette.light} />
     <group ref={group}>
-      <mesh><icosahedronGeometry args={[1, 3]} /><meshStandardMaterial color={palette.sea} roughness={1} metalness={0} flatShading /></mesh>
-      <mesh><icosahedronGeometry args={[1.003, 2]} /><meshBasicMaterial color={palette.wire} wireframe transparent opacity={.13} /></mesh>
+      <mesh><sphereGeometry args={[1, 48, 32]} /><meshStandardMaterial color={palette.sea} roughness={1} metalness={0} /></mesh>
+      <mesh><sphereGeometry args={[1.004, 24, 12]} /><meshBasicMaterial color={palette.wire} wireframe transparent opacity={.07} /></mesh>
       <points geometry={geometry.land}><pointsMaterial color={palette.land} size={.009} sizeAttenuation /></points>
       <points geometry={geometry.nordic}><pointsMaterial ref={highlight} color={palette.plum} size={.021} sizeAttenuation /></points>
       {NORDIC_CITIES.filter(city => ['Helsinki', 'Stockholm', 'Oslo', 'Copenhagen', 'Reykjavik'].includes(city.name)).map(city => <mesh key={city.name} position={globePosition(city.lat, city.lng, 1.022)}>
@@ -57,5 +57,5 @@ function World({ palette, active, reduced, gesture, onFailure }: Props) {
 }
 
 export default function SystoleGlobeScene(props: Props) {
-  return <Canvas dpr={[1, 1.5]} frameloop={props.active && !props.reduced ? 'always' : 'demand'} camera={{ position: globePosition(48, 8, 3.6), fov: 38, near: .1, far: 10 }} gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}><World {...props} /></Canvas>;
+  return <Canvas dpr={[1, 1.5]} frameloop={props.active && !props.reduced ? 'always' : 'demand'} camera={{ position: globePosition(48, 8, 3.25), fov: 38, near: .1, far: 10 }} gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}><World {...props} /></Canvas>;
 }
