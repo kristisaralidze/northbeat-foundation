@@ -1,5 +1,5 @@
 # Current fixes (Oct 24)
-- [ ] Refine page entrances and cascading lists; add measured Learn pulse/reveal and verify reduced motion, filtering and responsive layout.
+- [x] Refine page entrances and cascading lists; add measured Learn pulse/reveal and verify reduced motion, filtering and responsive layout.
 - [x] Replace remaining list-page native menus, memoize filtering and list rows, refine facts; verify Events/Opportunities/Explore on phones and desktop.
 - [x] Replace Systole floating button/panel with edge tab, ECG-paper sheet, shared-link opening; verify signup and 390px/1440px.
 - [x] URGENT: restore Brandfetch icon logos everywhere; stored check only overrides when present (light=ink tile, missing=name tile); admin uploads win; check runs in browser only.

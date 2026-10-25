@@ -20,6 +20,7 @@ export function LearnJourney({ children }: { children: ReactNode }) {
         const position = beat ? vertical ? beat.top - box.top + beat.height / 2 : beat.left - box.left + beat.width / 2 : 0;
         stop.style.setProperty('--pulse-delay', `${Math.max(0, position / Math.max(1, length)) * 1.2}s`);
       });
+      el.dataset['ready'] = 'true';
     };
     measure();
     const observer = new ResizeObserver(measure); observer.observe(el);
