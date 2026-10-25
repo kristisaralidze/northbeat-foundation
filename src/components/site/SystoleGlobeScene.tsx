@@ -4,7 +4,7 @@ import { BufferGeometry, CanvasTexture, Float32BufferAttribute, Group, PointsMat
 import samples from '@/assets/globe-points.json';
 import { globePosition, NORDIC_CITIES } from '@/lib/globe';
 
-export type GlobePalette = { land: string; sea: string; wire: string; plum: string; light: string };
+export type GlobePalette = { land: string; sea: string; wire: string; plum: string; nordic: string; light: string };
 export type GlobeGesture = { yaw: number; pitch: number; dragging: boolean };
 type Props = { palette: GlobePalette; active: boolean; reduced: boolean; gesture: MutableRefObject<GlobeGesture>; onFailure: () => void };
 
