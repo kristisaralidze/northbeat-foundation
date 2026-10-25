@@ -61,7 +61,7 @@ function World({ palette, active, reduced, gesture, onFailure }: Props) {
       <mesh><sphereGeometry args={[1, 64, 48]} /><meshStandardMaterial color={palette.sea} emissive={palette.sea} emissiveIntensity={.25} roughness={1} metalness={0} toneMapped={false} /></mesh>
       <lineSegments geometry={geometry.lines}><lineBasicMaterial color={palette.wire} transparent opacity={.08} /></lineSegments>
       <points geometry={geometry.land}><pointsMaterial color={palette.land} alphaMap={geometry.disk} alphaTest={.4} size={.014} sizeAttenuation toneMapped={false} /></points>
-      <points geometry={geometry.nordic}><pointsMaterial ref={highlight} color={palette.nordic} alphaMap={geometry.disk} alphaTest={.4} transparent size={.032} sizeAttenuation toneMapped={false} /></points>
+      <points geometry={geometry.nordic}><pointsMaterial ref={highlight} color={palette.nordic} alphaMap={geometry.disk} alphaTest={.4} transparent size={.028} sizeAttenuation toneMapped={false} /></points>
       {NORDIC_CITIES.filter(city => ['Helsinki', 'Stockholm', 'Oslo', 'Copenhagen', 'Reykjavik'].includes(city.name)).map(city => <mesh key={city.name} position={globePosition(city.lat, city.lng, 1.022)}>
         <octahedronGeometry args={[.013, 0]} /><meshStandardMaterial color={palette.nordic} emissive={palette.nordic} emissiveIntensity={.7} roughness={.4} />
       </mesh>)}
