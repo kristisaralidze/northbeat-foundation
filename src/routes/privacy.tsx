@@ -16,7 +16,7 @@ export const Route = createFileRoute("/privacy")({
     ],
     links: [{ rel: "canonical", href: "https://nordic-heartbeat.lovable.app/privacy" }],
   }),
-  errorComponent: () => <div role="alert" className="nb-page"><h1 className="nb-h1">This page didn't load</h1><p className="nb-lead">Please try again in a moment.</p></div>,
+  errorComponent: () => <div role="alert" className="nb-page"><h1 className="nb-h1">This page didn't load</h1><p className="nb-lead max-w-2xl">Please try again in a moment.</p></div>,
   component: PrivacyPage,
 });
 
@@ -24,19 +24,19 @@ function PrivacyPage() {
   const { data } = useSuspenseQuery(siteInfoQuery);
   const contact = data.contactEmail;
   return (
-    <div className="nb-page max-w-2xl">
+    <div className="nb-page">
       <header className="nb-page-header">
         <h1 className="nb-h1">Privacy policy</h1>
-        <p className="nb-lead">This page explains what we collect, why we use it, how long we keep it and what you can ask us to do about it.</p>
+        <p className="nb-lead max-w-2xl">This page explains what we collect, why we use it, how long we keep it and what you can ask us to do about it.</p>
       </header>
 
-      <section aria-labelledby="who-heading" className="nb-section">
+      <section aria-labelledby="who-heading" className="nb-section max-w-2xl">
         <h2 id="who-heading" className="nb-h2">Who we are</h2>
         <p className="nb-body">Northbeat is a free hub for Nordic health innovation. It is run by its founders from Helsinki, Finland. You can browse everything without an account.</p>
         {contact && <p className="nb-body">Questions about this policy? Write to <a href={`mailto:${contact}`} className="nb-link">{contact}</a>.</p>}
       </section>
 
-      <section aria-labelledby="collect-heading" className="nb-section">
+      <section aria-labelledby="collect-heading" className="nb-section max-w-2xl">
         <h2 id="collect-heading" className="nb-h2">What we collect</h2>
         <ul className="nb-body list-disc pl-5 space-y-2">
           <li><strong>Email addresses you give us.</strong> When you sign up for the newsletter or the Systole first-to-know list, we store your email. That is all we ask for.</li>
@@ -46,7 +46,7 @@ function PrivacyPage() {
         <p className="nb-body">We have no visitor accounts and we do not run user profiles.</p>
       </section>
 
-      <section aria-labelledby="why-heading" className="nb-section">
+      <section aria-labelledby="why-heading" className="nb-section max-w-2xl">
         <h2 id="why-heading" className="nb-h2">Why we use it</h2>
         <ul className="nb-body list-disc pl-5 space-y-2">
           <li>To send the newsletter you signed up for, about once a week.</li>
@@ -56,12 +56,12 @@ function PrivacyPage() {
         </ul>
       </section>
 
-      <section aria-labelledby="not-heading" className="nb-section">
+      <section aria-labelledby="not-heading" className="nb-section max-w-2xl">
         <h2 id="not-heading" className="nb-h2">What we don't do</h2>
         <p className="nb-body">We do not run ads. We do not sell email addresses. We do not track you across other websites. No one pays to be listed or featured.</p>
       </section>
 
-      <section aria-labelledby="others-heading" className="nb-section">
+      <section aria-labelledby="others-heading" className="nb-section max-w-2xl">
         <h2 id="others-heading" className="nb-h2">Services we use</h2>
         <ul className="nb-body list-disc pl-5 space-y-2">
           <li>The site runs on Lovable's cloud hosting.</li>
@@ -71,7 +71,7 @@ function PrivacyPage() {
         </ul>
       </section>
 
-      <section aria-labelledby="keep-heading" className="nb-section">
+      <section aria-labelledby="keep-heading" className="nb-section max-w-2xl">
         <h2 id="keep-heading" className="nb-h2">How long we keep it</h2>
         <ul className="nb-body list-disc pl-5 space-y-2">
           <li>Newsletter: until you unsubscribe.</li>
@@ -80,17 +80,17 @@ function PrivacyPage() {
         </ul>
       </section>
 
-      <section aria-labelledby="choices-heading" className="nb-section">
+      <section aria-labelledby="choices-heading" className="nb-section max-w-2xl">
         <h2 id="choices-heading" className="nb-h2">Your choices</h2>
         <p className="nb-body">Every newsletter has an unsubscribe link. You can also email us to unsubscribe, leave the Systole list, or have your submission deleted. To remove saved items and recent searches, clear your browser storage for this site.</p>
       </section>
 
-      <section aria-labelledby="changes-heading" className="nb-section">
+      <section aria-labelledby="changes-heading" className="nb-section max-w-2xl">
         <h2 id="changes-heading" className="nb-h2">Changes</h2>
         <p className="nb-body">If we change this policy, we update this page.</p>
       </section>
 
-      <section className="nb-section">
+      <section className="nb-section max-w-2xl">
         <h2 className="nb-h2">Read also</h2>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link to="/terms" className="nb-btn nb-btn-secondary">Terms of use</Link>
