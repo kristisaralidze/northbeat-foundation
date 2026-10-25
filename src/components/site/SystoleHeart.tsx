@@ -3,6 +3,7 @@ import { useServerFn } from '@tanstack/react-start';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { PulseArrow } from '@/components/ui/pulse-arrow';
+import { SystoleGlobe } from './SystoleGlobe';
 import { joinSystoleWaitlist } from '@/lib/site.functions';
 
 const HEART = 'M0 7.6C0 7.6-9 1.7-9-4.1-9-6.8-6.9-8.9-4.4-8.9-2.6-8.9-1-7.9 0-6.4 1-7.9 2.6-8.9 4.4-8.9 6.9-8.9 9-6.8 9-4.1 9 1.7 0 7.6 0 7.6Z';
@@ -94,6 +95,7 @@ export function SystoleHeart({ pathname }: { pathname: string }) {
           <Dialog.Description id="systole-description" className="nb-systole-sheet-message">NorthBeat is cooking something cool for you.</Dialog.Description>
           <p className="nb-systole-sheet-detail">Helsinki. Spring 2027.</p>
           <p className="nb-systole-sheet-detail">Stay tuned.</p>
+          {open && <SystoleGlobe />}
         </div>
         <div className="nb-systole-sheet-bottom">
           {state === 'done' ? <div className="nb-systole-success"><p role="status">You're on the list.</p><Button variant="link" className="nb-systole-text-action" onClick={share}>Send it to a friend</Button><p role="status" className="nb-systole-feedback">{copied ? 'Link copied.' : copyError ? "Couldn't copy the link. Please try again." : ''}</p></div> :

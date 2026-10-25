@@ -1407,6 +1407,13 @@ html, body { overflow-x: clip; }
 .theme-site .nb-systole-text-action:hover { color: var(--ink); background: transparent; }
 .theme-site .nb-systole-close { color: var(--ink); }
 .nb-systole-sheet-main { padding-top: 40px; padding-bottom: 48px; }
+.theme-site { --systole-globe-land: #A5A298; --systole-globe-sea: #D9D6CD; }
+.nb-systole-globe { width: 100%; height: 272px; margin-top: 16px; position: relative; touch-action: pan-y; cursor: grab; outline-offset: 4px; }
+.nb-systole-globe:active { cursor: grabbing; }
+.nb-systole-globe:focus-visible { outline: 1px solid var(--berry); }
+.nb-systole-globe canvas { touch-action: pan-y; }
+.nb-systole-globe-still { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+@media (max-height: 850px) { .nb-systole-globe { height: 208px; } .nb-systole-sheet-main:has(.nb-systole-globe) { padding-bottom: 24px; } }
 .theme-site .nb-systole-sheet-title { margin: 0 0 24px; line-height: 1; }
 .nb-systole-word-svg { display: block; width: 100%; height: 120px; overflow: visible; }
 .nb-systole-word-svg text { font-family: "Bodoni Moda", ui-serif, Georgia, serif; font-size: 92px; font-style: italic; font-weight: 800; letter-spacing: 0; fill: var(--ink); }
