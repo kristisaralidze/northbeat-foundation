@@ -10,6 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
+- The legacy /data-protection route permanently redirects to /privacy. Why: keep existing links working without duplicating the privacy notice.
 - Public directional arrows use PulseArrow and the same pulse-arrow.svg mask for editorial pseudo-elements. Why: one vector source keeps cards, links and CTA marks consistent without replacing disclosure chevrons.
 - ListFilterSelect shares controlled Radix filters across Events and Opportunities using existing menu tokens; derived lists and rows are memoized. Why: consistent keyboard/mobile menus and no repeated filtering on unrelated UI changes.
 - Systole uses a portalled Radix dialog, query-link opening and an open-only lazy R3F globe using existing geographic samples, visibility-paused frames and native pan-y gestures; waitlist logic is unchanged. Why: accessible sheet, isolated motion and no 3D startup cost while closed.
