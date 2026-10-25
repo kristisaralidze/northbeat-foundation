@@ -94,7 +94,6 @@ export function SystoleHeart({ pathname }: { pathname: string }) {
           <Dialog.Title className="nb-systole-sheet-title"><span className="sr-only">systole</span><SystoleWord /></Dialog.Title>
           <Dialog.Description id="systole-description" className="nb-systole-sheet-message">NorthBeat is cooking something cool for you.</Dialog.Description>
           <p className="nb-systole-sheet-detail">Helsinki. Spring 2027.</p>
-          <p className="nb-systole-sheet-detail">Stay tuned.</p>
           {open && <SystoleGlobe />}
         </div>
         <div className="nb-systole-sheet-bottom">
