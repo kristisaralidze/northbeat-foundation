@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AdminRouteImport } from './routes/admin'
+import { Route as DataProtectionRouteImport } from './routes/data-protection'
 import { Route as DirectionsRouteImport } from './routes/directions'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ExploreRouteImport } from './routes/explore'
@@ -22,6 +23,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SavedRouteImport } from './routes/saved'
 import { Route as SubmitRouteImport } from './routes/submit'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminBrandDataRouteImport } from './routes/admin.brand-data'
 import { Route as AdminCoverImagesRouteImport } from './routes/admin.cover-images'
@@ -78,6 +80,11 @@ const AdminRoute = AdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DataProtectionRoute = DataProtectionRouteImport.update({
+  id: '/data-protection',
+  path: '/data-protection',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DirectionsRoute = DirectionsRouteImport.update({
   id: '/directions',
   path: '/directions',
@@ -126,6 +133,11 @@ const SavedRoute = SavedRouteImport.update({
 const SubmitRoute = SubmitRouteImport.update({
   id: '/submit',
   path: '/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -333,6 +345,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/data-protection': typeof DataProtectionRoute
   '/directions': typeof DirectionsRoute
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
@@ -343,6 +356,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/submit': typeof SubmitRoute
+  '/terms': typeof TermsRoute
   '/admin/brand-data': typeof AdminBrandDataRoute
   '/admin/cover-images': typeof AdminCoverImagesRoute
   '/admin/logo-check': typeof AdminLogoCheckRoute
@@ -387,6 +401,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/data-protection': typeof DataProtectionRoute
   '/directions': typeof DirectionsRoute
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
@@ -396,6 +411,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/submit': typeof SubmitRoute
+  '/terms': typeof TermsRoute
   '/admin/brand-data': typeof AdminBrandDataRoute
   '/admin/cover-images': typeof AdminCoverImagesRoute
   '/admin/logo-check': typeof AdminLogoCheckRoute
@@ -442,6 +458,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
+  '/data-protection': typeof DataProtectionRoute
   '/directions': typeof DirectionsRoute
   '/events': typeof EventsRoute
   '/explore': typeof ExploreRoute
@@ -452,6 +469,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/saved': typeof SavedRoute
   '/submit': typeof SubmitRoute
+  '/terms': typeof TermsRoute
   '/admin/brand-data': typeof AdminBrandDataRoute
   '/admin/cover-images': typeof AdminCoverImagesRoute
   '/admin/logo-check': typeof AdminLogoCheckRoute
@@ -499,6 +517,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/data-protection'
     | '/directions'
     | '/events'
     | '/explore'
@@ -509,6 +528,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/saved'
     | '/submit'
+    | '/terms'
     | '/admin/brand-data'
     | '/admin/cover-images'
     | '/admin/logo-check'
@@ -553,6 +573,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/data-protection'
     | '/directions'
     | '/events'
     | '/explore'
@@ -562,6 +583,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/saved'
     | '/submit'
+    | '/terms'
     | '/admin/brand-data'
     | '/admin/cover-images'
     | '/admin/logo-check'
@@ -607,6 +629,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/data-protection'
     | '/directions'
     | '/events'
     | '/explore'
@@ -617,6 +640,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/saved'
     | '/submit'
+    | '/terms'
     | '/admin/brand-data'
     | '/admin/cover-images'
     | '/admin/logo-check'
@@ -663,6 +687,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
+  DataProtectionRoute: typeof DataProtectionRoute
   DirectionsRoute: typeof DirectionsRoute
   EventsRoute: typeof EventsRoute
   ExploreRoute: typeof ExploreRoute
@@ -673,6 +698,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SavedRoute: typeof SavedRoute
   SubmitRoute: typeof SubmitRoute
+  TermsRoute: typeof TermsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   EventSlugRoute: typeof EventSlugRoute
   LearnSlugRoute: typeof LearnSlugRoute
@@ -709,6 +735,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/data-protection': {
+      id: '/data-protection'
+      path: '/data-protection'
+      fullPath: '/data-protection'
+      preLoaderRoute: typeof DataProtectionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/directions': {
@@ -779,6 +812,13 @@ declare module '@tanstack/react-router' {
       path: '/submit'
       fullPath: '/submit'
       preLoaderRoute: typeof SubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -1140,6 +1180,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
+  DataProtectionRoute: DataProtectionRoute,
   DirectionsRoute: DirectionsRoute,
   EventsRoute: EventsRoute,
   ExploreRoute: ExploreRoute,
@@ -1150,6 +1191,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SavedRoute: SavedRoute,
   SubmitRoute: SubmitRoute,
+  TermsRoute: TermsRoute,
   AdminLoginRoute: AdminLoginRoute,
   EventSlugRoute: EventSlugRoute,
   LearnSlugRoute: LearnSlugRoute,
