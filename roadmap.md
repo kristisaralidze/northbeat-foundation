@@ -1,5 +1,5 @@
 # Current fixes (Oct 24)
-- [ ] Add the Systole Nordic globe; verify lighting, drag, scrolling, reduced motion and phone/desktop rendering.
+- [x] Add the Systole Nordic globe; verify lighting, drag, scrolling, reduced motion and phone/desktop rendering (9 draw calls, 3,016 triangles; no closed-sheet canvas).
 - [x] Replace site directional arrows with the shared pulse vector; check hover, reduced motion and 390px/1440px alignment.
 - [x] Refine page entrances and cascading lists; add measured Learn pulse/reveal and verify reduced motion, filtering and responsive layout.
 - [x] Replace remaining list-page native menus, memoize filtering and list rows, refine facts; verify Events/Opportunities/Explore on phones and desktop.
