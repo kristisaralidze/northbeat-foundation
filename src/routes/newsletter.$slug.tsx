@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { issueQuery } from "@/lib/newsletter.query";
 import { entryPath, issueLabel } from "@/lib/newsletter";
+import { PulseArrow } from "@/components/ui/pulse-arrow";
 
 export const Route = createFileRoute("/newsletter/$slug")({
   loader: async ({ context, params }) => {
@@ -76,7 +77,7 @@ function IssuePage() {
           </ul>
         </section>
       ) : null}
-      <p className="mt-10"><Link to="/newsletter" className="nb-link">← All issues</Link></p>
+      <p className="mt-10"><Link to="/newsletter" className="nb-link inline-flex items-center gap-2"><PulseArrow direction="left" />All issues</Link></p>
     </article>
   );
 }

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { ArrowRight } from 'lucide-react';
+import { PulseArrow } from '@/components/ui/pulse-arrow';
 
 const CARDS = [
   { audience: 'founder', title: "I'm building a startup", line: 'Funding calls, incubators, investors and events.' },
@@ -14,7 +14,7 @@ export function StartCards() {
       {CARDS.map(c => <li key={c.audience}><Link to="/start/$audience" params={{ audience: c.audience }} className="nb-start-card">
         <h3 className="nb-h3">{c.title}</h3>
         <p className="nb-small">{c.line}</p>
-        <ArrowRight className="nb-start-card-arrow h-5 w-5" aria-hidden />
+        <PulseArrow className="nb-start-card-arrow" />
       </Link></li>)}
     </ul>
   </section>;
