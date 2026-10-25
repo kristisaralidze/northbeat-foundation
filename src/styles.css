@@ -1609,12 +1609,11 @@ html, body { overflow-x: clip; }
 
 /* One crisp ECG-tail navigation mark, including home and portalled sheets. */
 .nb-pulse-arrow { display: inline-block; width: 1.8em; height: 1em; flex-shrink: 0; vertical-align: -0.15em; color: var(--berry, var(--primary)); overflow: visible; pointer-events: none; transition: transform .3s ease; }
-.nb-pulse-arrow[data-direction='left'] { rotate: 180deg; }
-:is(a, button, [role='button'], .nb-card, .nb-start-card, .nb-entry-card, .nb-event-row, article):is(:hover, :focus-visible) .nb-pulse-arrow { transform: translateX(4px); }
-:is(a, button, [role='button'], .nb-card, .nb-start-card, .nb-entry-card, .nb-event-row, article):is(:hover, :focus-visible) .nb-pulse-arrow[data-direction='left'] { transform: translateX(-4px); }
+:is(a, button, [role='button'], .nb-card, .nb-start-card, .nb-entry-card, .nb-event-row):is(:hover, :focus-visible) .nb-pulse-arrow { transform: translateX(4px); }
+:is(a, button, [role='button'], .nb-card, .nb-start-card, .nb-entry-card, .nb-event-row):is(:hover, :focus-visible) .nb-pulse-arrow[data-direction='left'] { transform: translateX(-4px); }
 .theme-site .nb-btn-primary .nb-pulse-arrow, .theme-site .nb-btn:is(:hover, :focus-visible) .nb-pulse-arrow { color: currentColor; }
 @media (prefers-reduced-motion: reduce) {
   .nb-pulse-arrow { transition: none; }
-  :is(a, button, [role='button'], .nb-card, .nb-start-card, .nb-entry-card, .nb-event-row, article):is(:hover, :focus-visible) .nb-pulse-arrow { transform: none; }
+  :is(a, button, [role='button'], .nb-card, .nb-start-card, .nb-entry-card, .nb-event-row):is(:hover, :focus-visible) .nb-pulse-arrow { transform: none; }
   .nb-public-page .nb-card:is(:hover, :focus-within)::after { transform: none; }
 }
