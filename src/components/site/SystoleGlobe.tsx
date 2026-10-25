@@ -29,7 +29,7 @@ export function SystoleGlobe() {
       const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
       return `rgb(${r}, ${g}, ${b})`;
     };
-    setPalette({ land: color('--systole-globe-land'), sea: color('--systole-globe-sea'), wire: color('--ink'), plum: color('--berry'), light: color('--systole-paper') });
+    setPalette({ land: color('--systole-globe-land'), sea: color('--systole-globe-sea'), wire: color('--ink'), plum: color('--berry'), nordic: color('--systole-globe-nordic'), light: color('--systole-paper') });
     const query = matchMedia('(prefers-reduced-motion: reduce)');
     const motion = () => setReduced(query.matches); motion(); query.addEventListener('change', motion);
     let inView = false;

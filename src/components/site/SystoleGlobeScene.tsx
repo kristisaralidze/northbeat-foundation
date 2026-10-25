@@ -4,7 +4,7 @@ import { BufferGeometry, CanvasTexture, Float32BufferAttribute, Group, PointsMat
 import samples from '@/assets/globe-points.json';
 import { globePosition, NORDIC_CITIES } from '@/lib/globe';
 
-export type GlobePalette = { land: string; sea: string; wire: string; plum: string; light: string };
+export type GlobePalette = { land: string; sea: string; wire: string; plum: string; nordic: string; light: string };
 export type GlobeGesture = { yaw: number; pitch: number; dragging: boolean };
 type Props = { palette: GlobePalette; active: boolean; reduced: boolean; gesture: MutableRefObject<GlobeGesture>; onFailure: () => void };
 
@@ -15,7 +15,14 @@ function World({ palette, active, reduced, gesture, onFailure }: Props) {
   const time = useRef(0);
   const geometry = useMemo(() => {
     const land: number[] = [], nordic: number[] = [];
-    samples.forEach(([lat = 0, lng = 0, region]) => (region === 1 ? nordic : land).push(...globePosition(lat, lng, 1.012)));
+    // The source sample holds only 140 Nordic points against 16k elsewhere, so each Nordic
+    // point is repeated with small jitter to give the accent countries a solid mass.
+    let seed = 7;
+    const jitter = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed / 0x7fffffff - .5) * 1.1; };
+    samples.forEach(([lat = 0, lng = 0, region]) => {
+      if (region === 1) for (let i = 0; i < 5; i++) nordic.push(...globePosition(lat + (i ? jitter() : 0), lng + (i ? jitter() : 0), 1.012));
+      else land.push(...globePosition(lat, lng, 1.012));
+    });
     const create = (positions: number[]) => new BufferGeometry().setAttribute('position', new Float32BufferAttribute(positions, 3));
     const lines: number[] = [];
     for (let lat = -60; lat <= 60; lat += 30) for (let lng = -180; lng < 180; lng += 3) lines.push(...globePosition(lat, lng, 1.006), ...globePosition(lat, lng + 3, 1.006));
@@ -43,7 +50,7 @@ function World({ palette, active, reduced, gesture, onFailure }: Props) {
     group.current.rotation.y += (gesture.current.yaw - group.current.rotation.y) * damping;
     group.current.rotation.x += (gesture.current.pitch - group.current.rotation.x) * damping;
     if (active && !reduced) time.current += dt;
-    if (highlight.current) highlight.current.opacity = reduced ? 1 : .88 + .12 * Math.sin(time.current * 1.4);
+    if (highlight.current) highlight.current.opacity = reduced ? 1 : .94 + .06 * Math.sin(time.current * 1.4);
     const host = gl.domElement.closest<HTMLElement>('.nb-systole-globe');
     if (host) { host.dataset['rotation'] = group.current.rotation.y.toFixed(4); host.dataset['drawCalls'] = String(gl.info.render.calls); host.dataset['triangles'] = String(gl.info.render.triangles); }
   });
@@ -52,11 +59,11 @@ function World({ palette, active, reduced, gesture, onFailure }: Props) {
     <directionalLight position={[0, 4, 3]} intensity={1.2} color={palette.light} />
     <group ref={group}>
       <mesh><sphereGeometry args={[1, 64, 48]} /><meshStandardMaterial color={palette.sea} emissive={palette.sea} emissiveIntensity={.25} roughness={1} metalness={0} toneMapped={false} /></mesh>
-      <lineSegments geometry={geometry.lines}><lineBasicMaterial color={palette.plum} transparent opacity={.12} /></lineSegments>
+      <lineSegments geometry={geometry.lines}><lineBasicMaterial color={palette.wire} transparent opacity={.08} /></lineSegments>
       <points geometry={geometry.land}><pointsMaterial color={palette.land} alphaMap={geometry.disk} alphaTest={.4} size={.014} sizeAttenuation toneMapped={false} /></points>
-      <points geometry={geometry.nordic}><pointsMaterial ref={highlight} color={palette.plum} alphaMap={geometry.disk} alphaTest={.4} transparent size={.027} sizeAttenuation toneMapped={false} /></points>
+      <points geometry={geometry.nordic}><pointsMaterial ref={highlight} color={palette.nordic} alphaMap={geometry.disk} alphaTest={.4} transparent size={.028} sizeAttenuation toneMapped={false} /></points>
       {NORDIC_CITIES.filter(city => ['Helsinki', 'Stockholm', 'Oslo', 'Copenhagen', 'Reykjavik'].includes(city.name)).map(city => <mesh key={city.name} position={globePosition(city.lat, city.lng, 1.022)}>
-        <octahedronGeometry args={[.012, 0]} /><meshStandardMaterial color={palette.plum} emissive={palette.plum} emissiveIntensity={.6} roughness={.45} />
+        <octahedronGeometry args={[.013, 0]} /><meshStandardMaterial color={palette.nordic} emissive={palette.nordic} emissiveIntensity={.7} roughness={.4} />
       </mesh>)}
     </group>
   </>;

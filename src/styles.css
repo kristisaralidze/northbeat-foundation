@@ -1407,7 +1407,7 @@ html, body { overflow-x: clip; }
 .theme-site .nb-systole-text-action:hover { color: var(--ink); background: transparent; }
 .theme-site .nb-systole-close { color: var(--ink); }
 .nb-systole-sheet-main { padding-top: 40px; padding-bottom: 48px; }
-.theme-site { --systole-globe-land: color-mix(in srgb, var(--berry) 30%, var(--systole-paper)); --systole-globe-sea: var(--systole-paper); }
+.theme-site { --systole-globe-land: color-mix(in srgb, var(--ink) 26%, var(--systole-paper)); --systole-globe-sea: var(--systole-paper); --systole-globe-nordic: color-mix(in srgb, var(--berry) 88%, var(--ink)); }
 .nb-systole-globe { width: 100%; height: 272px; margin-top: 16px; position: relative; touch-action: pan-y; cursor: grab; outline-offset: 4px; }
 .nb-systole-globe:active { cursor: grabbing; }
 .nb-systole-globe:focus-visible { outline: 1px solid var(--berry); }
