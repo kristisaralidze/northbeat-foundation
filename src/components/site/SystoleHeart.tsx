@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent, type CSSProperties } from 
 import { useServerFn } from '@tanstack/react-start';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
+import { PulseArrow } from '@/components/ui/pulse-arrow';
 import { joinSystoleWaitlist } from '@/lib/site.functions';
 
 const HEART = 'M0 7.6C0 7.6-9 1.7-9-4.1-9-6.8-6.9-8.9-4.4-8.9-2.6-8.9-1-7.9 0-6.4 1-7.9 2.6-8.9 4.4-8.9 6.9-8.9 9-6.8 9-4.1 9 1.7 0 7.6 0 7.6Z';
@@ -99,7 +100,7 @@ export function SystoleHeart({ pathname }: { pathname: string }) {
             <form onSubmit={submit} className="nb-systole-sheet-form">
               <label htmlFor="systole-heart-email">Hear it first</label>
               <input id="systole-heart-email" type="email" required autoComplete="email" placeholder="Your email" value={email} onChange={e => setEmail(e.target.value)} />
-              <Button variant="link" type="submit" className="nb-systole-text-action nb-systole-notify" disabled={state === 'busy'}>{state === 'busy' ? 'Saving…' : 'Notify me →'}</Button>
+              <Button variant="link" type="submit" className="nb-systole-text-action nb-systole-notify" disabled={state === 'busy'}>{state === 'busy' ? 'Saving…' : <>Notify me <PulseArrow /></>}</Button>
               <p role="status" aria-live="polite" className="nb-systole-feedback">{state === 'error' ? "That didn't work. Check the email address and try again." : ''}</p>
             </form>}
         </div>

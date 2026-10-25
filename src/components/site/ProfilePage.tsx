@@ -2,7 +2,8 @@ import { SaveButton } from './SaveButton';
 import { Link, useRouter } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
-import { ArrowLeft, ArrowUpRight, Building2, UserRound, Radio } from 'lucide-react';
+import { Building2, UserRound, Radio } from 'lucide-react';
+import { PulseArrow } from '@/components/ui/pulse-arrow';
 import { Button } from '@/components/ui/button';
 import { humanize, type EntityKey } from '@/lib/admin/entities';
 import { EMPTY_SEARCH } from '@/lib/explore';
@@ -37,13 +38,13 @@ function RelatedCard({ kind, entry }: { kind: EntityKey; entry: RelatedEntry }) 
   return <article className="nb-card flex min-w-0 flex-col gap-4">
     {kind === 'organisations' ? <OrganisationLogo name={entry.title} slug={entry.slug} /> : ['people', 'episodes'].includes(kind) && <ProfileImage image={entry.image} name={entry.title} kind={kind} small />}
     {entry.roles.length > 0 && <p className="nb-small text-muted-foreground break-words">{entry.roles.map(humanize).join(' · ')}</p>}
-    <h3 className="nb-h3"><EntryLink kind={kind} entry={entry} className="nb-org-link break-words">{entry.title}<ArrowUpRight className="h-4 w-4 shrink-0" aria-hidden /></EntryLink></h3>
+    <h3 className="nb-h3"><EntryLink kind={kind} entry={entry} className="nb-org-link break-words">{entry.title}<PulseArrow /></EntryLink></h3>
     {entry.summary && <p className="nb-small text-muted-foreground break-words">{entry.summary}</p>}
   </article>;
 }
 function WebLink({ url, children }: { url: string | null; children: ReactNode }) {
   const href = safeWebUrl(url);
-  return href ? <a href={href} target="_blank" rel="noopener noreferrer" className="nb-link inline-flex items-center gap-2">{children}<ArrowUpRight className="h-4 w-4" aria-hidden /><span className="sr-only"> (opens in a new tab)</span></a> : null;
+  return href ? <a href={href} target="_blank" rel="noopener noreferrer" className="nb-link inline-flex items-center gap-2">{children}<PulseArrow /><span className="sr-only"> (opens in a new tab)</span></a> : null;
 }
 function date(value: string | null, timezone?: string | null) {
   if (!value) return null;
@@ -80,7 +81,7 @@ function StandardProfilePage({ profile }: { profile: PublicProfile }) {
   </aside>;
   return <article className="nb-container nb-section">
     {(isOrg || kind === 'events') && <OrganisationCover image={text(row, 'cover_image_url')} website={text(row, 'image_source_url') ?? text(row, isOrg ? 'website' : 'source_url')} name={profile.title} />}
-    <div className="mb-8"><Link to="/explore" search={EMPTY_SEARCH} className="nb-link inline-flex items-center gap-2"><ArrowLeft className="h-4 w-4" aria-hidden />Explore</Link></div>
+    <div className="mb-8"><Link to="/explore" search={EMPTY_SEARCH} className="nb-link inline-flex items-center gap-2"><PulseArrow direction="left" />Explore</Link></div>
     <header data-profile-identity data-profile-detail={isOrg ? [label, text(row, 'city')].filter(Boolean).join(', ') : undefined} className="pb-10">
       <div className={isOrg ? 'flex items-start gap-4' : 'flex flex-col gap-6 sm:flex-row sm:items-start'}>
         {isOrg ? <OrganisationLogo name={profile.title} slug={profile.row.slug} uploaded={profile.image} website={text(row, 'website')} eager /> : (isPerson || (profile.image && kind !== 'episodes')) && <ProfileImage image={profile.image} name={profile.title} kind={kind} />}
