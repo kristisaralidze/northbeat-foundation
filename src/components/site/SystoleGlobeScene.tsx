@@ -43,7 +43,7 @@ function World({ palette, active, reduced, gesture, onFailure }: Props) {
     group.current.rotation.y += (gesture.current.yaw - group.current.rotation.y) * damping;
     group.current.rotation.x += (gesture.current.pitch - group.current.rotation.x) * damping;
     if (active && !reduced) time.current += dt;
-    if (highlight.current) highlight.current.opacity = reduced ? 1 : .88 + .12 * Math.sin(time.current * 1.4);
+    if (highlight.current) highlight.current.opacity = reduced ? 1 : .94 + .06 * Math.sin(time.current * 1.4);
     const host = gl.domElement.closest<HTMLElement>('.nb-systole-globe');
     if (host) { host.dataset['rotation'] = group.current.rotation.y.toFixed(4); host.dataset['drawCalls'] = String(gl.info.render.calls); host.dataset['triangles'] = String(gl.info.render.triangles); }
   });
@@ -56,7 +56,7 @@ function World({ palette, active, reduced, gesture, onFailure }: Props) {
       <points geometry={geometry.land}><pointsMaterial color={palette.land} alphaMap={geometry.disk} alphaTest={.4} size={.014} sizeAttenuation toneMapped={false} /></points>
       <points geometry={geometry.nordic}><pointsMaterial ref={highlight} color={palette.nordic} alphaMap={geometry.disk} alphaTest={.4} transparent size={.032} sizeAttenuation toneMapped={false} /></points>
       {NORDIC_CITIES.filter(city => ['Helsinki', 'Stockholm', 'Oslo', 'Copenhagen', 'Reykjavik'].includes(city.name)).map(city => <mesh key={city.name} position={globePosition(city.lat, city.lng, 1.022)}>
-        <octahedronGeometry args={[.012, 0]} /><meshStandardMaterial color={palette.plum} emissive={palette.plum} emissiveIntensity={.6} roughness={.45} />
+        <octahedronGeometry args={[.013, 0]} /><meshStandardMaterial color={palette.nordic} emissive={palette.nordic} emissiveIntensity={.7} roughness={.4} />
       </mesh>)}
     </group>
   </>;
