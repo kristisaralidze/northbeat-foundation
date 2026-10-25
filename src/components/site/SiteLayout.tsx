@@ -117,9 +117,8 @@ function FooterBottom() {
         <li><Link to="/newsletter" className="nb-link">Newsletter</Link></li>
         <li><Link to="/about" className="nb-link">About</Link></li>
         <li><Link to="/submit" className="nb-link">Add to the hub</Link></li>
-        <li><Link to="/privacy" className="nb-link">Privacy</Link></li>
-        <li><Link to="/terms" className="nb-link">Terms</Link></li>
-        <li><Link to="/data-protection" className="nb-link">Data protection</Link></li>
+        <li><Link to="/privacy" className="nb-link">Privacy policy</Link></li>
+        <li><Link to="/terms" className="nb-link">Terms of service</Link></li>
       </ul></nav>
       <p className="nb-footer-promise">No one pays to be listed or featured.</p>
       <div className="nb-footer-meta text-muted-foreground">
